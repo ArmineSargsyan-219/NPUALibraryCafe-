@@ -40,18 +40,19 @@ namespace NPUALibraryCafe.API.Controllers
                     totalAmount += menuItem.Price * item.Quantity;
                 }
 
-                // Create cafe order
+                // Create cafe order with timestamp
+                var now = DateTime.Now; // Use local time, not UTC
                 var order = new Cafeorder
                 {
                     Userid = userId,
-                    Orderdate = DateTime.UtcNow,
+                    Orderdate = now,
                     Totalamount = totalAmount,
                     Ordertype = dto.OrderType ?? "pickup",
                     Status = "Pending"
                 };
 
                 _context.Cafeorders.Add(order);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(); // Save to get the OrderID
 
                 // Create order items
                 foreach (var item in dto.Items)
@@ -65,18 +66,20 @@ namespace NPUALibraryCafe.API.Controllers
                     _context.Cafeorderitems.Add(orderItem);
                 }
 
+                await _context.SaveChangesAsync(); // Save order items
+
                 // Create payment record
                 var payment = new Payment
                 {
                     Orderid = order.Orderid,
                     Userid = userId,
                     Amount = totalAmount,
-                    Paymentmethod = dto.PaymentMethod ?? "cash",
-                    Paymentdate = DateTime.UtcNow
+                    Paymentmethod = string.IsNullOrEmpty(dto.PaymentMethod) ? "cash" : dto.PaymentMethod,
+                    Paymentdate = now
                 };
 
                 _context.Payments.Add(payment);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(); // Save payment
 
                 await transaction.CommitAsync();
 
@@ -91,7 +94,7 @@ namespace NPUALibraryCafe.API.Controllers
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                return StatusCode(500, new { error = "Failed to create order", details = ex.Message });
+                return StatusCode(500, new { error = "Failed to create order", details = ex.Message, innerException = ex.InnerException?.Message });
             }
         }
 
