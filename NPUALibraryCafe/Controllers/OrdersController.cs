@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 using NPUALibraryCafe.Models;
 
-namespace NPUALibraryCafe.API.Controllers
+namespace NPUALibraryCafe.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     [Authorize]
     public class OrdersController : ControllerBase
     {
@@ -18,211 +17,328 @@ namespace NPUALibraryCafe.API.Controllers
             _context = context;
         }
 
-        // POST: api/Orders
-        [HttpPost]
-        public async Task<ActionResult> CreateOrder([FromBody] CreateOrderDto dto)
-        {
-            using var transaction = await _context.Database.BeginTransactionAsync();
+        private int GetUserId() =>
+            int.TryParse(User.FindFirst("userId")?.Value, out int id) ? id : 0;
 
+        private string GetUserRole() =>
+            User.FindFirst("role")?.Value ?? "";
+
+        // POST /api/Orders - Create order (User)
+        [HttpPost]
+        public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDto dto)
+        {
+            var userId = GetUserId();
+            if (userId == 0) return Unauthorized();
+
+            if (dto.Items == null || dto.Items.Count == 0)
+                return BadRequest(new { error = "No items in order" });
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+                decimal total = 0;
+                var orderItems = new List<(int itemId, int qty, decimal price, string name)>();
 
-                // Calculate total amount
-                decimal totalAmount = 0;
                 foreach (var item in dto.Items)
                 {
                     var menuItem = await _context.Menuitems.FindAsync(item.ItemId);
                     if (menuItem == null)
-                    {
                         return BadRequest(new { error = $"Menu item {item.ItemId} not found" });
-                    }
-                    totalAmount += menuItem.Price * item.Quantity;
+
+                    total += menuItem.Price * item.Quantity;
+                    orderItems.Add((item.ItemId, item.Quantity, menuItem.Price, menuItem.Itemname));
                 }
 
-                // Create cafe order with timestamp
-                var now = DateTime.Now; // Use local time, not UTC
                 var order = new Cafeorder
                 {
                     Userid = userId,
-                    Orderdate = now,
-                    Totalamount = totalAmount,
+                    Orderdate = DateTime.Now,
+                    Totalamount = total,
                     Ordertype = dto.OrderType ?? "pickup",
                     Status = "Pending"
                 };
 
                 _context.Cafeorders.Add(order);
-                await _context.SaveChangesAsync(); // Save to get the OrderID
+                await _context.SaveChangesAsync();
 
-                // Create order items
-                foreach (var item in dto.Items)
+                foreach (var (itemId, qty, price, name) in orderItems)
                 {
-                    var orderItem = new Cafeorderitem
+                    _context.Cafeorderitems.Add(new Cafeorderitem
                     {
                         Orderid = order.Orderid,
-                        Itemid = item.ItemId,
-                        Quantity = item.Quantity
-                    };
-                    _context.Cafeorderitems.Add(orderItem);
+                        Itemid = itemId,
+                        Quantity = qty
+                    });
                 }
+                await _context.SaveChangesAsync();
 
-                await _context.SaveChangesAsync(); // Save order items
-
-                // Create payment record
                 var payment = new Payment
                 {
                     Orderid = order.Orderid,
                     Userid = userId,
-                    Amount = totalAmount,
+                    Amount = total,
                     Paymentmethod = string.IsNullOrEmpty(dto.PaymentMethod) ? "cash" : dto.PaymentMethod,
-                    Paymentdate = now
+                    Paymentdate = DateTime.Now
                 };
-
                 _context.Payments.Add(payment);
-                await _context.SaveChangesAsync(); // Save payment
+                await _context.SaveChangesAsync();
 
                 await transaction.CommitAsync();
+
+                // Notify user their order was received
+                await NotificationsController.CreateNotification(
+                    _context, userId,
+                    "Order Received! ☕",
+                    $"Your order has been received and is waiting for café staff to confirm. Total: {total} AMD",
+                    "order_pending",
+                    order.Orderid
+                );
 
                 return Ok(new
                 {
                     message = "Order created successfully",
                     orderId = order.Orderid,
-                    totalAmount = totalAmount,
+                    totalAmount = total,
+                    status = "Pending",
                     paymentId = payment.Paymentid
                 });
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                return StatusCode(500, new { error = "Failed to create order", details = ex.Message, innerException = ex.InnerException?.Message });
+                return StatusCode(500, new { error = "Failed to create order", detail = ex.Message });
             }
         }
 
-        // GET: api/Orders/my-orders
+        // GET /api/Orders/my-orders - Get user's own orders
         [HttpGet("my-orders")]
-        public async Task<ActionResult> GetMyOrders()
+        public async Task<IActionResult> GetMyOrders()
         {
-            try
-            {
-                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var userId = GetUserId();
+            if (userId == 0) return Unauthorized();
 
-                var orders = await _context.Cafeorders
-                    .Include(o => o.Cafeorderitems)
-                        .ThenInclude(oi => oi.Item)
-                    .Include(o => o.Payments)
-                    .Where(o => o.Userid == userId)
-                    .OrderByDescending(o => o.Orderdate)
-                    .Select(o => new
+            var orders = await _context.Cafeorders
+                .Where(o => o.Userid == userId)
+                .Include(o => o.Cafeorderitems)
+                    .ThenInclude(i => i.Item)
+                .OrderByDescending(o => o.Orderdate)
+                .Select(o => new
+                {
+                    orderId = o.Orderid,
+                    orderDate = o.Orderdate,
+                    totalAmount = o.Totalamount,
+                    status = o.Status,
+                    orderType = o.Ordertype,
+                    items = o.Cafeorderitems.Select(i => new
                     {
-                        orderId = o.Orderid,
-                        orderDate = o.Orderdate,
-                        totalAmount = o.Totalamount,
-                        orderType = o.Ordertype,
-                        status = o.Status,
-                        items = o.Cafeorderitems.Select(oi => new
-                        {
-                            itemId = oi.Itemid,
-                            itemName = oi.Item.Itemname,
-                            quantity = oi.Quantity,
-                            price = oi.Item.Price
-                        }).ToList(),
-                        paymentMethod = o.Payments.FirstOrDefault() != null
-                            ? o.Payments.FirstOrDefault().Paymentmethod
-                            : null
-                    })
-                    .ToListAsync();
+                        itemName = i.Item.Itemname,
+                        quantity = i.Quantity,
+                        price = i.Item.Price
+                    }).ToList()
+                })
+                .ToListAsync();
 
-                return Ok(orders);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = "Failed to retrieve orders", details = ex.Message });
-            }
+            return Ok(orders);
         }
 
-        // GET: api/Orders/{orderId}
-        [HttpGet("{orderId}")]
-        public async Task<ActionResult> GetOrderById(int orderId)
+        // GET /api/Orders/pending - Café Worker: See all pending orders
+        [HttpGet("pending")]
+        public async Task<IActionResult> GetPendingOrders()
         {
-            try
-            {
-                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var role = GetUserRole();
+            if (role != "cafe staff" && role != "admin")
+                return Forbid();
 
-                var order = await _context.Cafeorders
-                    .Include(o => o.Cafeorderitems)
-                        .ThenInclude(oi => oi.Item)
-                    .Include(o => o.Payments)
-                    .Where(o => o.Orderid == orderId && o.Userid == userId)
-                    .Select(o => new
-                    {
-                        orderId = o.Orderid,
-                        orderDate = o.Orderdate,
-                        totalAmount = o.Totalamount,
-                        orderType = o.Ordertype,
-                        status = o.Status,
-                        items = o.Cafeorderitems.Select(oi => new
-                        {
-                            itemId = oi.Itemid,
-                            itemName = oi.Item.Itemname,
-                            quantity = oi.Quantity,
-                            price = oi.Item.Price
-                        }).ToList(),
-                        paymentMethod = o.Payments.FirstOrDefault() != null
-                            ? o.Payments.FirstOrDefault().Paymentmethod
-                            : null,
-                        paymentDate = o.Payments.FirstOrDefault() != null
-                            ? o.Payments.FirstOrDefault().Paymentdate
-                            : (DateTime?)null
-                    })
-                    .FirstOrDefaultAsync();
-
-                if (order == null)
+            var orders = await _context.Cafeorders
+                .Where(o => o.Status == "Pending" || o.Status == "Confirmed" || o.Status == "InProgress")
+                .Include(o => o.User)
+                .Include(o => o.Cafeorderitems)
+                    .ThenInclude(i => i.Item)
+                .OrderBy(o => o.Orderdate)
+                .Select(o => new
                 {
-                    return NotFound(new { error = "Order not found" });
-                }
+                    orderId = o.Orderid,
+                    userName = o.User.Fullname,
+                    userEmail = o.User.Email,
+                    orderDate = o.Orderdate,
+                    totalAmount = o.Totalamount,
+                    status = o.Status,
+                    orderType = o.Ordertype,
+                    items = o.Cafeorderitems.Select(i => new
+                    {
+                        itemName = i.Item.Itemname,
+                        quantity = i.Quantity,
+                        price = i.Item.Price
+                    }).ToList()
+                })
+                .ToListAsync();
 
-                return Ok(order);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = "Failed to retrieve order", details = ex.Message });
-            }
+            return Ok(orders);
         }
 
-        // PUT: api/Orders/{orderId}/status
-        [HttpPut("{orderId}/status")]
-        public async Task<ActionResult> UpdateOrderStatus(int orderId, [FromBody] UpdateStatusDto dto)
+        // GET /api/Orders/all - Admin: See all orders
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllOrders()
         {
-            try
-            {
-                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var role = GetUserRole();
+            if (role != "admin") return Forbid();
 
-                var order = await _context.Cafeorders
-                    .FirstOrDefaultAsync(o => o.Orderid == orderId && o.Userid == userId);
-
-                if (order == null)
+            var orders = await _context.Cafeorders
+                .Include(o => o.User)
+                .Include(o => o.Cafeorderitems)
+                    .ThenInclude(i => i.Item)
+                .OrderByDescending(o => o.Orderdate)
+                .Select(o => new
                 {
-                    return NotFound(new { error = "Order not found" });
-                }
+                    orderId = o.Orderid,
+                    userName = o.User.Fullname,
+                    orderDate = o.Orderdate,
+                    totalAmount = o.Totalamount,
+                    status = o.Status,
+                    items = o.Cafeorderitems.Select(i => new
+                    {
+                        itemName = i.Item.Itemname,
+                        quantity = i.Quantity
+                    }).ToList()
+                })
+                .ToListAsync();
 
-                order.Status = dto.Status;
-                await _context.SaveChangesAsync();
+            return Ok(orders);
+        }
 
-                return Ok(new { message = "Order status updated successfully" });
-            }
-            catch (Exception ex)
+        // PUT /api/Orders/{id}/confirm - Café Worker confirms order
+        [HttpPut("{id}/confirm")]
+        public async Task<IActionResult> ConfirmOrder(int id)
+        {
+            var role = GetUserRole();
+            if (role != "cafe staff" && role != "admin") return Forbid();
+
+            var order = await _context.Cafeorders.FindAsync(id);
+            if (order == null) return NotFound(new { error = "Order not found" });
+            if (order.Status != "Pending") return BadRequest(new { error = "Order is not pending" });
+
+            order.Status = "Confirmed";
+            order.Confirmedat = DateTime.Now;
+            await _context.SaveChangesAsync();
+
+            // Notify user
+            await NotificationsController.CreateNotification(
+                _context, order.Userid,
+                "Order Confirmed! 👍",
+                "Your order has been confirmed by café staff and is being prepared!",
+                "order_confirmed",
+                order.Orderid
+            );
+
+            return Ok(new { message = "Order confirmed", orderId = id });
+        }
+
+        // PUT /api/Orders/{id}/inprogress - Café Worker marks as in progress
+        [HttpPut("{id}/inprogress")]
+        public async Task<IActionResult> MarkInProgress(int id)
+        {
+            var role = GetUserRole();
+            if (role != "cafe staff" && role != "admin") return Forbid();
+
+            var order = await _context.Cafeorders.FindAsync(id);
+            if (order == null) return NotFound(new { error = "Order not found" });
+
+            order.Status = "InProgress";
+            await _context.SaveChangesAsync();
+
+            // Notify user
+            await NotificationsController.CreateNotification(
+                _context, order.Userid,
+                "Order In Progress! ☕",
+                "Your order is being prepared right now! Won't be long!",
+                "order_inprogress",
+                order.Orderid
+            );
+
+            return Ok(new { message = "Order marked as in progress", orderId = id });
+        }
+
+        // PUT /api/Orders/{id}/done - Café Worker marks as done
+        [HttpPut("{id}/done")]
+        public async Task<IActionResult> MarkDone(int id)
+        {
+            var role = GetUserRole();
+            if (role != "cafe staff" && role != "admin") return Forbid();
+
+            var order = await _context.Cafeorders.FindAsync(id);
+            if (order == null) return NotFound(new { error = "Order not found" });
+
+            order.Status = "Done";
+            order.Completedat = DateTime.Now;
+            await _context.SaveChangesAsync();
+
+            // Notify user
+            await NotificationsController.CreateNotification(
+                _context, order.Userid,
+                "✅ Order Ready! Come Pick Up!",
+                "Your order is ready! Please come to the café counter to pick it up and pay.",
+                "order_done",
+                order.Orderid
+            );
+
+            return Ok(new { message = "Order marked as done", orderId = id });
+        }
+
+        // PUT /api/Orders/{id}/status - Update order status (Admin)
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusDto dto)
+        {
+            var role = GetUserRole();
+            if (role != "admin") return Forbid();
+
+            var order = await _context.Cafeorders.FindAsync(id);
+            if (order == null) return NotFound();
+
+            order.Status = dto.Status;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Status updated" });
+        }
+
+        // GET /api/Orders/{id} - Get single order
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetOrder(int id)
+        {
+            var userId = GetUserId();
+            var role = GetUserRole();
+
+            var order = await _context.Cafeorders
+                .Include(o => o.Cafeorderitems)
+                    .ThenInclude(i => i.Item)
+                .Include(o => o.User)
+                .FirstOrDefaultAsync(o => o.Orderid == id);
+
+            if (order == null) return NotFound();
+            if (order.Userid != userId && role != "admin" && role != "cafe staff")
+                return Forbid();
+
+            return Ok(new
             {
-                return StatusCode(500, new { error = "Failed to update order", details = ex.Message });
-            }
+                orderId = order.Orderid,
+                userName = order.User?.Fullname,
+                orderDate = order.Orderdate,
+                totalAmount = order.Totalamount,
+                status = order.Status,
+                items = order.Cafeorderitems.Select(i => new
+                {
+                    itemName = i.Item?.Itemname,
+                    quantity = i.Quantity,
+                    price = i.Item?.Price
+                })
+            });
         }
     }
 
-    // DTOs
     public class CreateOrderDto
     {
         public List<OrderItemDto> Items { get; set; } = new();
-        public string? PaymentMethod { get; set; } = "cash";
-        public string? OrderType { get; set; } = "pickup";
+        public string? PaymentMethod { get; set; }
+        public string? OrderType { get; set; }
     }
 
     public class OrderItemDto
@@ -233,6 +349,6 @@ namespace NPUALibraryCafe.API.Controllers
 
     public class UpdateStatusDto
     {
-        public string Status { get; set; } = string.Empty;
+        public string Status { get; set; } = "";
     }
 }

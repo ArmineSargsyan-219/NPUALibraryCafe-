@@ -17,7 +17,6 @@ namespace NPUALibraryCafe.Models
         [MaxLength(20)]
         public string Seatid { get; set; } = null!;
 
-        // Navigation property
         [ForeignKey("Reservationid")]
         public virtual Reservation Reservation { get; set; } = null!;
     }

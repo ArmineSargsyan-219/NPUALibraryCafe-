@@ -35,6 +35,13 @@ public partial class LibraryCafeDbContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<Notification> Notifications { get; set; }
+
+    public virtual DbSet<Reservation> Reservations { get; set; }
+
+    public virtual DbSet<Reservationseat> Reservationseats { get; set; }
+
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=library_cafe_system;Username=postgres;Password=596955");
@@ -90,11 +97,11 @@ public partial class LibraryCafeDbContext : DbContext
 
         modelBuilder.Entity<Borrowing>(entity =>
         {
-            entity.HasKey(e => e.Borrowid).HasName("borrowings_pkey");
+            entity.HasKey(e => e.Borrowingid).HasName("borrowings_pkey");
 
             entity.ToTable("borrowings");
 
-            entity.Property(e => e.Borrowid).HasColumnName("borrowid");
+            entity.Property(e => e.Borrowingid).HasColumnName("borrowid");
             entity.Property(e => e.Bookid).HasColumnName("bookid");
             entity.Property(e => e.Borrowdate).HasColumnName("borrowdate");
             entity.Property(e => e.Duedate).HasColumnName("duedate");

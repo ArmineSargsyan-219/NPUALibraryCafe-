@@ -34,7 +34,6 @@ namespace NPUALibraryCafe.Models
         [Column("createdat")]
         public DateTime Createdat { get; set; } = DateTime.Now;
 
-        // Navigation property
         [ForeignKey("Userid")]
         public virtual User User { get; set; } = null!;
     }

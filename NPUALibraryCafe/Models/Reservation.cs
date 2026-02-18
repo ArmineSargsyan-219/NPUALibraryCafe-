@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -18,7 +17,7 @@ namespace NPUALibraryCafe.Models
 
         [Column("reservationtype")]
         [MaxLength(20)]
-        public string Reservationtype { get; set; } = null!; // 'solo' or 'group'
+        public string Reservationtype { get; set; } = null!;
 
         [Column("starttime")]
         public DateTime Starttime { get; set; }
@@ -46,7 +45,6 @@ namespace NPUALibraryCafe.Models
         [Column("createdat")]
         public DateTime Createdat { get; set; } = DateTime.Now;
 
-        // Navigation properties
         [ForeignKey("Userid")]
         public virtual User User { get; set; } = null!;
 
