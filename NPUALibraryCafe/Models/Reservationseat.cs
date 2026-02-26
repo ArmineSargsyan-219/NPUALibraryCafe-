@@ -7,15 +7,18 @@ namespace NPUALibraryCafe.Models
     public class Reservationseat
     {
         [Key]
-        [Column("id")]
-        public int Id { get; set; }
+        [Column("reservationseatid")]
+        public int Reservationseatid { get; set; }
 
         [Column("reservationid")]
         public int Reservationid { get; set; }
 
-        [Column("seatid")]
-        [MaxLength(20)]
-        public string Seatid { get; set; } = null!;
+        [Column("seatnumber")]
+        public int Seatnumber { get; set; }
+
+        // NotMapped - kept for controller compatibility
+        [NotMapped]
+        public string Seatid { get; set; } = "";
 
         [ForeignKey("Reservationid")]
         public virtual Reservation Reservation { get; set; } = null!;

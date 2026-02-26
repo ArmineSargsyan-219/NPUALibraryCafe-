@@ -5,6 +5,9 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using NPUALibraryCafe.Models;
 
+// Fix for Npgsql DateTime UTC compatibility with 'timestamp without time zone'
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

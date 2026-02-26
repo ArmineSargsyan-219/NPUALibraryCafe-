@@ -18,7 +18,7 @@ namespace NPUALibraryCafe.Controllers
 
         private int GetUserId()
         {
-            var userIdClaim = User.FindFirst("userId")?.Value;
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             return int.TryParse(userIdClaim, out int userId) ? userId : 0;
         }
 
@@ -98,7 +98,7 @@ namespace NPUALibraryCafe.Controllers
                 Message = message,
                 Type = type,
                 Relatedid = relatedId,
-                Createdat = DateTime.Now
+                Createdat = DateTime.UtcNow
             };
             context.Notifications.Add(notification);
             await context.SaveChangesAsync();

@@ -25,7 +25,7 @@ public partial class Bookreview
 
     // ✨ ADD THIS - the missing property causing the error:
     [Column("createdat")]
-    public DateTime Createdat { get; set; } = DateTime.Now;
+    public DateTime Createdat { get; set; } = DateTime.UtcNow;
 
     // Navigation properties
     public virtual Book Book { get; set; } = null!;

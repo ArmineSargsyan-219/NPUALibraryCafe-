@@ -18,10 +18,10 @@ namespace NPUALibraryCafe.Controllers
         }
 
         private int GetUserId() =>
-            int.TryParse(User.FindFirst("userId")?.Value, out int id) ? id : 0;
+            int.TryParse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out int id) ? id : 0;
 
         private string GetUserRole() =>
-            User.FindFirst("role")?.Value ?? "";
+            User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "";
 
         // POST /api/Orders - Create order (User)
         [HttpPost]
@@ -52,7 +52,7 @@ namespace NPUALibraryCafe.Controllers
                 var order = new Cafeorder
                 {
                     Userid = userId,
-                    Orderdate = DateTime.Now,
+                    Orderdate = DateTime.UtcNow,
                     Totalamount = total,
                     Ordertype = dto.OrderType ?? "pickup",
                     Status = "Pending"
@@ -78,7 +78,7 @@ namespace NPUALibraryCafe.Controllers
                     Userid = userId,
                     Amount = total,
                     Paymentmethod = string.IsNullOrEmpty(dto.PaymentMethod) ? "cash" : dto.PaymentMethod,
-                    Paymentdate = DateTime.Now
+                    Paymentdate = DateTime.UtcNow
                 };
                 _context.Payments.Add(payment);
                 await _context.SaveChangesAsync();
@@ -218,7 +218,7 @@ namespace NPUALibraryCafe.Controllers
             if (order.Status != "Pending") return BadRequest(new { error = "Order is not pending" });
 
             order.Status = "Confirmed";
-            order.Confirmedat = DateTime.Now;
+            order.Confirmedat = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
             // Notify user
@@ -269,7 +269,7 @@ namespace NPUALibraryCafe.Controllers
             if (order == null) return NotFound(new { error = "Order not found" });
 
             order.Status = "Done";
-            order.Completedat = DateTime.Now;
+            order.Completedat = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
             // Notify user

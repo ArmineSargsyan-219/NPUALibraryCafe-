@@ -18,10 +18,10 @@ namespace NPUALibraryCafe.Controllers
         }
 
         private int GetUserId() =>
-            int.TryParse(User.FindFirst("userId")?.Value, out int id) ? id : 0;
+            int.TryParse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out int id) ? id : 0;
 
         private string GetUserRole() =>
-            User.FindFirst("role")?.Value ?? "";
+            User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "";
 
         // GET /api/Reservations/available?date=2026-02-17&startTime=14:00&endTime=16:00
         // Check which seats are available for a given time slot
@@ -108,7 +108,7 @@ namespace NPUALibraryCafe.Controllers
             if (userId == 0) return Unauthorized();
 
             // Validate time
-            if (dto.StartTime <= DateTime.Now)
+            if (dto.StartTime <= DateTime.UtcNow)
                 return BadRequest(new { error = "Start time must be in the future" });
 
             if (dto.EndTime <= dto.StartTime)
@@ -153,7 +153,7 @@ namespace NPUALibraryCafe.Controllers
                 Endtime = dto.EndTime,
                 Status = "Active",
                 Notes = dto.Notes,
-                Createdat = DateTime.Now
+                Createdat = DateTime.UtcNow
             };
 
             _context.Reservations.Add(reservation);
@@ -203,7 +203,7 @@ namespace NPUALibraryCafe.Controllers
             if (reservation.Status == "Expired") return BadRequest(new { error = "Reservation has expired" });
 
             reservation.Status = "Confirmed";
-            reservation.Confirmedat = DateTime.Now;
+            reservation.Confirmedat = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Reservation confirmed! See you there! ✅" });
@@ -224,7 +224,7 @@ namespace NPUALibraryCafe.Controllers
             if (reservation.Status == "Cancelled") return BadRequest(new { error = "Already cancelled" });
 
             reservation.Status = "Cancelled";
-            reservation.Cancelledat = DateTime.Now;
+            reservation.Cancelledat = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
             // Notify user if admin cancelled it
@@ -248,7 +248,7 @@ namespace NPUALibraryCafe.Controllers
         [AllowAnonymous] // Will be called by frontend timer
         public async Task<IActionResult> CheckAndSendReminders()
         {
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
             var reminderTime = now.AddMinutes(15);
 
             // Find reservations starting in next 15 minutes that haven't been notified yet
@@ -271,7 +271,7 @@ namespace NPUALibraryCafe.Controllers
                     res.Reservationid
                 );
 
-                res.Notificationsentat = DateTime.Now;
+                res.Notificationsentat = DateTime.UtcNow;
             }
 
             // Auto-expire reservations that started but weren't confirmed

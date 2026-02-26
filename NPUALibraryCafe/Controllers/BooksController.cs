@@ -17,10 +17,10 @@ namespace NPUALibraryCafe.Controllers
         }
 
         private int GetUserId() =>
-            int.TryParse(User.FindFirst("userId")?.Value, out int id) ? id : 0;
+            int.TryParse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out int id) ? id : 0;
 
         private string GetUserRole() =>
-            User.FindFirst("role")?.Value ?? "";
+            User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "";
 
         // GET /api/Books - All books with shelf info
         [HttpGet]
@@ -209,12 +209,12 @@ namespace NPUALibraryCafe.Controllers
             if (book.Availablecopies <= 0)
                 return BadRequest(new { error = "No available copies" });
 
-            var dueDate = DateTime.Now.AddDays(14);
+            var dueDate = DateTime.UtcNow.AddDays(14);
             var borrowing = new Borrowing
             {
                 Userid = userId,
                 Bookid = id,
-                Borrowdate = DateTime.Now,
+                Borrowdate = DateTime.UtcNow,
                 Duedate = dueDate,
                 Returndate = null
             };
@@ -257,7 +257,7 @@ namespace NPUALibraryCafe.Controllers
                     shelfNumber = b.Book.Shelfnumber,
                     borrowDate = b.Borrowdate,
                     dueDate = b.Duedate,
-                    isOverdue = b.Duedate < DateTime.Now
+                    isOverdue = b.Duedate < DateTime.UtcNow
                 })
                 .ToListAsync();
 
@@ -277,7 +277,7 @@ namespace NPUALibraryCafe.Controllers
             if (borrowing == null) return NotFound(new { error = "Borrowing record not found" });
             if (borrowing.Returndate != null) return BadRequest(new { error = "Book already returned" });
 
-            borrowing.Returndate = DateTime.Now;
+            borrowing.Returndate = DateTime.UtcNow;
             borrowing.Book.Availablecopies++;
             await _context.SaveChangesAsync();
 
@@ -318,7 +318,7 @@ namespace NPUALibraryCafe.Controllers
                 Userid = userId,
                 Rating = dto.Rating,
                 Comment = dto.Comment,
-                Createdat = DateTime.Now
+                Createdat = DateTime.UtcNow
             };
 
             _context.Bookreviews.Add(review);

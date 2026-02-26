@@ -84,7 +84,7 @@ public partial class LibraryCafeDbContext : DbContext
             entity.Property(e => e.Bookid).HasColumnName("bookid");
             entity.Property(e => e.Comment).HasColumnName("comment");
             entity.Property(e => e.Rating).HasColumnName("rating");
-            entity.Property(e => e.Userid).HasColumnName("userid");
+            entity.Property(e => e.Userid).HasColumnName("id");
 
             entity.HasOne(d => d.Book).WithMany(p => p.Bookreviews)
                 .HasForeignKey(d => d.Bookid)
@@ -106,7 +106,7 @@ public partial class LibraryCafeDbContext : DbContext
             entity.Property(e => e.Borrowdate).HasColumnName("borrowdate");
             entity.Property(e => e.Duedate).HasColumnName("duedate");
             entity.Property(e => e.Returndate).HasColumnName("returndate");
-            entity.Property(e => e.Userid).HasColumnName("userid");
+            entity.Property(e => e.Userid).HasColumnName("id");
 
             entity.HasOne(d => d.Book).WithMany(p => p.Borrowings)
                 .HasForeignKey(d => d.Bookid)
@@ -138,7 +138,7 @@ public partial class LibraryCafeDbContext : DbContext
             entity.Property(e => e.Totalamount)
                 .HasPrecision(10, 2)
                 .HasColumnName("totalamount");
-            entity.Property(e => e.Userid).HasColumnName("userid");
+            entity.Property(e => e.Userid).HasColumnName("id");
 
             entity.HasOne(d => d.User).WithMany(p => p.Cafeorders)
                 .HasForeignKey(d => d.Userid)
@@ -175,7 +175,7 @@ public partial class LibraryCafeDbContext : DbContext
             entity.Property(e => e.Comment).HasColumnName("comment");
             entity.Property(e => e.Itemid).HasColumnName("itemid");
             entity.Property(e => e.Rating).HasColumnName("rating");
-            entity.Property(e => e.Userid).HasColumnName("userid");
+            entity.Property(e => e.Userid).HasColumnName("id");
 
             entity.HasOne(d => d.Item).WithMany(p => p.Cafereviews)
                 .HasForeignKey(d => d.Itemid)
@@ -222,7 +222,7 @@ public partial class LibraryCafeDbContext : DbContext
             entity.Property(e => e.Paymentmethod)
                 .HasMaxLength(20)
                 .HasColumnName("paymentmethod");
-            entity.Property(e => e.Userid).HasColumnName("userid");
+            entity.Property(e => e.Userid).HasColumnName("id");
 
             entity.HasOne(d => d.Order).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.Orderid)
@@ -258,16 +258,16 @@ public partial class LibraryCafeDbContext : DbContext
 
             entity.HasIndex(e => e.Email, "users_email_key").IsUnique();
 
-            entity.Property(e => e.Userid).HasColumnName("userid");
+            entity.Property(e => e.Userid).HasColumnName("id");
             entity.Property(e => e.Email)
                 .HasMaxLength(150)
                 .HasColumnName("email");
             entity.Property(e => e.Fullname)
                 .HasMaxLength(100)
-                .HasColumnName("fullname");
+                .HasColumnName("name");
             entity.Property(e => e.Passwordhash)
                 .HasMaxLength(255)
-                .HasColumnName("passwordhash");
+                .HasColumnName("password");
             entity.Property(e => e.Role)
                 .HasMaxLength(20)
                 .HasColumnName("role");
