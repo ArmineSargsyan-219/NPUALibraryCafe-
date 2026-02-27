@@ -1,25 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NPUALibraryCafe.Models;
 
+[Table("menu_items")]
 public partial class Menuitem
 {
-    public int Itemid { get; set; }
+    [Key]
+    [Column("id")]
+    public string Itemid { get; set; } = null!;
 
+    [Column("name")]
     public string Itemname { get; set; } = null!;
 
-    public string Category { get; set; } = null!;
+    [Column("description")]
+    public string? Description { get; set; }
 
-    public decimal Price { get; set; }
+    [Column("category_id")]
+    public string? CategoryId { get; set; }
 
-    // ✨ NEW PROPERTY - Add this:
-    [Column("imagepath")]
+    [Column("price")]
+    public int Price { get; set; }
+
+    [Column("image")]
     public string? Imagepath { get; set; }
 
-    // Navigation properties stay at the end
-    public virtual ICollection<Cafeorderitem> Cafeorderitems { get; set; } = new List<Cafeorderitem>();
+    [Column("available")]
+    public bool Available { get; set; } = true;
 
-    public virtual ICollection<Cafereview> Cafereviews { get; set; } = new List<Cafereview>();
+    [Column("rating")]
+    public decimal? Rating { get; set; }
 }

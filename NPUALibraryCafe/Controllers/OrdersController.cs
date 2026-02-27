@@ -18,10 +18,10 @@ namespace NPUALibraryCafe.Controllers
         }
 
         private int GetUserId() =>
-            int.TryParse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out int id) ? id : 0;
+            int.TryParse(User.FindFirst("userId")?.Value, out int id) ? id : 0;
 
         private string GetUserRole() =>
-            User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "";
+            User.FindFirst("role")?.Value ?? "";
 
         // POST /api/Orders - Create order (User)
         [HttpPost]
@@ -33,11 +33,10 @@ namespace NPUALibraryCafe.Controllers
             if (dto.Items == null || dto.Items.Count == 0)
                 return BadRequest(new { error = "No items in order" });
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 decimal total = 0;
-                var orderItems = new List<(int itemId, int qty, decimal price, string name)>();
+                var itemDetails = new List<object>();
 
                 foreach (var item in dto.Items)
                 {
@@ -46,30 +45,21 @@ namespace NPUALibraryCafe.Controllers
                         return BadRequest(new { error = $"Menu item {item.ItemId} not found" });
 
                     total += menuItem.Price * item.Quantity;
-                    orderItems.Add((item.ItemId, item.Quantity, menuItem.Price, menuItem.Itemname));
+                    itemDetails.Add(new { id = menuItem.Itemid, name = menuItem.Itemname, quantity = item.Quantity, price = menuItem.Price });
                 }
 
                 var order = new Cafeorder
                 {
                     Userid = userId,
-                    Orderdate = DateTime.UtcNow,
+                    Orderdate = DateTime.Now,
+                    Createdat = DateTime.Now,
+                    Updatedat = DateTime.Now,
                     Totalamount = total,
-                    Ordertype = dto.OrderType ?? "pickup",
+                    Items = System.Text.Json.JsonSerializer.Serialize(itemDetails),
                     Status = "Pending"
                 };
 
                 _context.Cafeorders.Add(order);
-                await _context.SaveChangesAsync();
-
-                foreach (var (itemId, qty, price, name) in orderItems)
-                {
-                    _context.Cafeorderitems.Add(new Cafeorderitem
-                    {
-                        Orderid = order.Orderid,
-                        Itemid = itemId,
-                        Quantity = qty
-                    });
-                }
                 await _context.SaveChangesAsync();
 
                 var payment = new Payment
@@ -78,14 +68,11 @@ namespace NPUALibraryCafe.Controllers
                     Userid = userId,
                     Amount = total,
                     Paymentmethod = string.IsNullOrEmpty(dto.PaymentMethod) ? "cash" : dto.PaymentMethod,
-                    Paymentdate = DateTime.UtcNow
+                    Paymentdate = DateTime.Now
                 };
                 _context.Payments.Add(payment);
                 await _context.SaveChangesAsync();
 
-                await transaction.CommitAsync();
-
-                // Notify user their order was received
                 await NotificationsController.CreateNotification(
                     _context, userId,
                     "Order Received! ☕",
@@ -105,12 +92,11 @@ namespace NPUALibraryCafe.Controllers
             }
             catch (Exception ex)
             {
-                await transaction.RollbackAsync();
                 return StatusCode(500, new { error = "Failed to create order", detail = ex.Message });
             }
         }
 
-        // GET /api/Orders/my-orders - Get user's own orders
+        // GET /api/Orders/my-orders
         [HttpGet("my-orders")]
         public async Task<IActionResult> GetMyOrders()
         {
@@ -119,8 +105,6 @@ namespace NPUALibraryCafe.Controllers
 
             var orders = await _context.Cafeorders
                 .Where(o => o.Userid == userId)
-                .Include(o => o.Cafeorderitems)
-                    .ThenInclude(i => i.Item)
                 .OrderByDescending(o => o.Orderdate)
                 .Select(o => new
                 {
@@ -128,20 +112,14 @@ namespace NPUALibraryCafe.Controllers
                     orderDate = o.Orderdate,
                     totalAmount = o.Totalamount,
                     status = o.Status,
-                    orderType = o.Ordertype,
-                    items = o.Cafeorderitems.Select(i => new
-                    {
-                        itemName = i.Item.Itemname,
-                        quantity = i.Quantity,
-                        price = i.Item.Price
-                    }).ToList()
+                    items = o.Items
                 })
                 .ToListAsync();
 
             return Ok(orders);
         }
 
-        // GET /api/Orders/pending - Café Worker: See all pending orders
+        // GET /api/Orders/pending
         [HttpGet("pending")]
         public async Task<IActionResult> GetPendingOrders()
         {
@@ -152,8 +130,6 @@ namespace NPUALibraryCafe.Controllers
             var orders = await _context.Cafeorders
                 .Where(o => o.Status == "Pending" || o.Status == "Confirmed" || o.Status == "InProgress")
                 .Include(o => o.User)
-                .Include(o => o.Cafeorderitems)
-                    .ThenInclude(i => i.Item)
                 .OrderBy(o => o.Orderdate)
                 .Select(o => new
                 {
@@ -163,20 +139,14 @@ namespace NPUALibraryCafe.Controllers
                     orderDate = o.Orderdate,
                     totalAmount = o.Totalamount,
                     status = o.Status,
-                    orderType = o.Ordertype,
-                    items = o.Cafeorderitems.Select(i => new
-                    {
-                        itemName = i.Item.Itemname,
-                        quantity = i.Quantity,
-                        price = i.Item.Price
-                    }).ToList()
+                    items = o.Items
                 })
                 .ToListAsync();
 
             return Ok(orders);
         }
 
-        // GET /api/Orders/all - Admin: See all orders
+        // GET /api/Orders/all
         [HttpGet("all")]
         public async Task<IActionResult> GetAllOrders()
         {
@@ -185,8 +155,6 @@ namespace NPUALibraryCafe.Controllers
 
             var orders = await _context.Cafeorders
                 .Include(o => o.User)
-                .Include(o => o.Cafeorderitems)
-                    .ThenInclude(i => i.Item)
                 .OrderByDescending(o => o.Orderdate)
                 .Select(o => new
                 {
@@ -195,18 +163,14 @@ namespace NPUALibraryCafe.Controllers
                     orderDate = o.Orderdate,
                     totalAmount = o.Totalamount,
                     status = o.Status,
-                    items = o.Cafeorderitems.Select(i => new
-                    {
-                        itemName = i.Item.Itemname,
-                        quantity = i.Quantity
-                    }).ToList()
+                    items = o.Items
                 })
                 .ToListAsync();
 
             return Ok(orders);
         }
 
-        // PUT /api/Orders/{id}/confirm - Café Worker confirms order
+        // PUT /api/Orders/{id}/confirm
         [HttpPut("{id}/confirm")]
         public async Task<IActionResult> ConfirmOrder(int id)
         {
@@ -218,10 +182,9 @@ namespace NPUALibraryCafe.Controllers
             if (order.Status != "Pending") return BadRequest(new { error = "Order is not pending" });
 
             order.Status = "Confirmed";
-            order.Confirmedat = DateTime.UtcNow;
+            order.Updatedat = DateTime.Now;
             await _context.SaveChangesAsync();
 
-            // Notify user
             await NotificationsController.CreateNotification(
                 _context, order.Userid,
                 "Order Confirmed! 👍",
@@ -233,7 +196,7 @@ namespace NPUALibraryCafe.Controllers
             return Ok(new { message = "Order confirmed", orderId = id });
         }
 
-        // PUT /api/Orders/{id}/inprogress - Café Worker marks as in progress
+        // PUT /api/Orders/{id}/inprogress
         [HttpPut("{id}/inprogress")]
         public async Task<IActionResult> MarkInProgress(int id)
         {
@@ -244,9 +207,9 @@ namespace NPUALibraryCafe.Controllers
             if (order == null) return NotFound(new { error = "Order not found" });
 
             order.Status = "InProgress";
+            order.Updatedat = DateTime.Now;
             await _context.SaveChangesAsync();
 
-            // Notify user
             await NotificationsController.CreateNotification(
                 _context, order.Userid,
                 "Order In Progress! ☕",
@@ -258,7 +221,7 @@ namespace NPUALibraryCafe.Controllers
             return Ok(new { message = "Order marked as in progress", orderId = id });
         }
 
-        // PUT /api/Orders/{id}/done - Café Worker marks as done
+        // PUT /api/Orders/{id}/done
         [HttpPut("{id}/done")]
         public async Task<IActionResult> MarkDone(int id)
         {
@@ -269,10 +232,10 @@ namespace NPUALibraryCafe.Controllers
             if (order == null) return NotFound(new { error = "Order not found" });
 
             order.Status = "Done";
-            order.Completedat = DateTime.UtcNow;
+            order.Completedat = DateTime.Now;
+            order.Updatedat = DateTime.Now;
             await _context.SaveChangesAsync();
 
-            // Notify user
             await NotificationsController.CreateNotification(
                 _context, order.Userid,
                 "✅ Order Ready! Come Pick Up!",
@@ -284,7 +247,7 @@ namespace NPUALibraryCafe.Controllers
             return Ok(new { message = "Order marked as done", orderId = id });
         }
 
-        // PUT /api/Orders/{id}/status - Update order status (Admin)
+        // PUT /api/Orders/{id}/status
         [HttpPut("{id}/status")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusDto dto)
         {
@@ -295,12 +258,13 @@ namespace NPUALibraryCafe.Controllers
             if (order == null) return NotFound();
 
             order.Status = dto.Status;
+            order.Updatedat = DateTime.Now;
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Status updated" });
         }
 
-        // GET /api/Orders/{id} - Get single order
+        // GET /api/Orders/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOrder(int id)
         {
@@ -308,8 +272,6 @@ namespace NPUALibraryCafe.Controllers
             var role = GetUserRole();
 
             var order = await _context.Cafeorders
-                .Include(o => o.Cafeorderitems)
-                    .ThenInclude(i => i.Item)
                 .Include(o => o.User)
                 .FirstOrDefaultAsync(o => o.Orderid == id);
 
@@ -324,12 +286,7 @@ namespace NPUALibraryCafe.Controllers
                 orderDate = order.Orderdate,
                 totalAmount = order.Totalamount,
                 status = order.Status,
-                items = order.Cafeorderitems.Select(i => new
-                {
-                    itemName = i.Item?.Itemname,
-                    quantity = i.Quantity,
-                    price = i.Item?.Price
-                })
+                items = order.Items
             });
         }
     }
@@ -343,7 +300,7 @@ namespace NPUALibraryCafe.Controllers
 
     public class OrderItemDto
     {
-        public int ItemId { get; set; }
+        public string ItemId { get; set; } = "";
         public int Quantity { get; set; }
     }
 

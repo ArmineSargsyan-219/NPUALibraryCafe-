@@ -1,24 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NPUALibraryCafe.Models;
 
+[Table("books")]
 public partial class Book
 {
+    [Key]
+    [Column("bookid")]
     public int Bookid { get; set; }
 
+    [Column("title")]
     public string Title { get; set; } = null!;
 
+    [Column("author")]
     public string Author { get; set; } = null!;
 
+    [Column("category")]
     public string? Category { get; set; }
 
+    [Column("isbn")]
     public string? Isbn { get; set; }
 
-    public string Bookshelf { get; set; } = null!;
+    [Column("bookshelf")]
+    public string? Bookshelf { get; set; }
 
-    // ✨ NEW PROPERTIES - Add these:
     [Column("shelfnumber")]
     public string? Shelfnumber { get; set; }
 
@@ -37,8 +45,6 @@ public partial class Book
     [Column("imagepath")]
     public string? Imagepath { get; set; }
 
-    // Navigation properties stay at the end
     public virtual ICollection<Bookreview> Bookreviews { get; set; } = new List<Bookreview>();
-
     public virtual ICollection<Borrowing> Borrowings { get; set; } = new List<Borrowing>();
 }

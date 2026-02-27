@@ -32,7 +32,7 @@ namespace NPUALibraryCafe.Models
         public int? Relatedid { get; set; }
 
         [Column("createdat")]
-        public DateTime Createdat { get; set; } = DateTime.UtcNow;
+        public DateTime Createdat { get; set; } = DateTime.Now;
 
         [ForeignKey("Userid")]
         public virtual User User { get; set; } = null!;

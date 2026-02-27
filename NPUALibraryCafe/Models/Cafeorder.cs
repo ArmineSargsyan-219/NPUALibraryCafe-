@@ -5,36 +5,43 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NPUALibraryCafe.Models;
 
+[Table("orders")]
 public partial class Cafeorder
 {
+    [Key]
+    [Column("id")]
     public int Orderid { get; set; }
 
+    [Column("user_id")]
     public int Userid { get; set; }
 
-    public DateTime Orderdate { get; set; }
+    [Column("items")]
+    public string? Items { get; set; }
 
+    [Column("total_price")]
     public decimal Totalamount { get; set; }
 
-    public string Ordertype { get; set; } = null!;
-
+    [Column("status")]
     public string Status { get; set; } = null!;
 
-    [Column("notifiedat")]
-    public DateTime? Notifiedat { get; set; }
+    [Column("order_time")]
+    public DateTime? Orderdate { get; set; }
 
-    [Column("confirmedat")]
-    public DateTime? Confirmedat { get; set; }
+    [Column("ready_time")]
+    public DateTime? Readytime { get; set; }
 
-    [Column("completedat")]
+    [Column("completed_time")]
     public DateTime? Completedat { get; set; }
 
-    [Column("notes")]
-    [MaxLength(500)]
-    public string? Notes { get; set; }
+    [Column("history_time")]
+    public DateTime? Historytime { get; set; }
 
-    public virtual ICollection<Cafeorderitem> Cafeorderitems { get; set; } = new List<Cafeorderitem>();
+    [Column("created_at")]
+    public DateTime? Createdat { get; set; }
+
+    [Column("updated_at")]
+    public DateTime? Updatedat { get; set; }
 
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
-
     public virtual User User { get; set; } = null!;
 }

@@ -1,33 +1,40 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NPUALibraryCafe.Models;
 
+[Table("borrowed_books")]
 public partial class Borrowing
 {
     [Key]
-    [Column("borrowingid")]
+    [Column("id")]
     public int Borrowingid { get; set; }
 
-    [Column("userid")]
+    [Column("user_id")]
     public int Userid { get; set; }
 
-    [Column("bookid")]
+    [Column("book_id")]
     public int Bookid { get; set; }
 
-    [Column("borrowdate")]
-    public DateTime Borrowdate { get; set; }
+    [Column("book_title")]
+    public string? BookTitle { get; set; }
 
-    [Column("duedate")]
-    public DateTime Duedate { get; set; }
+    [Column("book_author")]
+    public string? BookAuthor { get; set; }
 
-    [Column("returndate")]
+    [Column("borrowed_at")]
+    public DateTime? Borrowdate { get; set; }
+
+    [Column("due_date")]
+    public DateTime? Duedate { get; set; }
+
+    [Column("returned_at")]
     public DateTime? Returndate { get; set; }
 
-    // Navigation properties
-    public virtual Book Book { get; set; } = null!;
+    [Column("status")]
+    public string? Status { get; set; }
 
+    public virtual Book Book { get; set; } = null!;
     public virtual User User { get; set; } = null!;
 }

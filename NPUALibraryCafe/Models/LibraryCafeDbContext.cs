@@ -16,261 +16,218 @@ public partial class LibraryCafeDbContext : DbContext
     }
 
     public virtual DbSet<Book> Books { get; set; }
-
     public virtual DbSet<Bookreview> Bookreviews { get; set; }
-
     public virtual DbSet<Borrowing> Borrowings { get; set; }
-
     public virtual DbSet<Cafeorder> Cafeorders { get; set; }
-
     public virtual DbSet<Cafeorderitem> Cafeorderitems { get; set; }
-
     public virtual DbSet<Cafereview> Cafereviews { get; set; }
-
     public virtual DbSet<Menuitem> Menuitems { get; set; }
-
     public virtual DbSet<Payment> Payments { get; set; }
-
     public virtual DbSet<Systemsetting> Systemsettings { get; set; }
-
     public virtual DbSet<User> Users { get; set; }
-
     public virtual DbSet<Notification> Notifications { get; set; }
-
     public virtual DbSet<Reservation> Reservations { get; set; }
-
     public virtual DbSet<Reservationseat> Reservationseats { get; set; }
 
-
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=library_cafe_system;Username=postgres;Password=596955");
+        => optionsBuilder.UseNpgsql("Host=ep-still-surf-ahge1fih-pooler.c-3.us-east-1.aws.neon.tech;Database=neondb;Username=neondb_owner;Password=npg_I2Zonf1PYzCH;SSL Mode=Require;Channel Binding=Require");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Book>(entity =>
         {
             entity.HasKey(e => e.Bookid).HasName("books_pkey");
-
             entity.ToTable("books");
-
             entity.HasIndex(e => e.Isbn, "books_isbn_key").IsUnique();
-
             entity.Property(e => e.Bookid).HasColumnName("bookid");
-            entity.Property(e => e.Author)
-                .HasMaxLength(150)
-                .HasColumnName("author");
-            entity.Property(e => e.Bookshelf)
-                .HasMaxLength(50)
-                .HasColumnName("bookshelf");
-            entity.Property(e => e.Category)
-                .HasMaxLength(100)
-                .HasColumnName("category");
-            entity.Property(e => e.Isbn)
-                .HasMaxLength(20)
-                .HasColumnName("isbn");
-            entity.Property(e => e.Title)
-                .HasMaxLength(255)
-                .HasColumnName("title");
+            entity.Property(e => e.Author).HasMaxLength(150).HasColumnName("author");
+            entity.Property(e => e.Bookshelf).HasMaxLength(50).HasColumnName("bookshelf");
+            entity.Property(e => e.Shelfnumber).HasMaxLength(50).HasColumnName("shelfnumber");
+            entity.Property(e => e.Category).HasMaxLength(100).HasColumnName("category");
+            entity.Property(e => e.Isbn).HasMaxLength(20).HasColumnName("isbn");
+            entity.Property(e => e.Title).HasMaxLength(255).HasColumnName("title");
+            entity.Property(e => e.Physicalcopies).HasColumnName("physicalcopies");
+            entity.Property(e => e.Availablecopies).HasColumnName("availablecopies");
+            entity.Property(e => e.Pdfurl).HasColumnName("pdfurl");
+            entity.Property(e => e.Pdfavailable).HasColumnName("pdfavailable");
+            entity.Property(e => e.Imagepath).HasColumnName("imagepath");
         });
 
         modelBuilder.Entity<Bookreview>(entity =>
         {
             entity.HasKey(e => e.Reviewid).HasName("bookreviews_pkey");
-
             entity.ToTable("bookreviews");
-
             entity.Property(e => e.Reviewid).HasColumnName("reviewid");
             entity.Property(e => e.Bookid).HasColumnName("bookid");
             entity.Property(e => e.Comment).HasColumnName("comment");
             entity.Property(e => e.Rating).HasColumnName("rating");
-            entity.Property(e => e.Userid).HasColumnName("id");
-
+            entity.Property(e => e.Userid).HasColumnName("userid");
             entity.HasOne(d => d.Book).WithMany(p => p.Bookreviews)
-                .HasForeignKey(d => d.Bookid)
-                .HasConstraintName("bookreviews_bookid_fkey");
-
+                .HasForeignKey(d => d.Bookid).HasConstraintName("bookreviews_bookid_fkey");
             entity.HasOne(d => d.User).WithMany(p => p.Bookreviews)
-                .HasForeignKey(d => d.Userid)
-                .HasConstraintName("bookreviews_userid_fkey");
+                .HasForeignKey(d => d.Userid).HasConstraintName("bookreviews_userid_fkey");
         });
 
         modelBuilder.Entity<Borrowing>(entity =>
         {
-            entity.HasKey(e => e.Borrowingid).HasName("borrowings_pkey");
-
-            entity.ToTable("borrowings");
-
-            entity.Property(e => e.Borrowingid).HasColumnName("borrowid");
-            entity.Property(e => e.Bookid).HasColumnName("bookid");
-            entity.Property(e => e.Borrowdate).HasColumnName("borrowdate");
-            entity.Property(e => e.Duedate).HasColumnName("duedate");
-            entity.Property(e => e.Returndate).HasColumnName("returndate");
-            entity.Property(e => e.Userid).HasColumnName("id");
-
+            entity.HasKey(e => e.Borrowingid).HasName("borrowed_books_pkey");
+            entity.ToTable("borrowed_books");
+            entity.Property(e => e.Borrowingid).HasColumnName("id");
+            entity.Property(e => e.Userid).HasColumnName("user_id");
+            entity.Property(e => e.Bookid).HasColumnName("book_id");
+            entity.Property(e => e.BookTitle).HasColumnName("book_title");
+            entity.Property(e => e.BookAuthor).HasColumnName("book_author");
+            entity.Property(e => e.Borrowdate).HasColumnName("borrowed_at");
+            entity.Property(e => e.Duedate).HasColumnName("due_date");
+            entity.Property(e => e.Returndate).HasColumnName("returned_at");
+            entity.Property(e => e.Status).HasColumnName("status");
             entity.HasOne(d => d.Book).WithMany(p => p.Borrowings)
-                .HasForeignKey(d => d.Bookid)
-                .HasConstraintName("borrowings_bookid_fkey");
-
+                .HasForeignKey(d => d.Bookid).HasConstraintName("borrowed_books_book_id_fkey");
             entity.HasOne(d => d.User).WithMany(p => p.Borrowings)
-                .HasForeignKey(d => d.Userid)
-                .HasConstraintName("borrowings_userid_fkey");
+                .HasForeignKey(d => d.Userid).HasConstraintName("borrowed_books_user_id_fkey");
         });
 
         modelBuilder.Entity<Cafeorder>(entity =>
         {
-            entity.HasKey(e => e.Orderid).HasName("cafeorders_pkey");
-
-            entity.ToTable("cafeorders");
-
-            entity.Property(e => e.Orderid).HasColumnName("orderid");
-            entity.Property(e => e.Orderdate)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("orderdate");
-            entity.Property(e => e.Ordertype)
-                .HasMaxLength(20)
-                .HasColumnName("ordertype");
-            entity.Property(e => e.Status)
-                .HasMaxLength(20)
-                .HasDefaultValueSql("'Pending'::character varying")
-                .HasColumnName("status");
-            entity.Property(e => e.Totalamount)
-                .HasPrecision(10, 2)
-                .HasColumnName("totalamount");
-            entity.Property(e => e.Userid).HasColumnName("id");
-
+            entity.HasKey(e => e.Orderid).HasName("orders_pkey");
+            entity.ToTable("orders");
+            entity.Property(e => e.Orderid).HasColumnName("id");
+            entity.Property(e => e.Userid).HasColumnName("user_id");
+            entity.Property(e => e.Items).HasColumnName("items");
+            entity.Property(e => e.Totalamount).HasColumnName("total_price");
+            entity.Property(e => e.Status).HasColumnName("status");
+            entity.Property(e => e.Orderdate).HasColumnName("order_time");
+            entity.Property(e => e.Readytime).HasColumnName("ready_time");
+            entity.Property(e => e.Completedat).HasColumnName("completed_time");
+            entity.Property(e => e.Historytime).HasColumnName("history_time");
+            entity.Property(e => e.Createdat).HasColumnName("created_at");
+            entity.Property(e => e.Updatedat).HasColumnName("updated_at");
             entity.HasOne(d => d.User).WithMany(p => p.Cafeorders)
-                .HasForeignKey(d => d.Userid)
-                .HasConstraintName("cafeorders_userid_fkey");
+                .HasForeignKey(d => d.Userid).HasConstraintName("orders_user_id_fkey");
         });
 
         modelBuilder.Entity<Cafeorderitem>(entity =>
         {
-            entity.HasKey(e => e.Orderitemid).HasName("cafeorderitems_pkey");
-
-            entity.ToTable("cafeorderitems");
-
-            entity.Property(e => e.Orderitemid).HasColumnName("orderitemid");
-            entity.Property(e => e.Itemid).HasColumnName("itemid");
-            entity.Property(e => e.Orderid).HasColumnName("orderid");
+            entity.HasKey(e => e.Orderitemid).HasName("cart_items_pkey");
+            entity.ToTable("cart_items");
+            entity.Property(e => e.Orderitemid).HasColumnName("id");
+            entity.Property(e => e.Userid).HasColumnName("user_id");
+            entity.Property(e => e.Itemid).HasColumnName("menu_item_id");
+            entity.Property(e => e.Size).HasColumnName("size");
+            entity.Property(e => e.Price).HasColumnName("price");
             entity.Property(e => e.Quantity).HasColumnName("quantity");
-
-            entity.HasOne(d => d.Item).WithMany(p => p.Cafeorderitems)
-                .HasForeignKey(d => d.Itemid)
-                .HasConstraintName("cafeorderitems_itemid_fkey");
-
-            entity.HasOne(d => d.Order).WithMany(p => p.Cafeorderitems)
-                .HasForeignKey(d => d.Orderid)
-                .HasConstraintName("cafeorderitems_orderid_fkey");
+            entity.Property(e => e.Createdat).HasColumnName("created_at");
         });
 
         modelBuilder.Entity<Cafereview>(entity =>
         {
             entity.HasKey(e => e.Reviewid).HasName("cafereviews_pkey");
-
             entity.ToTable("cafereviews");
-
             entity.Property(e => e.Reviewid).HasColumnName("reviewid");
             entity.Property(e => e.Comment).HasColumnName("comment");
             entity.Property(e => e.Itemid).HasColumnName("itemid");
             entity.Property(e => e.Rating).HasColumnName("rating");
-            entity.Property(e => e.Userid).HasColumnName("id");
-
-            entity.HasOne(d => d.Item).WithMany(p => p.Cafereviews)
-                .HasForeignKey(d => d.Itemid)
-                .HasConstraintName("cafereviews_itemid_fkey");
-
+            entity.Property(e => e.Userid).HasColumnName("userid");
             entity.HasOne(d => d.User).WithMany(p => p.Cafereviews)
-                .HasForeignKey(d => d.Userid)
-                .HasConstraintName("cafereviews_userid_fkey");
+                .HasForeignKey(d => d.Userid).HasConstraintName("cafereviews_userid_fkey");
         });
 
         modelBuilder.Entity<Menuitem>(entity =>
         {
-            entity.HasKey(e => e.Itemid).HasName("menuitems_pkey");
-
-            entity.ToTable("menuitems");
-
-            entity.Property(e => e.Itemid).HasColumnName("itemid");
-            entity.Property(e => e.Category)
-                .HasMaxLength(50)
-                .HasColumnName("category");
-            entity.Property(e => e.Itemname)
-                .HasMaxLength(150)
-                .HasColumnName("itemname");
-            entity.Property(e => e.Price)
-                .HasPrecision(10, 2)
-                .HasColumnName("price");
+            entity.HasKey(e => e.Itemid).HasName("menu_items_pkey");
+            entity.ToTable("menu_items");
+            entity.Property(e => e.Itemid).HasColumnName("id");
+            entity.Property(e => e.Itemname).HasMaxLength(150).HasColumnName("name");
+            entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.CategoryId).HasColumnName("category_id");
+            entity.Property(e => e.Price).HasColumnName("price");
+            entity.Property(e => e.Imagepath).HasColumnName("image");
+            entity.Property(e => e.Available).HasColumnName("available");
+            entity.Property(e => e.Rating).HasColumnName("rating");
         });
 
         modelBuilder.Entity<Payment>(entity =>
         {
             entity.HasKey(e => e.Paymentid).HasName("payments_pkey");
-
             entity.ToTable("payments");
-
             entity.Property(e => e.Paymentid).HasColumnName("paymentid");
-            entity.Property(e => e.Amount)
-                .HasPrecision(10, 2)
-                .HasColumnName("amount");
+            entity.Property(e => e.Amount).HasPrecision(10, 2).HasColumnName("amount");
             entity.Property(e => e.Orderid).HasColumnName("orderid");
-            entity.Property(e => e.Paymentdate)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("paymentdate");
-            entity.Property(e => e.Paymentmethod)
-                .HasMaxLength(20)
-                .HasColumnName("paymentmethod");
-            entity.Property(e => e.Userid).HasColumnName("id");
-
+            entity.Property(e => e.Paymentdate).HasColumnName("paymentdate");
+            entity.Property(e => e.Paymentmethod).HasMaxLength(20).HasColumnName("paymentmethod");
+            entity.Property(e => e.Userid).HasColumnName("userid");
             entity.HasOne(d => d.Order).WithMany(p => p.Payments)
-                .HasForeignKey(d => d.Orderid)
-                .HasConstraintName("payments_orderid_fkey");
-
+                .HasForeignKey(d => d.Orderid).HasConstraintName("payments_orderid_fkey");
             entity.HasOne(d => d.User).WithMany(p => p.Payments)
-                .HasForeignKey(d => d.Userid)
-                .HasConstraintName("payments_userid_fkey");
+                .HasForeignKey(d => d.Userid).HasConstraintName("payments_userid_fkey");
         });
 
         modelBuilder.Entity<Systemsetting>(entity =>
         {
             entity.HasKey(e => e.Settingid).HasName("systemsettings_pkey");
-
             entity.ToTable("systemsettings");
-
             entity.HasIndex(e => e.Settingname, "systemsettings_settingname_key").IsUnique();
-
             entity.Property(e => e.Settingid).HasColumnName("settingid");
-            entity.Property(e => e.Settingname)
-                .HasMaxLength(100)
-                .HasColumnName("settingname");
-            entity.Property(e => e.Settingvalue)
-                .HasMaxLength(255)
-                .HasColumnName("settingvalue");
+            entity.Property(e => e.Settingname).HasMaxLength(100).HasColumnName("settingname");
+            entity.Property(e => e.Settingvalue).HasMaxLength(255).HasColumnName("settingvalue");
+        });
+
+        modelBuilder.Entity<Notification>(entity =>
+        {
+            entity.HasKey(e => e.Notificationid).HasName("notifications_pkey");
+            entity.ToTable("notifications");
+            entity.Property(e => e.Notificationid).HasColumnName("notificationid");
+            entity.Property(e => e.Userid).HasColumnName("userid");
+            entity.Property(e => e.Title).HasMaxLength(200).HasColumnName("title");
+            entity.Property(e => e.Message).HasColumnName("message");
+            entity.Property(e => e.Type).HasMaxLength(50).HasColumnName("type");
+            entity.Property(e => e.Isread).HasColumnName("isread");
+            entity.Property(e => e.Relatedid).HasColumnName("relatedid");
+            entity.Property(e => e.Createdat).HasColumnName("createdat");
+            entity.HasOne(d => d.User).WithMany(p => p.Notifications)
+                .HasForeignKey(d => d.Userid).HasConstraintName("notifications_userid_fkey");
+        });
+
+        modelBuilder.Entity<Reservation>(entity =>
+        {
+            entity.HasKey(e => e.Reservationid).HasName("reservations_pkey");
+            entity.ToTable("reservations");
+            entity.Property(e => e.Reservationid).HasColumnName("reservationid");
+            entity.Property(e => e.Userid).HasColumnName("userid");
+            entity.Property(e => e.Reservationtype).HasMaxLength(20).HasColumnName("reservationtype");
+            entity.Property(e => e.Starttime).HasColumnName("starttime");
+            entity.Property(e => e.Endtime).HasColumnName("endtime");
+            entity.Property(e => e.Status).HasMaxLength(20).HasColumnName("status");
+            entity.Property(e => e.Notificationsentat).HasColumnName("notificationsentat");
+            entity.Property(e => e.Confirmedat).HasColumnName("confirmedat");
+            entity.Property(e => e.Cancelledat).HasColumnName("cancelledat");
+            entity.Property(e => e.Notes).HasMaxLength(500).HasColumnName("notes");
+            entity.Property(e => e.Createdat).HasColumnName("createdat");
+            entity.HasOne(d => d.User).WithMany(p => p.Reservations)
+                .HasForeignKey(d => d.Userid).HasConstraintName("reservations_userid_fkey");
+        });
+
+        modelBuilder.Entity<Reservationseat>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("reservationseats_pkey");
+            entity.ToTable("reservationseats");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Reservationid).HasColumnName("reservationid");
+            entity.Property(e => e.Seatid).HasMaxLength(20).HasColumnName("seatid");
+            entity.HasOne(d => d.Reservation).WithMany(p => p.Reservationseats)
+                .HasForeignKey(d => d.Reservationid).HasConstraintName("reservationseats_reservationid_fkey");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.Userid).HasName("users_pkey");
-
             entity.ToTable("users");
-
             entity.HasIndex(e => e.Email, "users_email_key").IsUnique();
-
             entity.Property(e => e.Userid).HasColumnName("id");
-            entity.Property(e => e.Email)
-                .HasMaxLength(150)
-                .HasColumnName("email");
-            entity.Property(e => e.Fullname)
-                .HasMaxLength(100)
-                .HasColumnName("name");
-            entity.Property(e => e.Passwordhash)
-                .HasMaxLength(255)
-                .HasColumnName("password");
-            entity.Property(e => e.Role)
-                .HasMaxLength(20)
-                .HasColumnName("role");
+            entity.Property(e => e.Email).HasColumnName("email");
+            entity.Property(e => e.Fullname).HasColumnName("name");
+            entity.Property(e => e.Passwordhash).HasColumnName("password");
+            entity.Property(e => e.Role).HasColumnName("role");
         });
 
         OnModelCreatingPartial(modelBuilder);

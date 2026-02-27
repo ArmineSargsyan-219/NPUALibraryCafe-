@@ -22,7 +22,7 @@ namespace NPUALibraryCafe.API.Controllers
             try
             {
                 var menuItems = await _context.Menuitems
-                    .OrderBy(m => m.Category)
+                    .OrderBy(m => m.CategoryId)
                     .ThenBy(m => m.Itemname)
                     .ToListAsync();
 
@@ -36,7 +36,7 @@ namespace NPUALibraryCafe.API.Controllers
 
         // GET: api/Menu/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetMenuItemById(int id)
+        public async Task<ActionResult> GetMenuItemById(string id)
         {
             try
             {
@@ -62,7 +62,7 @@ namespace NPUALibraryCafe.API.Controllers
             try
             {
                 var menuItems = await _context.Menuitems
-                    .Where(m => m.Category.ToLower() == category.ToLower())
+                    .Where(m => m.CategoryId != null && m.CategoryId.ToLower() == category.ToLower())
                     .OrderBy(m => m.Itemname)
                     .ToListAsync();
 

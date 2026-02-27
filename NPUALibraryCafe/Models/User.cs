@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NPUALibraryCafe.Models;
 
+[Table("users")]
 public partial class User
 {
+    [Key]
     [Column("id")]
     public int Userid { get; set; }
 

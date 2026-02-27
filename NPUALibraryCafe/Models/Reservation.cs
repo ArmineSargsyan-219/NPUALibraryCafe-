@@ -15,37 +15,35 @@ namespace NPUALibraryCafe.Models
         [Column("userid")]
         public int Userid { get; set; }
 
-        [Column("reservationdate")]
-        public DateTime Reservationdate { get; set; }
+        [Column("reservationtype")]
+        [MaxLength(20)]
+        public string Reservationtype { get; set; } = null!;
+
+        [Column("starttime")]
+        public DateTime Starttime { get; set; }
+
+        [Column("endtime")]
+        public DateTime Endtime { get; set; }
 
         [Column("status")]
         [MaxLength(20)]
         public string Status { get; set; } = "Active";
 
-        // NotMapped - kept for controller compatibility
-        [NotMapped]
-        public DateTime Starttime { get; set; }
-
-        [NotMapped]
-        public DateTime Endtime { get; set; }
-
-        [NotMapped]
-        public string Reservationtype { get; set; } = "solo";
-
-        [NotMapped]
+        [Column("notificationsentat")]
         public DateTime? Notificationsentat { get; set; }
 
-        [NotMapped]
+        [Column("confirmedat")]
         public DateTime? Confirmedat { get; set; }
 
-        [NotMapped]
+        [Column("cancelledat")]
         public DateTime? Cancelledat { get; set; }
 
-        [NotMapped]
+        [Column("notes")]
+        [MaxLength(500)]
         public string? Notes { get; set; }
 
-        [NotMapped]
-        public DateTime Createdat { get; set; } = DateTime.UtcNow;
+        [Column("createdat")]
+        public DateTime Createdat { get; set; } = DateTime.Now;
 
         [ForeignKey("Userid")]
         public virtual User User { get; set; } = null!;

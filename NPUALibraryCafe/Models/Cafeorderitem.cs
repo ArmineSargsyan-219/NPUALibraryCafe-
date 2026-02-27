@@ -1,19 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NPUALibraryCafe.Models;
 
+[Table("cart_items")]
 public partial class Cafeorderitem
 {
+    [Key]
+    [Column("id")]
     public int Orderitemid { get; set; }
 
-    public int Orderid { get; set; }
+    [Column("user_id")]
+    public string? Userid { get; set; }
 
-    public int Itemid { get; set; }
+    [Column("menu_item_id")]
+    public string? Itemid { get; set; }
 
+    [Column("size")]
+    public string? Size { get; set; }
+
+    [Column("price")]
+    public int Price { get; set; }
+
+    [Column("quantity")]
     public int Quantity { get; set; }
 
-    public virtual Menuitem Item { get; set; } = null!;
-
-    public virtual Cafeorder Order { get; set; } = null!;
+    [Column("created_at")]
+    public DateTime? Createdat { get; set; }
 }

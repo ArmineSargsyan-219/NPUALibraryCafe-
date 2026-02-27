@@ -1473,8 +1473,8 @@
 
     <script>
         // Configuration
-        const API_BASE = 'https://localhost:7296/api';
-        const IMG_BASE = 'https://localhost:7296';
+        const API_BASE = 'http://localhost:5265/api';
+        const IMG_BASE = 'http://localhost:5265';
         let currentUser = null;
         let authToken = null;
         let cart = [];
@@ -1550,18 +1550,18 @@
                 ? `background-image:url('${IMG_BASE}/${book.imagePath}')`
                 : 'class="no-img"';
             return `
-        <div class="book-card">
-          <div class="book-cover" ${imgStyle}>
-            ${!book.imagePath ? '📖' : ''}
-          </div>
-          <div class="book-info">
-            <div class="book-ttl">${book.title}</div>
-            <div class="book-auth">${book.author}</div>
-            ${book.shelfNumber ? `<div class="book-shelf">Shelf ${book.shelfNumber}</div>` : ''}
-            <div class="book-avail">${book.availableCopies || 0} available</div>
-          </div>
-        </div>
-      `;
+            <div class="book-card">
+              <div class="book-cover" ${imgStyle}>
+                ${!book.imagePath ? '📖' : ''}
+              </div>
+              <div class="book-info">
+                <div class="book-ttl">${book.title}</div>
+                <div class="book-auth">${book.author}</div>
+                ${book.shelfNumber ? `<div class="book-shelf">Shelf ${book.shelfNumber}</div>` : ''}
+                <div class="book-avail">${book.availableCopies || 0} available</div>
+              </div>
+            </div>
+          `;
         }
 
         function searchBooks() {
@@ -1581,7 +1581,7 @@
             document.getElementById('statMenu').textContent = data.length;
 
             // Categories
-            const categories = ['All', ...new Set(data.map(i => i.category))];
+            const categories = ['All', ...new Set(data.map(i => i.categoryId || i.category_id || i.category).filter(Boolean))];
             document.getElementById('menuFilter').innerHTML = categories.map((cat, i) =>
                 `<button class="filter-pill ${i === 0 ? 'active' : ''}" onclick="filterMenu('${cat}')">${cat}</button>`
             ).join('');
@@ -1595,24 +1595,27 @@
         }
 
         function renderMenuItem(item) {
-            const imgStyle = item.imagePath
-                ? `background-image:url('${IMG_BASE}/${item.imagePath}')`
-                : 'class="no-img"';
+            const imageUrl = item.imagepath ? `${IMG_BASE}/images/${item.imagepath}` : null;
+            const imgStyle = imageUrl
+                ? `style="background-image:url('${imageUrl}');background-size:cover;background-position:center;"`
+                : '';
+            const name = item.itemname || item.name || '';
+            const category = item.categoryId || item.category_id || '';
             return `
-        <div class="menu-card">
-          <div class="menu-img" ${imgStyle}>
-            ${!item.imagePath ? '☕' : ''}
-            <span class="menu-cat-tag">${item.category}</span>
-          </div>
-          <div class="menu-info">
-            <div class="menu-name">${item.itemName}</div>
-            <div class="menu-footer">
-              <span class="menu-price">${item.price} AMD</span>
-              <button class="add-btn" onclick='addToCart(${JSON.stringify(item)})'>+</button>
+            <div class="menu-card">
+              <div class="menu-img ${!imageUrl ? 'no-img' : ''}" ${imgStyle}>
+                ${!imageUrl ? '☕' : ''}
+                <span class="menu-cat-tag">${category}</span>
+              </div>
+              <div class="menu-info">
+                <div class="menu-name">${name}</div>
+                <div class="menu-footer">
+                  <span class="menu-price">${item.price} AMD</span>
+                  <button class="add-btn" onclick='addToCart(${JSON.stringify(item)})'>+</button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      `;
+          `;
         }
 
         function renderMenuItems(items) {
@@ -1625,7 +1628,7 @@
 
             const filtered = category === 'All'
                 ? menuData
-                : menuData.filter(i => i.category === category);
+                : menuData.filter(i => i.categoryId === category);
             renderMenuItems(filtered);
         }
 
@@ -1693,14 +1696,14 @@
 
         async function register(e) {
             e.preventDefault();
-            const name = document.getElementById('regName').value;
+            const fullName = document.getElementById('regName').value;
             const email = document.getElementById('regEmail').value;
             const password = document.getElementById('regPassword').value;
             const role = document.getElementById('regRole').value;
 
             const result = await apiCall('/Auth/register', {
                 method: 'POST',
-                body: JSON.stringify({ name, email, password, role })
+                body: JSON.stringify({ fullName, email, password, role })
             });
 
             if (result) {
@@ -1741,14 +1744,14 @@
             }
 
             list.innerHTML = data.notifications.map(n => `
-        <div class="notif-item ${n.isRead ? '' : 'unread'}">
-          <div class="ni-icon ${n.type.includes('order') ? 'ni-order' : 'ni-res'}">${getNotifIcon(n.type)}</div>
-          <div class="ni-body">
-            <div class="ni-text">${n.message}</div>
-            <div class="ni-time">${formatTime(n.createdAt)}</div>
-          </div>
-        </div>
-      `).join('');
+            <div class="notif-item ${n.isRead ? '' : 'unread'}">
+              <div class="ni-icon ${n.type.includes('order') ? 'ni-order' : 'ni-res'}">${getNotifIcon(n.type)}</div>
+              <div class="ni-body">
+                <div class="ni-text">${n.message}</div>
+                <div class="ni-time">${formatTime(n.createdAt)}</div>
+              </div>
+            </div>
+          `).join('');
 
             if (data.unreadCount > 0) document.getElementById('notifDot').classList.add('show');
         }
