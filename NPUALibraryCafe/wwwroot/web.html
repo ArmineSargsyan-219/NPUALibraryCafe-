@@ -1409,7 +1409,9 @@
                 <h2 class="modal-title">Create Account</h2>
                 <p class="modal-subtitle">Join NPUA Library Café</p>
             </div>
-            <form onsubmit="register(event)">
+
+            <!-- Step 1: Fill in details -->
+            <div id="registerStep1">
                 <div class="form-group">
                     <label>Full Name</label>
                     <input type="text" id="regName" required>
@@ -1425,16 +1427,37 @@
                 <div class="form-group">
                     <label>Role</label>
                     <select id="regRole" required>
-                        <option value="student">Student</option>
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
                         <option value="librarian">Library Worker</option>
                         <option value="cafe staff">Café Worker</option>
                     </select>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" onclick="closeModal('registerModal')">Cancel</button>
-                    <button type="submit" class="btn-primary">Register</button>
+                    <button type="button" class="btn-primary" onclick="sendVerificationCode()">Send Code</button>
                 </div>
-            </form>
+            </div>
+
+            <!-- Step 2: Enter verification code -->
+            <div id="registerStep2" style="display:none;">
+                <p style="color:var(--warm-gray);font-size:0.85rem;margin-bottom:1.5rem;">
+                    We sent a 6-digit code to <strong id="regEmailDisplay"></strong>. Enter it below.
+                </p>
+                <div class="form-group">
+                    <label>Verification Code</label>
+                    <input type="text" id="regCode" maxlength="6" placeholder="000000"
+                           style="font-size:1.5rem;letter-spacing:0.5rem;text-align:center;">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="backToStep1()">Back</button>
+                    <button type="button" class="btn-primary" onclick="register()">Verify & Register</button>
+                </div>
+                <p style="text-align:center;margin-top:1rem;font-size:0.8rem;color:var(--warm-gray);">
+                    Didn't receive it? <button onclick="sendVerificationCode()" style="background:none;border:none;color:var(--moss);cursor:pointer;font-weight:500;">Resend</button>
+                </p>
+            </div>
+
             <div class="modal-switch">
                 Already have an account? <button onclick="switchModal('registerModal','loginModal')">Login</button>
             </div>
@@ -1473,8 +1496,8 @@
 
     <script>
         // Configuration
-        const API_BASE = 'http://localhost:5265/api';
-        const IMG_BASE = 'http://localhost:5265';
+        const API_BASE = 'https://localhost:7296/api';
+        const IMG_BASE = 'https://localhost:7296';
         let currentUser = null;
         let authToken = null;
         let cart = [];
@@ -1595,7 +1618,7 @@
         }
 
         function renderMenuItem(item) {
-            const imageUrl = item.imagepath ? `${IMG_BASE}/images/${item.imagepath}` : null;
+            const imageUrl = item.imagepath ? `/images/menu/${item.imagepath}` : null;
             const imgStyle = imageUrl
                 ? `style="background-image:url('${imageUrl}');background-size:cover;background-position:center;"`
                 : '';
@@ -1694,20 +1717,52 @@
             }
         }
 
-        async function register(e) {
-            e.preventDefault();
-            const fullName = document.getElementById('regName').value;
+        async function sendVerificationCode() {
+            const name = document.getElementById('regName').value;
             const email = document.getElementById('regEmail').value;
             const password = document.getElementById('regPassword').value;
             const role = document.getElementById('regRole').value;
 
+            if (!name || !email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const result = await apiCall('/Auth/send-code', {
+                method: 'POST',
+                body: JSON.stringify({ name, email, password, role })
+            });
+
+            if (result) {
+                document.getElementById('regEmailDisplay').textContent = email;
+                document.getElementById('registerStep1').style.display = 'none';
+                document.getElementById('registerStep2').style.display = 'block';
+            }
+        }
+
+        function backToStep1() {
+            document.getElementById('registerStep1').style.display = 'block';
+            document.getElementById('registerStep2').style.display = 'none';
+        }
+
+        async function register() {
+            const email = document.getElementById('regEmail').value;
+            const code = document.getElementById('regCode').value;
+
+            if (!code || code.length !== 6) {
+                alert('Please enter the 6-digit code');
+                return;
+            }
+
             const result = await apiCall('/Auth/register', {
                 method: 'POST',
-                body: JSON.stringify({ fullName, email, password, role })
+                body: JSON.stringify({ email, code })
             });
 
             if (result) {
                 alert('Registration successful! Please login.');
+                backToStep1();
+                document.getElementById('regCode').value = '';
                 switchModal('registerModal', 'loginModal');
             }
         }
