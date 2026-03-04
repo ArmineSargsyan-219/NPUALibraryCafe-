@@ -1357,15 +1357,49 @@
             <div class="page-header">
                 <div>
                     <div class="section-eyebrow">Reservations</div>
-                    <h2 class="section-title">Reserve <em>your seat</em></h2>
+                    <h2 class="section-title">Reserve <em>a table</em></h2>
                 </div>
             </div>
-            <p style="font-size:0.9rem;color:var(--warm-gray);max-width:600px;margin-bottom:2rem;">Book a seat in advance. Solo desks for focused work (up to 3 hours) or group tables for team meetings (up to 2 hours). You'll receive a reminder 15 minutes before your reservation.</p>
-            <div style="background:white;border:1px solid var(--rule);border-radius:12px;padding:2rem;text-align:center;">
-                <div style="font-size:4rem;margin-bottom:1rem;">💺</div>
-                <h3 style="font-family:var(--font-display);font-size:1.5rem;margin-bottom:0.5rem;">Seat Reservation</h3>
-                <p style="color:var(--warm-gray);margin-bottom:1.5rem;">Interactive seat map coming soon</p>
-                <button class="btn-moss" onclick="alert('Reservation feature will be available once you send me the seat layout!')">Reserve Now</button>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;max-width:900px;">
+                <div style="background:white;border:1px solid var(--rule);border-radius:16px;padding:2rem;">
+                    <h3 style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:1.5rem;">Pick your time</h3>
+                    <div class="form-group">
+                        <label>Start Date & Time</label>
+                        <input type="datetime-local" id="resStart" style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;">
+                    </div>
+                    <div class="form-group">
+                        <label>End Date & Time</label>
+                        <input type="datetime-local" id="resEnd" style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;">
+                    </div>
+                    <div class="form-group">
+                        <label>Notes (optional)</label>
+                        <input type="text" id="resNotes" placeholder="e.g. Team meeting, study group..." style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;">
+                    </div>
+                    <button class="btn-primary" style="width:100%;" onclick="checkTableAvailability()">Check Availability</button>
+                </div>
+                <div style="background:white;border:1px solid var(--rule);border-radius:16px;padding:2rem;">
+                    <h3 style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:0.5rem;">Select a table</h3>
+                    <p style="font-size:0.8rem;color:var(--warm-gray);margin-bottom:1.5rem;">Pick your time first, then select an available table</p>
+                    <div style="display:flex;flex-direction:column;gap:1rem;" id="tableMap">
+                        <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;border:2px solid var(--rule);border-radius:12px;cursor:pointer;" id="tc-1" onclick="selectTable('1')">
+                            <div style="font-size:1.1rem;margin-right:0.5rem;">T1 [4 seats]</div>
+                            <div style="flex:1;"><div style="font-weight:600;font-size:0.9rem;">Table 1</div><div style="font-size:0.75rem;color:var(--warm-gray);" id="tc-1">Select time first</div></div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;border:2px solid var(--rule);border-radius:12px;cursor:pointer;" id="tc-2" onclick="selectTable('2')">
+                            <div style="font-size:1.1rem;margin-right:0.5rem;">T2 [6 seats]</div>
+                            <div style="flex:1;"><div style="font-weight:600;font-size:0.9rem;">Table 2</div><div style="font-size:0.75rem;color:var(--warm-gray);" id="tc-2">Select time first</div></div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;border:2px solid var(--rule);border-radius:12px;cursor:pointer;" id="tc-3" onclick="selectTable('3')">
+                            <div style="font-size:1.1rem;margin-right:0.5rem;">T3 [4 seats]</div>
+                            <div style="flex:1;"><div style="font-weight:600;font-size:0.9rem;">Table 3</div><div style="font-size:0.75rem;color:var(--warm-gray);" id="tc-3">Select time first</div></div>
+                        </div>
+                    </div>
+                    <button class="btn-moss" style="width:100%;margin-top:1.5rem;opacity:0.5;" id="reserveBtn" onclick="makeReservation()">Reserve Table</button>
+                </div>
+            </div>
+            <div style="margin-top:3rem;">
+                <h3 style="font-family:var(--font-display);font-size:1.5rem;margin-bottom:1.5rem;">My <em>Reservations</em></h3>
+                <div id="myReservations" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;"></div>
             </div>
         </div>
     </div>
@@ -1573,18 +1607,18 @@
                 ? `background-image:url('${IMG_BASE}/${book.imagePath}')`
                 : 'class="no-img"';
             return `
-            <div class="book-card">
-              <div class="book-cover" ${imgStyle}>
-                ${!book.imagePath ? '📖' : ''}
-              </div>
-              <div class="book-info">
-                <div class="book-ttl">${book.title}</div>
-                <div class="book-auth">${book.author}</div>
-                ${book.shelfNumber ? `<div class="book-shelf">Shelf ${book.shelfNumber}</div>` : ''}
-                <div class="book-avail">${book.availableCopies || 0} available</div>
-              </div>
-            </div>
-          `;
+                <div class="book-card">
+                  <div class="book-cover" ${imgStyle}>
+                    ${!book.imagePath ? '📖' : ''}
+                  </div>
+                  <div class="book-info">
+                    <div class="book-ttl">${book.title}</div>
+                    <div class="book-auth">${book.author}</div>
+                    ${book.shelfNumber ? `<div class="book-shelf">Shelf ${book.shelfNumber}</div>` : ''}
+                    <div class="book-avail">${book.availableCopies || 0} available</div>
+                  </div>
+                </div>
+              `;
         }
 
         function searchBooks() {
@@ -1625,20 +1659,20 @@
             const name = item.itemname || item.name || '';
             const category = item.categoryId || item.category_id || '';
             return `
-            <div class="menu-card">
-              <div class="menu-img ${!imageUrl ? 'no-img' : ''}" ${imgStyle}>
-                ${!imageUrl ? '☕' : ''}
-                <span class="menu-cat-tag">${category}</span>
-              </div>
-              <div class="menu-info">
-                <div class="menu-name">${name}</div>
-                <div class="menu-footer">
-                  <span class="menu-price">${item.price} AMD</span>
-                  <button class="add-btn" onclick='addToCart(${JSON.stringify(item)})'>+</button>
+                <div class="menu-card">
+                  <div class="menu-img ${!imageUrl ? 'no-img' : ''}" ${imgStyle}>
+                    ${!imageUrl ? '☕' : ''}
+                    <span class="menu-cat-tag">${category}</span>
+                  </div>
+                  <div class="menu-info">
+                    <div class="menu-name">${name}</div>
+                    <div class="menu-footer">
+                      <span class="menu-price">${item.price} AMD</span>
+                      <button class="add-btn" onclick='addToCart(${JSON.stringify(item)})'>+</button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          `;
+              `;
         }
 
         function renderMenuItems(items) {
@@ -1799,14 +1833,14 @@
             }
 
             list.innerHTML = data.notifications.map(n => `
-            <div class="notif-item ${n.isRead ? '' : 'unread'}">
-              <div class="ni-icon ${n.type.includes('order') ? 'ni-order' : 'ni-res'}">${getNotifIcon(n.type)}</div>
-              <div class="ni-body">
-                <div class="ni-text">${n.message}</div>
-                <div class="ni-time">${formatTime(n.createdAt)}</div>
-              </div>
-            </div>
-          `).join('');
+                <div class="notif-item ${n.isRead ? '' : 'unread'}">
+                  <div class="ni-icon ${n.type.includes('order') ? 'ni-order' : 'ni-res'}">${getNotifIcon(n.type)}</div>
+                  <div class="ni-body">
+                    <div class="ni-text">${n.message}</div>
+                    <div class="ni-time">${formatTime(n.createdAt)}</div>
+                  </div>
+                </div>
+              `).join('');
 
             if (data.unreadCount > 0) document.getElementById('notifDot').classList.add('show');
         }
@@ -1868,6 +1902,117 @@
                 dropdown.classList.remove('show');
             }
         });
+
+        // ===== RESERVATIONS =====
+        let selectedTable = null;
+        let tableAvailability = {};
+
+        async function checkTableAvailability() {
+            const start = document.getElementById('resStart').value;
+            const end = document.getElementById('resEnd').value;
+            if (!start || !end) { alert('Please select both start and end times'); return; }
+            if (new Date(end) <= new Date(start)) { alert('End time must be after start time'); return; }
+            if (new Date(start) <= new Date()) { alert('Start time must be in the future'); return; }
+            const data = await apiCall('/Reservations/tables?startTime=' + encodeURIComponent(start) + '&endTime=' + encodeURIComponent(end));
+            if (!data) return;
+            selectedTable = null;
+            document.getElementById('reserveBtn').style.opacity = '0.5';
+            data.forEach(t => {
+                tableAvailability[t.id] = t.available;
+                const card = document.getElementById('tc-' + t.id);
+                const status = document.getElementById('ts-' + t.id);
+                if (!card) return;
+                card.className = 'table-card ' + (t.available ? 'available' : 'unavailable');
+                status.textContent = t.available ? 'Available' : 'Reserved';
+                status.style.color = t.available ? 'var(--moss)' : 'var(--terracotta)';
+            });
+        }
+
+        function selectTable(tableId) {
+            if (tableAvailability[tableId] === undefined) { alert('Please check availability first'); return; }
+            if (!tableAvailability[tableId]) return;
+            selectedTable = tableId;
+            ['1', '2', '3'].forEach(t => {
+                const card = document.getElementById('tc-' + t);
+                if (tableAvailability[t] !== undefined)
+                    card.className = 'table-card ' + (t === tableId ? 'selected' : (tableAvailability[t] ? 'available' : 'unavailable'));
+            });
+            document.getElementById('reserveBtn').style.opacity = '1';
+        }
+
+        async function makeReservation() {
+            if (!authToken) { alert('Please login to make a reservation'); openModal('loginModal'); return; }
+            if (!selectedTable) { alert('Please select a table'); return; }
+            const start = document.getElementById('resStart').value;
+            const end = document.getElementById('resEnd').value;
+            const notes = document.getElementById('resNotes').value;
+            if (!start || !end) { alert('Please select times'); return; }
+            const tableName = selectedTable.replace('table-', 'Table ');
+            if (!confirm('Reserve ' + tableName + ' from ' + new Date(start).toLocaleString() + ' to ' + new Date(end).toLocaleString() + '?\n\nYou will get a reminder 15 minutes before. Confirm?')) return;
+            const result = await apiCall('/Reservations', {
+                method: 'POST',
+                body: JSON.stringify({ tableId: selectedTable, startTime: start, endTime: end, notes: notes })
+            });
+            if (result) {
+                alert('Table reserved! You will get a notification 15 minutes before.');
+                selectedTable = null;
+                document.getElementById('resStart').value = '';
+                document.getElementById('resEnd').value = '';
+                document.getElementById('resNotes').value = '';
+                tableAvailability = {};
+                ['table-1', 'table-2', 'table-3'].forEach(t => {
+                    document.getElementById('tc-' + t).className = 'table-card';
+                    document.getElementById('ts-' + t).textContent = 'Select time first';
+                    document.getElementById('ts-' + t).style.color = '';
+                });
+                document.getElementById('reserveBtn').style.opacity = '0.5';
+                loadMyReservations();
+            }
+        }
+
+        async function loadMyReservations() {
+            if (!authToken) return;
+            const data = await apiCall('/Reservations/my');
+            if (!data) return;
+            const container = document.getElementById('myReservations');
+            if (!container) return;
+            if (data.length === 0) { container.innerHTML = '<p style="color:var(--warm-gray);">No reservations yet.</p>'; return; }
+            container.innerHTML = data.map(r => {
+                const tableName = (r.tableId || '').replace('table-', 'Table ');
+                const start = new Date(r.startTime);
+                const end = new Date(r.endTime);
+                const badgeClass = r.status === 'Active' ? 'badge-pending' : r.status === 'Confirmed' ? 'badge-confirmed' : '';
+                const canCancel = r.status === 'Active' || r.status === 'Confirmed';
+                const canConfirm = r.status === 'Active';
+                return '<div style="background:white;border:1px solid var(--rule);border-radius:12px;padding:1.5rem;">'
+                    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;">'
+                    + '<span style="font-weight:600;">' + (tableName || 'Table') + '</span>'
+                    + '<span class="status-badge ' + badgeClass + '">' + r.status + '</span></div>'
+                    + '<div style="font-size:0.82rem;color:var(--warm-gray);margin-bottom:0.5rem;">'
+                    + start.toLocaleDateString() + ' ' + start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    + ' - ' + end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</div>'
+                    + (r.notes ? '<div style="font-size:0.78rem;color:var(--warm-gray);">' + r.notes + '</div>' : '')
+                    + '<div style="display:flex;gap:0.5rem;margin-top:0.8rem;">'
+                    + (canConfirm ? '<button class="btn-moss" style="padding:0.4rem 0.9rem;font-size:0.75rem;" onclick="confirmReservation(' + r.id + ')">Confirm</button>' : '')
+                    + (canCancel ? '<button class="btn-secondary" style="padding:0.4rem 0.9rem;font-size:0.75rem;" onclick="cancelReservation(' + r.id + ')">Cancel</button>' : '')
+                    + '</div></div>';
+            }).join('');
+        }
+
+        async function confirmReservation(id) {
+            const result = await apiCall('/Reservations/' + id + '/confirm', { method: 'PUT' });
+            if (result) { alert(result.message); loadMyReservations(); }
+        }
+
+        async function cancelReservation(id) {
+            if (!confirm('Cancel this reservation?')) return;
+            const result = await apiCall('/Reservations/' + id, { method: 'DELETE' });
+            if (result) { loadMyReservations(); }
+        }
+
+        setInterval(async () => {
+            try { await fetch(API_BASE + '/Reservations/check-reminders', { method: 'POST' }); if (authToken) loadNotifications(); } catch (e) { }
+        }, 60000);
     </script>
 </body>
 </html>

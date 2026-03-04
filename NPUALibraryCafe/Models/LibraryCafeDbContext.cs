@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+using System.Xml;
 
 namespace NPUALibraryCafe.Models;
 
@@ -27,7 +28,7 @@ public partial class LibraryCafeDbContext : DbContext
     public virtual DbSet<User> Users { get; set; }
     public virtual DbSet<Notification> Notifications { get; set; }
     public virtual DbSet<Reservation> Reservations { get; set; }
-    public virtual DbSet<Reservationseat> Reservationseats { get; set; }
+    public virtual DbSet<CafeTable> CafeTables { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseNpgsql("Host=ep-still-surf-ahge1fih-pooler.c-3.us-east-1.aws.neon.tech;Database=neondb;Username=neondb_owner;Password=npg_I2Zonf1PYzCH;SSL Mode=Require;Channel Binding=Require");
@@ -190,32 +191,32 @@ public partial class LibraryCafeDbContext : DbContext
 
         modelBuilder.Entity<Reservation>(entity =>
         {
-            entity.HasKey(e => e.Reservationid).HasName("reservations_pkey");
+            entity.HasKey(e => e.Id).HasName("reservations_pkey");
             entity.ToTable("reservations");
-            entity.Property(e => e.Reservationid).HasColumnName("reservationid");
-            entity.Property(e => e.Userid).HasColumnName("userid");
-            entity.Property(e => e.Reservationtype).HasMaxLength(20).HasColumnName("reservationtype");
-            entity.Property(e => e.Starttime).HasColumnName("starttime");
-            entity.Property(e => e.Endtime).HasColumnName("endtime");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.TableId).HasColumnName("table_id");
+            entity.Property(e => e.UserEmail).HasMaxLength(255).HasColumnName("user_email");
+            entity.Property(e => e.UserName).HasMaxLength(150).HasColumnName("user_name");
+            entity.Property(e => e.StartTime).HasColumnName("start_time");
+            entity.Property(e => e.EndTime).HasColumnName("end_time");
             entity.Property(e => e.Status).HasMaxLength(20).HasColumnName("status");
-            entity.Property(e => e.Notificationsentat).HasColumnName("notificationsentat");
-            entity.Property(e => e.Confirmedat).HasColumnName("confirmedat");
-            entity.Property(e => e.Cancelledat).HasColumnName("cancelledat");
-            entity.Property(e => e.Notes).HasMaxLength(500).HasColumnName("notes");
-            entity.Property(e => e.Createdat).HasColumnName("createdat");
-            entity.HasOne(d => d.User).WithMany(p => p.Reservations)
-                .HasForeignKey(d => d.Userid).HasConstraintName("reservations_userid_fkey");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.HasOne(d => d.Table).WithMany()
+                .HasForeignKey(d => d.TableId).HasConstraintName("reservations_table_id_fkey");
         });
 
-        modelBuilder.Entity<Reservationseat>(entity =>
+        modelBuilder.Entity<CafeTable>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("reservationseats_pkey");
-            entity.ToTable("reservationseats");
+            entity.HasKey(e => e.Id).HasName("tables_pkey");
+            entity.ToTable("tables");
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Reservationid).HasColumnName("reservationid");
-            entity.Property(e => e.Seatid).HasMaxLength(20).HasColumnName("seatid");
-            entity.HasOne(d => d.Reservation).WithMany(p => p.Reservationseats)
-                .HasForeignKey(d => d.Reservationid).HasConstraintName("reservationseats_reservationid_fkey");
+            entity.Property(e => e.TableNumber).HasMaxLength(10).HasColumnName("table_number");
+            entity.Property(e => e.Capacity).HasColumnName("capacity");
+            entity.Property(e => e.Type).HasMaxLength(20).HasColumnName("type");
+            entity.Property(e => e.PositionRow).HasColumnName("position_row");
+            entity.Property(e => e.PositionCol).HasColumnName("position_col");
+            entity.Property(e => e.IsReserved).HasColumnName("is_reserved");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
         });
 
         modelBuilder.Entity<User>(entity =>

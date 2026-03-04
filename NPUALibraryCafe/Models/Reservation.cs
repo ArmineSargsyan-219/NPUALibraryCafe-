@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -9,45 +8,65 @@ namespace NPUALibraryCafe.Models
     public class Reservation
     {
         [Key]
-        [Column("reservationid")]
-        public int Reservationid { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
 
-        [Column("userid")]
-        public int Userid { get; set; }
+        [Column("table_id")]
+        public int TableId { get; set; }
 
-        [Column("reservationtype")]
-        [MaxLength(20)]
-        public string Reservationtype { get; set; } = null!;
+        [Column("user_email")]
+        [MaxLength(255)]
+        public string UserEmail { get; set; } = null!;
 
-        [Column("starttime")]
-        public DateTime Starttime { get; set; }
+        [Column("user_name")]
+        [MaxLength(150)]
+        public string UserName { get; set; } = null!;
 
-        [Column("endtime")]
-        public DateTime Endtime { get; set; }
+        [Column("start_time")]
+        public DateTime StartTime { get; set; }
+
+        [Column("end_time")]
+        public DateTime EndTime { get; set; }
 
         [Column("status")]
         [MaxLength(20)]
         public string Status { get; set; } = "Active";
 
-        [Column("notificationsentat")]
-        public DateTime? Notificationsentat { get; set; }
+        [Column("created_at")]
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        [Column("confirmedat")]
-        public DateTime? Confirmedat { get; set; }
+        [ForeignKey("TableId")]
+        public virtual CafeTable? Table { get; set; }
+    }
 
-        [Column("cancelledat")]
-        public DateTime? Cancelledat { get; set; }
+    [Table("tables")]
+    public class CafeTable
+    {
+        [Key]
+        [Column("id")]
+        public int Id { get; set; }
 
-        [Column("notes")]
-        [MaxLength(500)]
-        public string? Notes { get; set; }
+        [Column("table_number")]
+        [MaxLength(10)]
+        public string TableNumber { get; set; } = null!;
 
-        [Column("createdat")]
-        public DateTime Createdat { get; set; } = DateTime.Now;
+        [Column("capacity")]
+        public int Capacity { get; set; }
 
-        [ForeignKey("Userid")]
-        public virtual User User { get; set; } = null!;
+        [Column("type")]
+        [MaxLength(20)]
+        public string Type { get; set; } = "group";
 
-        public virtual ICollection<Reservationseat> Reservationseats { get; set; } = new List<Reservationseat>();
+        [Column("position_row")]
+        public int PositionRow { get; set; }
+
+        [Column("position_col")]
+        public int PositionCol { get; set; }
+
+        [Column("is_reserved")]
+        public bool IsReserved { get; set; }
+
+        [Column("created_at")]
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

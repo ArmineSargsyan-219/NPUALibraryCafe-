@@ -2,12 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NPUALibraryCafe.Models;
+using System.Security.Claims;
 
 namespace NPUALibraryCafe.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class ReservationsController : ControllerBase
     {
         private readonly LibraryCafeDbContext _context;
@@ -17,301 +17,257 @@ namespace NPUALibraryCafe.Controllers
             _context = context;
         }
 
-        private int GetUserId() =>
-            int.TryParse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out int id) ? id : 0;
+        private string GetUserEmail() => User.FindFirst(ClaimTypes.Email)?.Value ?? "";
+        private string GetUserName() => User.FindFirst(ClaimTypes.Name)?.Value ?? "";
+        private string GetUserRole() => User.FindFirst(ClaimTypes.Role)?.Value ?? "";
 
-        private string GetUserRole() =>
-            User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "";
-
-        // GET /api/Reservations/available?date=2026-02-17&startTime=14:00&endTime=16:00
-        // Check which seats are available for a given time slot
-        [HttpGet("available")]
-        public async Task<IActionResult> GetAvailableSeats(
+        // GET /api/Reservations/tables?startTime=...&endTime=...
+        [HttpGet("tables")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetTableAvailability(
             [FromQuery] DateTime startTime,
             [FromQuery] DateTime endTime)
         {
-            // Get all reserved seats during this time period
-            var reservedSeats = await _context.Reservations
+            var allTables = await _context.CafeTables.ToListAsync();
+
+            var reservedTableIds = await _context.Reservations
                 .Where(r =>
                     r.Status != "Cancelled" &&
                     r.Status != "Expired" &&
-                    r.Starttime < endTime &&
-                    r.Endtime > startTime)
-                .Include(r => r.Reservationseats)
-                .SelectMany(r => r.Reservationseats.Select(s => s.Seatid))
+                    r.StartTime < endTime &&
+                    r.EndTime > startTime)
+                .Select(r => r.TableId)
                 .ToListAsync();
 
-            return Ok(new { reservedSeats });
+            var result = allTables.Select(t => new
+            {
+                id = t.Id,
+                tableNumber = t.TableNumber,
+                capacity = t.Capacity,
+                available = !reservedTableIds.Contains(t.Id)
+            });
+
+            return Ok(result);
         }
 
-        // GET /api/Reservations/my - Get my reservations
+        // GET /api/Reservations/my
         [HttpGet("my")]
+        [Authorize]
         public async Task<IActionResult> GetMyReservations()
         {
-            var userId = GetUserId();
-            if (userId == 0) return Unauthorized();
+            var email = GetUserEmail();
+            if (string.IsNullOrEmpty(email)) return Unauthorized();
 
             var reservations = await _context.Reservations
-                .Where(r => r.Userid == userId)
-                .Include(r => r.Reservationseats)
-                .OrderByDescending(r => r.Starttime)
+                .Include(r => r.Table)
+                .Where(r => r.UserEmail == email)
+                .OrderByDescending(r => r.StartTime)
                 .Select(r => new
                 {
-                    id = r.Reservationid,
-                    type = r.Reservationtype,
-                    startTime = r.Starttime,
-                    endTime = r.Endtime,
+                    id = r.Id,
+                    tableId = r.TableId,
+                    tableName = r.Table != null ? r.Table.TableNumber : "",
+                    startTime = r.StartTime,
+                    endTime = r.EndTime,
                     status = r.Status,
-                    seats = r.Reservationseats.Select(s => s.Seatid).ToList(),
-                    notes = r.Notes,
-                    createdAt = r.Createdat
+                    createdAt = r.CreatedAt
                 })
                 .ToListAsync();
 
             return Ok(reservations);
         }
 
-        // GET /api/Reservations/all - Admin only: Get all reservations
+        // GET /api/Reservations/all - Admin only
         [HttpGet("all")]
+        [Authorize]
         public async Task<IActionResult> GetAllReservations()
         {
-            var role = GetUserRole();
-            if (role != "admin") return Forbid();
+            if (GetUserRole() != "admin") return Forbid();
 
             var reservations = await _context.Reservations
-                .Include(r => r.User)
-                .Include(r => r.Reservationseats)
-                .OrderByDescending(r => r.Starttime)
+                .Include(r => r.Table)
+                .OrderByDescending(r => r.StartTime)
                 .Select(r => new
                 {
-                    id = r.Reservationid,
-                    user = r.User.Fullname,
-                    userEmail = r.User.Email,
-                    type = r.Reservationtype,
-                    startTime = r.Starttime,
-                    endTime = r.Endtime,
+                    id = r.Id,
+                    userEmail = r.UserEmail,
+                    userName = r.UserName,
+                    tableNumber = r.Table != null ? r.Table.TableNumber : "",
+                    startTime = r.StartTime,
+                    endTime = r.EndTime,
                     status = r.Status,
-                    seats = r.Reservationseats.Select(s => s.Seatid).ToList(),
-                    notes = r.Notes,
-                    createdAt = r.Createdat
+                    createdAt = r.CreatedAt
                 })
                 .ToListAsync();
 
             return Ok(reservations);
         }
 
-        // POST /api/Reservations - Create a reservation
+        // POST /api/Reservations
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateReservation([FromBody] CreateReservationDto dto)
         {
-            var userId = GetUserId();
-            if (userId == 0) return Unauthorized();
+            var email = GetUserEmail();
+            var name = GetUserName();
+            if (string.IsNullOrEmpty(email)) return Unauthorized();
 
-            // Validate time
-            if (dto.StartTime <= DateTime.UtcNow)
+            if (dto.StartTime <= DateTime.Now)
                 return BadRequest(new { error = "Start time must be in the future" });
 
             if (dto.EndTime <= dto.StartTime)
                 return BadRequest(new { error = "End time must be after start time" });
 
-            // Validate duration based on type
-            var duration = dto.EndTime - dto.StartTime;
-            if (dto.ReservationType == "solo" && duration.TotalHours > 3)
-                return BadRequest(new { error = "Solo reservations cannot exceed 3 hours" });
+            var table = await _context.CafeTables.FindAsync(dto.TableId);
+            if (table == null)
+                return BadRequest(new { error = "Table not found" });
 
-            if (dto.ReservationType == "group" && duration.TotalHours > 2)
-                return BadRequest(new { error = "Group reservations cannot exceed 2 hours" });
-
-            if (dto.Seats == null || dto.Seats.Count == 0)
-                return BadRequest(new { error = "Please select at least one seat" });
-
-            // Validate seat count for solo
-            if (dto.ReservationType == "solo" && dto.Seats.Count > 1)
-                return BadRequest(new { error = "Solo reservations can only have 1 seat" });
-
-            // Check seat availability
-            var conflictingSeats = await _context.Reservations
-                .Where(r =>
+            // Check availability
+            var conflict = await _context.Reservations
+                .AnyAsync(r =>
+                    r.TableId == dto.TableId &&
                     r.Status != "Cancelled" &&
                     r.Status != "Expired" &&
-                    r.Starttime < dto.EndTime &&
-                    r.Endtime > dto.StartTime)
-                .Include(r => r.Reservationseats)
-                .SelectMany(r => r.Reservationseats.Select(s => s.Seatid))
-                .ToListAsync();
+                    r.StartTime < dto.EndTime &&
+                    r.EndTime > dto.StartTime);
 
-            var unavailable = dto.Seats.Intersect(conflictingSeats).ToList();
-            if (unavailable.Any())
-                return BadRequest(new { error = $"Seats already reserved: {string.Join(", ", unavailable)}" });
+            if (conflict)
+                return BadRequest(new { error = "This table is already reserved for that time. Please choose another table or time." });
 
-            // Create reservation
             var reservation = new Reservation
             {
-                Userid = userId,
-                Reservationtype = dto.ReservationType,
-                Starttime = dto.StartTime,
-                Endtime = dto.EndTime,
+                TableId = dto.TableId,
+                UserEmail = email,
+                UserName = name,
+                StartTime = dto.StartTime,
+                EndTime = dto.EndTime,
                 Status = "Active",
-                Notes = dto.Notes,
-                Createdat = DateTime.UtcNow
+                CreatedAt = DateTime.Now
             };
 
             _context.Reservations.Add(reservation);
-            await _context.SaveChangesAsync();
 
-            // Add seats
-            foreach (var seatId in dto.Seats)
-            {
-                _context.Reservationseats.Add(new Reservationseat
-                {
-                    Reservationid = reservation.Reservationid,
-                    Seatid = seatId
-                });
-            }
-            await _context.SaveChangesAsync();
+            // Mark table as reserved
+            table.IsReserved = true;
 
-            // Send confirmation notification
-            await NotificationsController.CreateNotification(
-                _context, userId,
-                "Reservation Created! ✅",
-                $"Your {dto.ReservationType} reservation is confirmed for {dto.StartTime:MMM dd} at {dto.StartTime:HH:mm}. You will receive a reminder 15 minutes before.",
-                "reservation_confirmed",
-                reservation.Reservationid
-            );
+            await _context.SaveChangesAsync();
+            
+           
 
             return Ok(new
             {
-                message = "Reservation created successfully",
-                reservationId = reservation.Reservationid,
-                startTime = reservation.Starttime,
-                endTime = reservation.Endtime,
-                seats = dto.Seats,
-                type = dto.ReservationType
+                message = "Table reserved successfully",
+                reservationId = reservation.Id,
+                tableId = dto.TableId,
+                tableName = table.TableNumber,
+                startTime = reservation.StartTime,
+                endTime = reservation.EndTime
             });
         }
 
-        // PUT /api/Reservations/{id}/confirm - Confirm reservation (when reminded)
+        // PUT /api/Reservations/{id}/confirm
         [HttpPut("{id}/confirm")]
+        [Authorize]
         public async Task<IActionResult> ConfirmReservation(int id)
         {
-            var userId = GetUserId();
+            var email = GetUserEmail();
             var reservation = await _context.Reservations
-                .FirstOrDefaultAsync(r => r.Reservationid == id && r.Userid == userId);
+                .FirstOrDefaultAsync(r => r.Id == id && r.UserEmail == email);
 
             if (reservation == null) return NotFound(new { error = "Reservation not found" });
             if (reservation.Status == "Cancelled") return BadRequest(new { error = "Reservation is cancelled" });
             if (reservation.Status == "Expired") return BadRequest(new { error = "Reservation has expired" });
 
             reservation.Status = "Confirmed";
-            reservation.Confirmedat = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Reservation confirmed! See you there! ✅" });
+            return Ok(new { message = "Reservation confirmed! See you there!" });
         }
 
-        // DELETE /api/Reservations/{id} - Cancel reservation
+        // DELETE /api/Reservations/{id}
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> CancelReservation(int id)
         {
-            var userId = GetUserId();
+            var email = GetUserEmail();
             var role = GetUserRole();
 
             var reservation = await _context.Reservations
-                .FirstOrDefaultAsync(r => r.Reservationid == id &&
-                    (r.Userid == userId || role == "admin"));
+                .Include(r => r.Table)
+                .FirstOrDefaultAsync(r => r.Id == id &&
+                    (r.UserEmail == email || role == "admin"));
 
             if (reservation == null) return NotFound(new { error = "Reservation not found" });
             if (reservation.Status == "Cancelled") return BadRequest(new { error = "Already cancelled" });
 
             reservation.Status = "Cancelled";
-            reservation.Cancelledat = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
 
-            // Notify user if admin cancelled it
-            if (role == "admin" && reservation.Userid != userId)
+            // Free the table if no other active reservations
+            if (reservation.Table != null)
             {
-                await NotificationsController.CreateNotification(
-                    _context, reservation.Userid,
-                    "Reservation Cancelled",
-                    $"Your reservation on {reservation.Starttime:MMM dd} at {reservation.Starttime:HH:mm} has been cancelled by admin.",
-                    "reservation_cancelled",
-                    reservation.Reservationid
-                );
+                var otherActive = await _context.Reservations
+                    .AnyAsync(r => r.TableId == reservation.TableId &&
+                        r.Id != reservation.Id &&
+                        r.Status != "Cancelled" && r.Status != "Expired");
+                if (!otherActive)
+                    reservation.Table.IsReserved = false;
             }
 
+            await _context.SaveChangesAsync();
             return Ok(new { message = "Reservation cancelled" });
         }
 
-        // POST /api/Reservations/check-reminders - Called by background job or frontend polling
-        // Sends reminders for reservations starting in 15 minutes
+        // POST /api/Reservations/check-reminders
         [HttpPost("check-reminders")]
-        [AllowAnonymous] // Will be called by frontend timer
+        [AllowAnonymous]
         public async Task<IActionResult> CheckAndSendReminders()
         {
-            var now = DateTime.UtcNow;
-            var reminderTime = now.AddMinutes(15);
+            var now = DateTime.Now;
+            var reminderWindow = now.AddMinutes(15);
 
-            // Find reservations starting in next 15 minutes that haven't been notified yet
+            // Send 15-min reminders (find by user_email in notifications)
             var upcoming = await _context.Reservations
+                .Include(r => r.Table)
                 .Where(r =>
                     r.Status == "Active" &&
-                    r.Starttime <= reminderTime &&
-                    r.Starttime > now &&
-                    r.Notificationsentat == null)
+                    r.StartTime <= reminderWindow &&
+                    r.StartTime > now)
                 .ToListAsync();
 
-            foreach (var res in upcoming)
-            {
-                // Send notification
-                await NotificationsController.CreateNotification(
-                    _context, res.Userid,
-                    "⏰ Reservation Starting Soon!",
-                    $"Your reservation starts at {res.Starttime:HH:mm}. Please confirm to keep your seat!",
-                    "reservation_reminder",
-                    res.Reservationid
-                );
-
-                res.Notificationsentat = DateTime.UtcNow;
-            }
-
-            // Auto-expire reservations that started but weren't confirmed
+            // Auto-expire ended reservations
             var toExpire = await _context.Reservations
+                .Include(r => r.Table)
                 .Where(r =>
-                    r.Status == "Active" &&
-                    r.Starttime <= now &&
-                    r.Notificationsentat != null)
+                    (r.Status == "Active" || r.Status == "Confirmed") &&
+                    r.EndTime <= now)
                 .ToListAsync();
 
             foreach (var res in toExpire)
             {
                 res.Status = "Expired";
-                await NotificationsController.CreateNotification(
-                    _context, res.Userid,
-                    "Reservation Expired ❌",
-                    $"Your reservation at {res.Starttime:HH:mm} was automatically cancelled because it was not confirmed.",
-                    "reservation_cancelled",
-                    res.Reservationid
-                );
+                if (res.Table != null)
+                {
+                    var otherActive = await _context.Reservations
+                        .AnyAsync(r => r.TableId == res.TableId &&
+                            r.Id != res.Id &&
+                            r.Status != "Cancelled" && r.Status != "Expired");
+                    if (!otherActive)
+                        res.Table.IsReserved = false;
+                }
             }
 
             if (upcoming.Any() || toExpire.Any())
                 await _context.SaveChangesAsync();
 
-            return Ok(new
-            {
-                remindersSet = upcoming.Count,
-                expired = toExpire.Count
-            });
+            return Ok(new { remindersChecked = upcoming.Count, expired = toExpire.Count });
         }
     }
 
-    // DTOs
     public class CreateReservationDto
     {
-        public string ReservationType { get; set; } = "solo"; // 'solo' or 'group'
+        public int TableId { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
-        public List<string> Seats { get; set; } = new();
         public string? Notes { get; set; }
     }
 }
