@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hy">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NPUA Library Café</title>
+    <title>ՀԱՊՀ Գրադարան-Սրճարան</title>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Design System */
         *, *::before, *::after {
             margin: 0;
             padding: 0;
@@ -26,7 +25,6 @@
             --sage: #8aaa85;
             --amber: #c4873a;
             --terracotta: #b85540;
-            --blue: #3a5a80;
             --font-display: 'Cormorant Garamond', Georgia, serif;
             --font-body: 'Outfit', sans-serif;
             --shadow: 0 4px 24px rgba(0,0,0,0.08);
@@ -49,7 +47,6 @@
             font-family: var(--font-body);
         }
 
-        /* Loader */
         .loader {
             position: fixed;
             inset: 0;
@@ -107,7 +104,6 @@
             }
         }
 
-        /* Navigation */
         nav {
             position: fixed;
             top: 0;
@@ -283,7 +279,6 @@
                 color: white;
             }
 
-        /* Notification Dropdown */
         .notif-dropdown {
             position: fixed;
             top: 72px;
@@ -333,6 +328,8 @@
             font-size: 0.72rem;
             color: var(--moss);
             cursor: pointer;
+            background: none;
+            border: none;
         }
 
         .notif-list {
@@ -399,7 +396,6 @@
             font-size: 0.82rem;
         }
 
-        /* Page System */
         .page {
             display: none;
             padding-top: 64px;
@@ -423,7 +419,6 @@
             }
         }
 
-        /* Shared Components */
         .section {
             max-width: 1440px;
             margin: 0 auto;
@@ -565,7 +560,6 @@
                 background: #2d7a2d;
             }
 
-        /* Home Page Hero */
         .hero {
             height: calc(100vh - 64px);
             min-height: 580px;
@@ -725,7 +719,6 @@
             background: rgba(255,255,255,0.3);
         }
 
-        /* Book Cards */
         .book-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -813,7 +806,6 @@
             margin-top: 0.2rem;
         }
 
-        /* Menu Cards */
         .menu-filter {
             display: flex;
             gap: 0.5rem;
@@ -938,7 +930,6 @@
                 transform: scale(1.1);
             }
 
-        /* Cart Float */
         .cart-float {
             position: fixed;
             bottom: 2rem;
@@ -976,7 +967,6 @@
             padding: 0.1rem 0.45rem;
         }
 
-        /* Search Bar */
         .search-bar {
             display: flex;
             gap: 0.6rem;
@@ -1006,7 +996,6 @@
                 cursor: pointer;
             }
 
-        /* Auth Modals */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -1101,7 +1090,6 @@
                 text-decoration: underline;
             }
 
-        /* Footer */
         footer {
             background: var(--ink);
             color: rgba(255,255,255,0.5);
@@ -1162,7 +1150,6 @@
             margin-top: 2rem;
         }
 
-        /* Responsive */
         @media (max-width: 1024px) {
             .hero {
                 grid-template-columns: 1fr;
@@ -1214,33 +1201,30 @@
 </head>
 <body>
 
-    <!-- LOADER -->
     <div class="loader" id="loader">
-        <div class="loader-logo">NPUA <span>Library Café</span></div>
+        <div class="loader-logo">ՀԱՊՀ <span>Գրադարան-Սրճարան</span></div>
         <div class="loader-bar"></div>
     </div>
 
-    <!-- NOTIFICATION DROPDOWN -->
     <div class="notif-dropdown" id="notifDropdown">
         <div class="notif-hdr">
-            <span class="notif-hdr-title">Notifications</span>
-            <button class="notif-hdr-action" onclick="markAllRead()">Mark all read</button>
+            <span class="notif-hdr-title">Ծանուցումներ</span>
+            <button class="notif-hdr-action" onclick="markAllRead()">Նշել բոլորը կարդացված</button>
         </div>
         <div class="notif-list" id="notifList">
-            <div class="notif-empty">No new notifications</div>
+            <div class="notif-empty">Նոր ծանուցումներ չկան</div>
         </div>
     </div>
 
-    <!-- NAV -->
     <nav id="mainNav">
         <div class="nav-inner">
             <div class="nav-left">
-                <button class="nav-link active" onclick="showPage('home')">Home</button>
-                <button class="nav-link" onclick="showPage('library')">Library</button>
-                <button class="nav-link" onclick="showPage('cafe')">Café</button>
-                <button class="nav-link" onclick="showPage('reservations')">Reservations</button>
+                <button class="nav-link active" onclick="showPage('home')">Գլխավոր</button>
+                <button class="nav-link" onclick="showPage('library')">Գրադարան</button>
+                <button class="nav-link" onclick="showPage('cafe')">Սրճարան</button>
+                <button class="nav-link" onclick="showPage('reservations')">Ամրագրումներ</button>
             </div>
-            <div class="nav-logo" onclick="showPage('home')">NPUA <span>Library Café</span></div>
+            <div class="nav-logo" onclick="showPage('home')">ՀԱՊՀ <span>Գրադարան-Սրճարան</span></div>
             <div class="nav-right">
                 <button class="notif-btn" onclick="toggleNotif()" id="notifBtn">
                     🔔
@@ -1250,100 +1234,92 @@
                     <div class="user-avatar" id="userAvatar"></div>
                     <span id="userName"></span>
                 </div>
-                <button class="btn-nav btn-outline" onclick="openModal('loginModal')" id="loginBtn">Login</button>
-                <button class="btn-nav btn-outline" onclick="logout()" id="logoutBtn" style="display:none;">Logout</button>
+                <button class="btn-nav btn-outline" onclick="openModal('loginModal')" id="loginBtn">Մուտք</button>
+                <button class="btn-nav btn-outline" onclick="logout()" id="logoutBtn" style="display:none;">Ելք</button>
             </div>
         </div>
     </nav>
 
-    <!-- HOME PAGE -->
     <div class="page active" id="pg-home">
         <div class="hero">
             <div class="hero-img-panel">
-                <!-- Replace with real image: <img src="your-photo.jpg" alt="Library Café"> -->
-                <div class="hero-img-caption">NPUA Library Café · Yerevan</div>
+                <div class="hero-img-caption">ՀԱՊՀ Գրադարան-Սրճարան · Երևան</div>
             </div>
             <div class="hero-text-panel">
-                <div class="hero-eyebrow">National Polytechnic University of Armenia</div>
-                <h1 class="hero-h1">Where <em>Books</em><br>Meet Coffee</h1>
-                <p class="hero-p">A space to study, discover, and savour — your campus library and café, reimagined as one.</p>
+                <div class="hero-eyebrow">Հայաստանի Ազգային Պոլիտեխնիկական Համալսարան</div>
+                <h1 class="hero-h1">Որտեղ <em>Գրքերը</em><br>Հանդիպում են Սուրճին</h1>
+                <p class="hero-p">Տարածք՝ սովորելու, հայտնաբերելու և վայելելու — ձեր համալսարանի գրադարանն ու սրճարանը՝ մեկ տեղում։</p>
                 <div class="hero-btns">
-                    <button class="btn-primary" onclick="showPage('library')">Browse Library</button>
-                    <button class="btn-outline" onclick="showPage('cafe')">Order from Café</button>
+                    <button class="btn-primary" onclick="showPage('library')">Դիտել Գրադարանը</button>
+                    <button class="btn-outline" onclick="showPage('cafe')">Պատվիրել Սրճարանից</button>
                 </div>
                 <div class="hero-stats">
-                    <div><div class="stat-num" id="statBooks">—</div><div class="stat-lbl">Books</div></div>
-                    <div><div class="stat-num" id="statMenu">—</div><div class="stat-lbl">Menu items</div></div>
-                    <div><div class="stat-num">32</div><div class="stat-lbl">Seats</div></div>
+                    <div><div class="stat-num" id="statBooks">—</div><div class="stat-lbl">Գրքեր</div></div>
+                    <div><div class="stat-num" id="statMenu">—</div><div class="stat-lbl">Մենյուի կետեր</div></div>
+                    <div><div class="stat-num">32</div><div class="stat-lbl">Նստատեղեր</div></div>
                 </div>
             </div>
         </div>
-
         <div class="marquee-strip">
             <div class="marquee-track">
-                <span class="marquee-item">Library <span class="marquee-dot"></span></span>
-                <span class="marquee-item">Café <span class="marquee-dot"></span></span>
-                <span class="marquee-item">Seat Reservations <span class="marquee-dot"></span></span>
-                <span class="marquee-item">Study Space <span class="marquee-dot"></span></span>
-                <span class="marquee-item">Fresh Coffee <span class="marquee-dot"></span></span>
-                <span class="marquee-item">Borrow Books <span class="marquee-dot"></span></span>
-                <!-- Duplicate for seamless loop -->
-                <span class="marquee-item">Library <span class="marquee-dot"></span></span>
-                <span class="marquee-item">Café <span class="marquee-dot"></span></span>
-                <span class="marquee-item">Seat Reservations <span class="marquee-dot"></span></span>
-                <span class="marquee-item">Study Space <span class="marquee-dot"></span></span>
-                <span class="marquee-item">Fresh Coffee <span class="marquee-dot"></span></span>
-                <span class="marquee-item">Borrow Books <span class="marquee-dot"></span></span>
+                <span class="marquee-item">Գրադարան <span class="marquee-dot"></span></span>
+                <span class="marquee-item">Սրճարան <span class="marquee-dot"></span></span>
+                <span class="marquee-item">Սեղանի Ամրագրում <span class="marquee-dot"></span></span>
+                <span class="marquee-item">Ուսումնական Տարածք <span class="marquee-dot"></span></span>
+                <span class="marquee-item">Թարմ Սուրճ <span class="marquee-dot"></span></span>
+                <span class="marquee-item">Գրքեր Վերցնել <span class="marquee-dot"></span></span>
+                <span class="marquee-item">Գրադարան <span class="marquee-dot"></span></span>
+                <span class="marquee-item">Սրճարան <span class="marquee-dot"></span></span>
+                <span class="marquee-item">Սեղանի Ամրագրում <span class="marquee-dot"></span></span>
+                <span class="marquee-item">Ուսումնական Տարածք <span class="marquee-dot"></span></span>
+                <span class="marquee-item">Թարմ Սուրճ <span class="marquee-dot"></span></span>
+                <span class="marquee-item">Գրքեր Վերցնել <span class="marquee-dot"></span></span>
             </div>
         </div>
-
         <div class="section">
             <div class="page-header">
                 <div>
-                    <div class="section-eyebrow">Library</div>
-                    <h2 class="section-title">Trending <em>this week</em></h2>
+                    <div class="section-eyebrow">Գրադարան</div>
+                    <h2 class="section-title">Հայտնի <em>այս շաբաթ</em></h2>
                 </div>
-                <button class="btn-secondary" onclick="showPage('library')">View full catalogue</button>
+                <button class="btn-secondary" onclick="showPage('library')">Դիտել ամբողջ կատալոգը</button>
             </div>
             <div class="book-grid" id="homeBooks"></div>
         </div>
-
         <div class="section" style="background:var(--sand);">
             <div class="page-header">
                 <div>
-                    <div class="section-eyebrow">Café Menu</div>
-                    <h2 class="section-title">Popular <em>right now</em></h2>
+                    <div class="section-eyebrow">Սրճարանի Մենյու</div>
+                    <h2 class="section-title">Հայտնի <em>հիմա</em></h2>
                 </div>
-                <button class="btn-secondary" onclick="showPage('cafe')">Full menu</button>
+                <button class="btn-secondary" onclick="showPage('cafe')">Ամբողջ մենյու</button>
             </div>
             <div class="menu-grid" id="homeMenu"></div>
         </div>
     </div>
 
-    <!-- LIBRARY PAGE -->
     <div class="page" id="pg-library">
         <div class="section">
             <div class="page-header">
                 <div>
-                    <div class="section-eyebrow">Library</div>
-                    <h2 class="section-title">Browse <em>our collection</em></h2>
+                    <div class="section-eyebrow">Գրադարան</div>
+                    <h2 class="section-title">Դիտել <em>մեր հավաքածուն</em></h2>
                 </div>
             </div>
             <div class="search-bar">
-                <input type="text" placeholder="Search by title, author, or ISBN..." id="bookSearch">
-                <button onclick="searchBooks()">Search</button>
+                <input type="text" placeholder="Որոնել ըստ վերնագրի, հեղինակի կամ ISBN-ի..." id="bookSearch">
+                <button onclick="searchBooks()">Որոնել</button>
             </div>
             <div class="book-grid" id="libraryBooks"></div>
         </div>
     </div>
 
-    <!-- CAFÉ PAGE -->
     <div class="page" id="pg-cafe">
         <div class="section">
             <div class="page-header">
                 <div>
-                    <div class="section-eyebrow">Café</div>
-                    <h2 class="section-title">Order <em>from our menu</em></h2>
+                    <div class="section-eyebrow">Սրճարան</div>
+                    <h2 class="section-title">Պատվիրել <em>մեր մենյուից</em></h2>
                 </div>
             </div>
             <div class="menu-filter" id="menuFilter"></div>
@@ -1351,185 +1327,150 @@
         </div>
     </div>
 
-    <!-- RESERVATIONS PAGE -->
     <div class="page" id="pg-reservations">
         <div class="section">
             <div class="page-header">
                 <div>
-                    <div class="section-eyebrow">Reservations</div>
-                    <h2 class="section-title">Reserve <em>a table</em></h2>
+                    <div class="section-eyebrow">Ամրագրումներ</div>
+                    <h2 class="section-title">Ամրագրել <em>սեղան</em></h2>
                 </div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;max-width:900px;">
                 <div style="background:white;border:1px solid var(--rule);border-radius:16px;padding:2rem;">
-                    <h3 style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:1.5rem;">Pick your time</h3>
+                    <h3 style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:1.5rem;">Ընտրել ժամանակ</h3>
                     <div class="form-group">
-                        <label>Start Date & Time</label>
+                        <label>Մեկնարկ</label>
                         <input type="datetime-local" id="resStart" style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;">
                     </div>
                     <div class="form-group">
-                        <label>End Date & Time</label>
+                        <label>Ավարտ</label>
                         <input type="datetime-local" id="resEnd" style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;">
                     </div>
                     <div class="form-group">
-                        <label>Notes (optional)</label>
-                        <input type="text" id="resNotes" placeholder="e.g. Team meeting, study group..." style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;">
+                        <label>Նշումներ (կամընտիր)</label>
+                        <input type="text" id="resNotes" placeholder="օրինակ՝ թիմային հանդիպում, ուսումնական խումբ..." style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;">
                     </div>
-                    <button class="btn-primary" style="width:100%;" onclick="checkTableAvailability()">Check Availability</button>
+                    <button class="btn-primary" style="width:100%;" onclick="checkTableAvailability()">Ստուգել հասանելիությունը</button>
                 </div>
                 <div style="background:white;border:1px solid var(--rule);border-radius:16px;padding:2rem;">
-                    <h3 style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:0.5rem;">Select a table</h3>
-                    <p style="font-size:0.8rem;color:var(--warm-gray);margin-bottom:1.5rem;">Pick your time first, then select an available table</p>
+                    <h3 style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:0.5rem;">Ընտրել սեղան</h3>
+                    <p style="font-size:0.8rem;color:var(--warm-gray);margin-bottom:1.5rem;">Նախ ընտրեք ժամանակը, ապա ընտրեք հասանելի սեղան</p>
                     <div style="display:flex;flex-direction:column;gap:1rem;" id="tableMap">
-                        <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;border:2px solid var(--rule);border-radius:12px;cursor:pointer;" id="tc-1" onclick="selectTable('1')">
-                            <div style="font-size:1.1rem;margin-right:0.5rem;">T1 [4 seats]</div>
-                            <div style="flex:1;"><div style="font-weight:600;font-size:0.9rem;">Table 1</div><div style="font-size:0.75rem;color:var(--warm-gray);" id="tc-1">Select time first</div></div>
+                        <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;border:2px solid var(--rule);border-radius:12px;cursor:pointer;" id="tc-1" onclick="selectTable(1)">
+                            <div style="font-size:1.1rem;margin-right:0.5rem;">T1 [4 տեղ]</div>
+                            <div style="flex:1;"><div style="font-weight:600;font-size:0.9rem;">Սեղան 1</div><div style="font-size:0.75rem;color:var(--warm-gray);" id="ts-1">Նախ ընտրեք ժամանակը</div></div>
                         </div>
-                        <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;border:2px solid var(--rule);border-radius:12px;cursor:pointer;" id="tc-2" onclick="selectTable('2')">
-                            <div style="font-size:1.1rem;margin-right:0.5rem;">T2 [6 seats]</div>
-                            <div style="flex:1;"><div style="font-weight:600;font-size:0.9rem;">Table 2</div><div style="font-size:0.75rem;color:var(--warm-gray);" id="tc-2">Select time first</div></div>
+                        <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;border:2px solid var(--rule);border-radius:12px;cursor:pointer;" id="tc-2" onclick="selectTable(2)">
+                            <div style="font-size:1.1rem;margin-right:0.5rem;">T2 [6 տեղ]</div>
+                            <div style="flex:1;"><div style="font-weight:600;font-size:0.9rem;">Սեղան 2</div><div style="font-size:0.75rem;color:var(--warm-gray);" id="ts-2">Նախ ընտրեք ժամանակը</div></div>
                         </div>
-                        <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;border:2px solid var(--rule);border-radius:12px;cursor:pointer;" id="tc-3" onclick="selectTable('3')">
-                            <div style="font-size:1.1rem;margin-right:0.5rem;">T3 [4 seats]</div>
-                            <div style="flex:1;"><div style="font-weight:600;font-size:0.9rem;">Table 3</div><div style="font-size:0.75rem;color:var(--warm-gray);" id="tc-3">Select time first</div></div>
+                        <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;border:2px solid var(--rule);border-radius:12px;cursor:pointer;" id="tc-3" onclick="selectTable(3)">
+                            <div style="font-size:1.1rem;margin-right:0.5rem;">T3 [4 տեղ]</div>
+                            <div style="flex:1;"><div style="font-weight:600;font-size:0.9rem;">Սեղան 3</div><div style="font-size:0.75rem;color:var(--warm-gray);" id="ts-3">Նախ ընտրեք ժամանակը</div></div>
                         </div>
                     </div>
-                    <button class="btn-moss" style="width:100%;margin-top:1.5rem;opacity:0.5;" id="reserveBtn" onclick="makeReservation()">Reserve Table</button>
+                    <button class="btn-moss" style="width:100%;margin-top:1.5rem;opacity:0.5;" id="reserveBtn" onclick="makeReservation()">Ամրագրել Սեղանը</button>
                 </div>
             </div>
             <div style="margin-top:3rem;">
-                <h3 style="font-family:var(--font-display);font-size:1.5rem;margin-bottom:1.5rem;">My <em>Reservations</em></h3>
+                <h3 style="font-family:var(--font-display);font-size:1.5rem;margin-bottom:1.5rem;">Իմ <em>Ամրագրումները</em></h3>
                 <div id="myReservations" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;"></div>
             </div>
         </div>
     </div>
 
-    <!-- CART FLOAT -->
     <button class="cart-float" id="cartFloat" onclick="checkout()">
-        🛒 Cart <span class="cart-badge" id="cartBadge">0</span>
+        🛒 Զամբյուղ <span class="cart-badge" id="cartBadge">0</span>
     </button>
 
-    <!-- LOGIN MODAL -->
     <div class="modal-overlay" id="loginModal">
         <div class="modal-box">
             <div class="modal-header">
-                <h2 class="modal-title">Welcome Back</h2>
-                <p class="modal-subtitle">Login to your account</p>
+                <h2 class="modal-title">Բարի Վերադարձ</h2>
+                <p class="modal-subtitle">Մուտք գործել ձեր հաշիվ</p>
             </div>
             <form onsubmit="login(event)">
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="loginEmail" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="loginPassword" required>
-                </div>
+                <div class="form-group"><label>Էլ. փոստ</label><input type="email" id="loginEmail" required></div>
+                <div class="form-group"><label>Գաղտնաբառ</label><input type="password" id="loginPassword" required></div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="closeModal('loginModal')">Cancel</button>
-                    <button type="submit" class="btn-primary">Login</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('loginModal')">Չեղարկել</button>
+                    <button type="submit" class="btn-primary">Մուտք</button>
                 </div>
             </form>
-            <div class="modal-switch">
-                Don't have an account? <button onclick="switchModal('loginModal','registerModal')">Register</button>
-            </div>
+            <div class="modal-switch">Հաշիվ չունե՞ք։ <button onclick="switchModal('loginModal','registerModal')">Գրանցվել</button></div>
         </div>
     </div>
 
-    <!-- REGISTER MODAL -->
     <div class="modal-overlay" id="registerModal">
         <div class="modal-box">
             <div class="modal-header">
-                <h2 class="modal-title">Create Account</h2>
-                <p class="modal-subtitle">Join NPUA Library Café</p>
+                <h2 class="modal-title">Ստեղծել Հաշիվ</h2>
+                <p class="modal-subtitle">Միանալ ՀԱՊՀ Գրադարան-Սրճարանին</p>
             </div>
-
-            <!-- Step 1: Fill in details -->
             <div id="registerStep1">
+                <div class="form-group"><label>Անուն Ազգանուն</label><input type="text" id="regName" required></div>
+                <div class="form-group"><label>Էլ. փոստ</label><input type="email" id="regEmail" required></div>
+                <div class="form-group"><label>Գաղտնաբառ</label><input type="password" id="regPassword" required></div>
                 <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" id="regName" required>
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="regEmail" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="regPassword" required>
-                </div>
-                <div class="form-group">
-                    <label>Role</label>
+                    <label>Դեր</label>
                     <select id="regRole" required>
-                        <option value="user">User</option>
-                        <option value="admin">Admin</option>
-                        <option value="librarian">Library Worker</option>
-                        <option value="cafe staff">Café Worker</option>
+                        <option value="user">Օգտվող</option>
+                        <option value="admin">Ադմին</option>
+                        <option value="librarian">Գրադարանավար</option>
+                        <option value="cafe staff">Սրճարանի Աշխատող</option>
                     </select>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="closeModal('registerModal')">Cancel</button>
-                    <button type="button" class="btn-primary" onclick="sendVerificationCode()">Send Code</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('registerModal')">Չեղարկել</button>
+                    <button type="button" class="btn-primary" onclick="sendVerificationCode()">Ուղարկել Կոդ</button>
                 </div>
             </div>
-
-            <!-- Step 2: Enter verification code -->
             <div id="registerStep2" style="display:none;">
-                <p style="color:var(--warm-gray);font-size:0.85rem;margin-bottom:1.5rem;">
-                    We sent a 6-digit code to <strong id="regEmailDisplay"></strong>. Enter it below.
-                </p>
+                <p style="color:var(--warm-gray);font-size:0.85rem;margin-bottom:1.5rem;">6-նիշ կոդ ուղարկվեց <strong id="regEmailDisplay"></strong> հասցեին։ Մուտքագրեք ստորև։</p>
                 <div class="form-group">
-                    <label>Verification Code</label>
-                    <input type="text" id="regCode" maxlength="6" placeholder="000000"
-                           style="font-size:1.5rem;letter-spacing:0.5rem;text-align:center;">
+                    <label>Հաստատման Կոդ</label>
+                    <input type="text" id="regCode" maxlength="6" placeholder="000000" style="font-size:1.5rem;letter-spacing:0.5rem;text-align:center;">
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="backToStep1()">Back</button>
-                    <button type="button" class="btn-primary" onclick="register()">Verify & Register</button>
+                    <button type="button" class="btn-secondary" onclick="backToStep1()">Հետ</button>
+                    <button type="button" class="btn-primary" onclick="register()">Հաստատել և Գրանցվել</button>
                 </div>
-                <p style="text-align:center;margin-top:1rem;font-size:0.8rem;color:var(--warm-gray);">
-                    Didn't receive it? <button onclick="sendVerificationCode()" style="background:none;border:none;color:var(--moss);cursor:pointer;font-weight:500;">Resend</button>
-                </p>
+                <p style="text-align:center;margin-top:1rem;font-size:0.8rem;color:var(--warm-gray);">Չստացա՞ք։ <button onclick="sendVerificationCode()" style="background:none;border:none;color:var(--moss);cursor:pointer;font-weight:500;">Կրկին ուղարկել</button></p>
             </div>
-
-            <div class="modal-switch">
-                Already have an account? <button onclick="switchModal('registerModal','loginModal')">Login</button>
-            </div>
+            <div class="modal-switch">Արդեն հաշիվ ունե՞ք։ <button onclick="switchModal('registerModal','loginModal')">Մուտք</button></div>
         </div>
     </div>
 
-    <!-- FOOTER -->
     <footer>
         <div class="footer-grid">
             <div>
-                <div class="footer-logo">NPUA Library Café</div>
-                <p class="footer-tagline">A campus space where knowledge and community meet over great coffee. Open Monday – Saturday.</p>
+                <div class="footer-logo">ՀԱՊՀ Գրադարան-Սրճարան</div>
+                <p class="footer-tagline">Համալսարանական տարածք, որտեղ գիտելիքն ու համայնքը հանդիպում են հիանալի սուրճի շուրջ։ Բաց երկուշաբթիից - շաբաթ։</p>
             </div>
             <div class="footer-col">
-                <h4>Library</h4>
-                <button onclick="showPage('library')">Browse Catalogue</button>
-                <button onclick="showPage('library')">Borrow a Book</button>
-                <button onclick="showPage('library')">PDF Access</button>
+                <h4>Գրադարան</h4>
+                <button onclick="showPage('library')">Դիտել Կատալոգը</button>
+                <button onclick="showPage('library')">Վերցնել Գիրք</button>
+                <button onclick="showPage('library')">PDF Հասանելիություն</button>
             </div>
             <div class="footer-col">
-                <h4>Café</h4>
-                <button onclick="showPage('cafe')">Full Menu</button>
-                <button onclick="showPage('cafe')">Order Online</button>
+                <h4>Սրճարան</h4>
+                <button onclick="showPage('cafe')">Ամբողջ Մենյու</button>
+                <button onclick="showPage('cafe')">Պատվիրել Առցանց</button>
             </div>
             <div class="footer-col">
-                <h4>Account</h4>
-                <button onclick="openModal('loginModal')">My Profile</button>
-                <button onclick="showPage('reservations')">Reservations</button>
+                <h4>Հաշիվ</h4>
+                <button onclick="openModal('loginModal')">Իմ Էջը</button>
+                <button onclick="showPage('reservations')">Ամրագրումներ</button>
             </div>
         </div>
         <div class="footer-bottom">
-            <span>© 2026 NPUA Library Café</span>
-            <span>National Polytechnic University of Armenia</span>
+            <span>© 2026 ՀԱՊՀ Գրադարան-Սրճարան</span>
+            <span>Հայաստանի Ազգային Պոլիտեխնիկական Համալսարան</span>
         </div>
     </footer>
 
     <script>
-        // Configuration
         const API_BASE = 'https://localhost:7296/api';
         const IMG_BASE = 'https://localhost:7296';
         let currentUser = null;
@@ -1538,24 +1479,18 @@
         let booksData = [];
         let menuData = [];
 
-        // Initialization
         window.addEventListener('load', async () => {
             setTimeout(() => document.getElementById('loader').classList.add('hidden'), 800);
-
-            // Check if already logged in
             authToken = localStorage.getItem('authToken');
             if (authToken) {
                 currentUser = JSON.parse(localStorage.getItem('currentUser'));
                 updateUIForLoggedInUser();
             }
-
-            // Load data
             await loadBooks();
             await loadMenu();
             loadNotifications();
         });
 
-        // Navigation
         window.addEventListener('scroll', () => {
             document.getElementById('mainNav').classList.toggle('scrolled', scrollY > 20);
         });
@@ -1563,116 +1498,76 @@
         function showPage(pageName) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            document.getElementById(`pg-${pageName}`).classList.add('active');
-            document.querySelector(`[onclick="showPage('${pageName}')"]`)?.classList.add('active');
+            document.getElementById('pg-' + pageName).classList.add('active');
+            document.querySelector('[onclick="showPage(\'' + pageName + '\')"]')?.classList.add('active');
             window.scrollTo(0, 0);
+            if (pageName === 'reservations') loadMyReservations();
         }
 
-        // API Functions
         async function apiCall(endpoint, options = {}) {
             const headers = { 'Content-Type': 'application/json' };
-            if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
-
+            if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
             try {
-                const response = await fetch(`${API_BASE}${endpoint}`, {
-                    ...options,
-                    headers: { ...headers, ...options.headers }
-                });
+                const response = await fetch(API_BASE + endpoint, { ...options, headers: { ...headers, ...options.headers } });
                 if (!response.ok) throw new Error(await response.text());
                 return await response.json();
             } catch (error) {
                 console.error('API Error:', error);
-                alert('Error: ' + error.message);
+                alert('Սխալ: ' + error.message);
                 return null;
             }
         }
 
-        // Books
         async function loadBooks() {
             const data = await apiCall('/Books');
             if (!data) return;
             booksData = data;
             document.getElementById('statBooks').textContent = data.length;
-
-            // Show first 6 on homepage
-            const homeBooks = data.slice(0, 6);
-            document.getElementById('homeBooks').innerHTML = homeBooks.map(renderBook).join('');
-
-            // Show all in library page
+            document.getElementById('homeBooks').innerHTML = data.slice(0, 6).map(renderBook).join('');
             document.getElementById('libraryBooks').innerHTML = data.map(renderBook).join('');
         }
 
         function renderBook(book) {
-            const imgStyle = book.imagePath
-                ? `background-image:url('${IMG_BASE}/${book.imagePath}')`
-                : 'class="no-img"';
-            return `
-                <div class="book-card">
-                  <div class="book-cover" ${imgStyle}>
-                    ${!book.imagePath ? '📖' : ''}
-                  </div>
-                  <div class="book-info">
-                    <div class="book-ttl">${book.title}</div>
-                    <div class="book-auth">${book.author}</div>
-                    ${book.shelfNumber ? `<div class="book-shelf">Shelf ${book.shelfNumber}</div>` : ''}
-                    <div class="book-avail">${book.availableCopies || 0} available</div>
-                  </div>
-                </div>
-              `;
+            const imgStyle = book.imagePath ? 'background-image:url(\'' + IMG_BASE + '/' + book.imagePath + '\')' : '';
+            const noImg = !book.imagePath ? 'no-img' : '';
+            return '<div class="book-card"><div class="book-cover ' + noImg + '" style="' + imgStyle + '">' + (!book.imagePath ? '📖' : '') + '</div>'
+                + '<div class="book-info"><div class="book-ttl">' + book.title + '</div><div class="book-auth">' + book.author + '</div>'
+                + (book.shelfNumber ? '<div class="book-shelf">Դարակ ' + book.shelfNumber + '</div>' : '')
+                + '<div class="book-avail">' + (book.availableCopies || 0) + ' հասանելի</div></div></div>';
         }
 
         function searchBooks() {
             const query = document.getElementById('bookSearch').value.toLowerCase();
-            const filtered = booksData.filter(b =>
-                b.title.toLowerCase().includes(query) ||
-                b.author.toLowerCase().includes(query)
-            );
+            const filtered = booksData.filter(b => b.title.toLowerCase().includes(query) || b.author.toLowerCase().includes(query));
             document.getElementById('libraryBooks').innerHTML = filtered.map(renderBook).join('');
         }
 
-        // Menu
+        const categoryLabels = { 'hot': 'Տաք Ըմպելիքներ', 'cold': 'Սառը Ըմպելիքներ', 'food': 'Ուտելիք', 'snack': 'Նախուտեստ' };
+
         async function loadMenu() {
-            const data = await apiCall('/Menu');
+            const data = await apiCall('/Menu/items');
             if (!data) return;
             menuData = data;
             document.getElementById('statMenu').textContent = data.length;
-
-            // Categories
-            const categories = ['All', ...new Set(data.map(i => i.categoryId || i.category_id || i.category).filter(Boolean))];
+            const cats = [...new Set(data.map(i => i.category_id).filter(Boolean))];
+            const categories = ['all', ...cats];
             document.getElementById('menuFilter').innerHTML = categories.map((cat, i) =>
-                `<button class="filter-pill ${i === 0 ? 'active' : ''}" onclick="filterMenu('${cat}')">${cat}</button>`
+                '<button class="filter-pill ' + (i === 0 ? 'active' : '') + '" onclick="filterMenu(\'' + cat + '\')">' + (cat === 'all' ? 'Բոլորը' : (categoryLabels[cat] || cat)) + '</button>'
             ).join('');
-
-            // Show first 4 on homepage
-            const homeMenu = data.slice(0, 4);
-            document.getElementById('homeMenu').innerHTML = homeMenu.map(renderMenuItem).join('');
-
-            // Show all in cafe page
+            document.getElementById('homeMenu').innerHTML = data.slice(0, 4).map(renderMenuItem).join('');
             renderMenuItems(data);
         }
 
         function renderMenuItem(item) {
-            const imageUrl = item.imagepath ? `/images/menu/${item.imagepath}` : null;
-            const imgStyle = imageUrl
-                ? `style="background-image:url('${imageUrl}');background-size:cover;background-position:center;"`
-                : '';
-            const name = item.itemname || item.name || '';
-            const category = item.categoryId || item.category_id || '';
-            return `
-                <div class="menu-card">
-                  <div class="menu-img ${!imageUrl ? 'no-img' : ''}" ${imgStyle}>
-                    ${!imageUrl ? '☕' : ''}
-                    <span class="menu-cat-tag">${category}</span>
-                  </div>
-                  <div class="menu-info">
-                    <div class="menu-name">${name}</div>
-                    <div class="menu-footer">
-                      <span class="menu-price">${item.price} AMD</span>
-                      <button class="add-btn" onclick='addToCart(${JSON.stringify(item)})'>+</button>
-                    </div>
-                  </div>
-                </div>
-              `;
+            const imageUrl = item.image_url || null;
+            const imgStyle = imageUrl ? 'style="background-image:url(\'' + imageUrl + '\');background-size:cover;background-position:center;"' : '';
+            const name = item.name || '';
+            const category = categoryLabels[item.category_id] || item.category_id || '';
+            return '<div class="menu-card"><div class="menu-img ' + (!imageUrl ? 'no-img' : '') + '" ' + imgStyle + '>'
+                + (!imageUrl ? '☕' : '') + '<span class="menu-cat-tag">' + category + '</span></div>'
+                + '<div class="menu-info"><div class="menu-name">' + name + '</div>'
+                + '<div class="menu-footer"><span class="menu-price">' + item.price + ' AMD</span>'
+                + '<button class="add-btn" onclick=\'addToCart(' + JSON.stringify(item) + ')\'>+</button></div></div></div>';
         }
 
         function renderMenuItems(items) {
@@ -1682,72 +1577,39 @@
         function filterMenu(category) {
             document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
             event.target.classList.add('active');
-
-            const filtered = category === 'All'
-                ? menuData
-                : menuData.filter(i => i.categoryId === category);
+            const filtered = category === 'all' ? menuData : menuData.filter(i => i.category_id === category);
             renderMenuItems(filtered);
         }
 
-        // Cart
         function addToCart(item) {
             cart.push(item);
             updateCartUI();
             event.target.textContent = '✓';
             event.target.style.background = 'var(--moss)';
-            setTimeout(() => {
-                event.target.textContent = '+';
-                event.target.style.background = 'var(--ink)';
-            }, 1000);
+            setTimeout(() => { event.target.textContent = '+'; event.target.style.background = 'var(--ink)'; }, 1000);
         }
 
         function updateCartUI() {
-            const badge = document.getElementById('cartBadge');
-            const btn = document.getElementById('cartFloat');
-            badge.textContent = cart.length;
-            if (cart.length > 0) btn.classList.add('show');
-            else btn.classList.remove('show');
+            document.getElementById('cartBadge').textContent = cart.length;
+            if (cart.length > 0) document.getElementById('cartFloat').classList.add('show');
+            else document.getElementById('cartFloat').classList.remove('show');
         }
 
         async function checkout() {
-            if (!authToken) {
-                alert('Please login to place an order');
-                openModal('loginModal');
-                return;
-            }
-
+            if (!authToken) { alert('Պատվեր տալու համար մուտք գործեք'); openModal('loginModal'); return; }
             const items = cart.map(item => ({ itemId: item.itemId, quantity: 1 }));
-            const result = await apiCall('/Orders', {
-                method: 'POST',
-                body: JSON.stringify({ items, orderType: 'pickup', paymentMethod: 'cash' })
-            });
-
-            if (result) {
-                alert(`Order placed! Total: ${result.totalAmount} AMD`);
-                cart = [];
-                updateCartUI();
-            }
+            const result = await apiCall('/Orders', { method: 'POST', body: JSON.stringify({ items, orderType: 'pickup', paymentMethod: 'cash' }) });
+            if (result) { alert('Պատվերը կատարվեց! Ընդհանուր՝ ' + result.totalAmount + ' AMD'); cart = []; updateCartUI(); }
         }
 
-        // Auth
         async function login(e) {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-
-            const result = await apiCall('/Auth/login', {
-                method: 'POST',
-                body: JSON.stringify({ email, password })
-            });
-
+            const result = await apiCall('/Auth/login', { method: 'POST', body: JSON.stringify({ email: document.getElementById('loginEmail').value, password: document.getElementById('loginPassword').value }) });
             if (result && result.token) {
-                authToken = result.token;
-                currentUser = result.user;
+                authToken = result.token; currentUser = result.user;
                 localStorage.setItem('authToken', authToken);
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                updateUIForLoggedInUser();
-                closeModal('loginModal');
-                alert('Login successful!');
+                updateUIForLoggedInUser(); closeModal('loginModal'); alert('Մուտքը հաջողվեց!');
             }
         }
 
@@ -1756,17 +1618,8 @@
             const email = document.getElementById('regEmail').value;
             const password = document.getElementById('regPassword').value;
             const role = document.getElementById('regRole').value;
-
-            if (!name || !email || !password) {
-                alert('Please fill in all fields');
-                return;
-            }
-
-            const result = await apiCall('/Auth/send-code', {
-                method: 'POST',
-                body: JSON.stringify({ name, email, password, role })
-            });
-
+            if (!name || !email || !password) { alert('Խնդրում ենք լրացնել բոլոր դաշտերը'); return; }
+            const result = await apiCall('/Auth/send-code', { method: 'POST', body: JSON.stringify({ name, email, password, role }) });
             if (result) {
                 document.getElementById('regEmailDisplay').textContent = email;
                 document.getElementById('registerStep1').style.display = 'none';
@@ -1780,68 +1633,41 @@
         }
 
         async function register() {
-            const email = document.getElementById('regEmail').value;
             const code = document.getElementById('regCode').value;
-
-            if (!code || code.length !== 6) {
-                alert('Please enter the 6-digit code');
-                return;
-            }
-
-            const result = await apiCall('/Auth/register', {
-                method: 'POST',
-                body: JSON.stringify({ email, code })
-            });
-
-            if (result) {
-                alert('Registration successful! Please login.');
-                backToStep1();
-                document.getElementById('regCode').value = '';
-                switchModal('registerModal', 'loginModal');
-            }
+            if (!code || code.length !== 6) { alert('Խնդրում ենք մուտքագրել 6-նիշ կոդը'); return; }
+            const result = await apiCall('/Auth/register', { method: 'POST', body: JSON.stringify({ email: document.getElementById('regEmail').value, code }) });
+            if (result) { alert('Գրանցումը հաջողվեց! Խնդրում ենք մուտք գործել։'); backToStep1(); document.getElementById('regCode').value = ''; switchModal('registerModal', 'loginModal'); }
         }
 
         function logout() {
-            authToken = null;
-            currentUser = null;
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('currentUser');
+            authToken = null; currentUser = null;
+            localStorage.removeItem('authToken'); localStorage.removeItem('currentUser');
             document.getElementById('userPill').style.display = 'none';
             document.getElementById('loginBtn').style.display = 'block';
             document.getElementById('logoutBtn').style.display = 'none';
-            alert('Logged out successfully');
+            alert('Ելքը հաջողվեց');
         }
 
         function updateUIForLoggedInUser() {
             document.getElementById('userPill').style.display = 'flex';
             document.getElementById('loginBtn').style.display = 'none';
             document.getElementById('logoutBtn').style.display = 'block';
-            document.getElementById('userName').textContent = currentUser.fullName || currentUser.email;
-            document.getElementById('userAvatar').textContent = (currentUser.fullName || currentUser.email).substring(0, 2).toUpperCase();
+            const name = currentUser.fullName || currentUser.name || currentUser.email;
+            document.getElementById('userName').textContent = name;
+            document.getElementById('userAvatar').textContent = name.substring(0, 2).toUpperCase();
         }
 
-        // Notifications
         async function loadNotifications() {
             if (!authToken) return;
             const data = await apiCall('/Notifications');
             if (!data || !data.notifications) return;
-
             const list = document.getElementById('notifList');
-            if (data.notifications.length === 0) {
-                list.innerHTML = '<div class="notif-empty">No new notifications</div>';
-                return;
-            }
-
-            list.innerHTML = data.notifications.map(n => `
-                <div class="notif-item ${n.isRead ? '' : 'unread'}">
-                  <div class="ni-icon ${n.type.includes('order') ? 'ni-order' : 'ni-res'}">${getNotifIcon(n.type)}</div>
-                  <div class="ni-body">
-                    <div class="ni-text">${n.message}</div>
-                    <div class="ni-time">${formatTime(n.createdAt)}</div>
-                  </div>
-                </div>
-              `).join('');
-
+            if (data.notifications.length === 0) { list.innerHTML = '<div class="notif-empty">Նոր ծանուցումներ չկան</div>'; return; }
+            list.innerHTML = data.notifications.map(n =>
+                '<div class="notif-item ' + (n.isRead ? '' : 'unread') + '">'
+                + '<div class="ni-icon ' + (n.type.includes('order') ? 'ni-order' : 'ni-res') + '">' + getNotifIcon(n.type) + '</div>'
+                + '<div class="ni-body"><div class="ni-text">' + n.message + '</div><div class="ni-time">' + formatTime(n.createdAt) + '</div></div></div>'
+            ).join('');
             if (data.unreadCount > 0) document.getElementById('notifDot').classList.add('show');
         }
 
@@ -1855,17 +1681,14 @@
 
         function formatTime(dateStr) {
             const date = new Date(dateStr);
-            const now = new Date();
-            const diff = Math.floor((now - date) / 1000 / 60);
-            if (diff < 1) return 'Just now';
-            if (diff < 60) return `${diff} minutes ago`;
-            if (diff < 1440) return `${Math.floor(diff / 60)} hours ago`;
+            const diff = Math.floor((new Date() - date) / 60000);
+            if (diff < 1) return 'Հենց նոր';
+            if (diff < 60) return diff + ' րոպե առաջ';
+            if (diff < 1440) return Math.floor(diff / 60) + ' ժամ առաջ';
             return date.toLocaleDateString();
         }
 
-        function toggleNotif() {
-            document.getElementById('notifDropdown').classList.toggle('show');
-        }
+        function toggleNotif() { document.getElementById('notifDropdown').classList.toggle('show'); }
 
         async function markAllRead() {
             if (authToken) await apiCall('/Notifications/read-all', { method: 'PUT' });
@@ -1873,46 +1696,30 @@
             loadNotifications();
         }
 
-        // Modals
-        function openModal(id) {
-            document.getElementById(id).classList.add('show');
-        }
+        function openModal(id) { document.getElementById(id).classList.add('show'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+        function switchModal(from, to) { closeModal(from); openModal(to); }
 
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('show');
-        }
-
-        function switchModal(from, to) {
-            closeModal(from);
-            openModal(to);
-        }
-
-        // Close modals on outside click
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
-            overlay.addEventListener('click', e => {
-                if (e.target === overlay) closeModal(overlay.id);
-            });
+            overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(overlay.id); });
         });
 
-        // Close notifications on outside click
         document.addEventListener('click', e => {
             const dropdown = document.getElementById('notifDropdown');
             const btn = document.getElementById('notifBtn');
-            if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
-                dropdown.classList.remove('show');
-            }
+            if (!dropdown.contains(e.target) && !btn.contains(e.target)) dropdown.classList.remove('show');
         });
 
-        // ===== RESERVATIONS =====
+        // ===== ԱՄՐԱԳՐՈՒՄՆԵՐ =====
         let selectedTable = null;
         let tableAvailability = {};
 
         async function checkTableAvailability() {
             const start = document.getElementById('resStart').value;
             const end = document.getElementById('resEnd').value;
-            if (!start || !end) { alert('Please select both start and end times'); return; }
-            if (new Date(end) <= new Date(start)) { alert('End time must be after start time'); return; }
-            if (new Date(start) <= new Date()) { alert('Start time must be in the future'); return; }
+            if (!start || !end) { alert('Խնդրում ենք ընտրել մեկնարկի և ավարտի ժամանակը'); return; }
+            if (new Date(end) <= new Date(start)) { alert('Ավարտի ժամանակը պետք է լինի մեկնարկից հետո'); return; }
+            if (new Date(start) <= new Date()) { alert('Մեկնարկի ժամանակը պետք է լինի ապագայում'); return; }
             const data = await apiCall('/Reservations/tables?startTime=' + encodeURIComponent(start) + '&endTime=' + encodeURIComponent(end));
             if (!data) return;
             selectedTable = null;
@@ -1922,48 +1729,55 @@
                 const card = document.getElementById('tc-' + t.id);
                 const status = document.getElementById('ts-' + t.id);
                 if (!card) return;
-                card.className = 'table-card ' + (t.available ? 'available' : 'unavailable');
-                status.textContent = t.available ? 'Available' : 'Reserved';
+                card.style.border = t.available ? '2px solid #7aab72' : '2px solid var(--rule)';
+                card.style.background = t.available ? '#f5faf4' : '';
+                card.style.opacity = t.available ? '1' : '0.5';
+                status.textContent = t.available ? 'Հասանելի' : 'Ամրագրված';
                 status.style.color = t.available ? 'var(--moss)' : 'var(--terracotta)';
             });
         }
 
         function selectTable(tableId) {
-            if (tableAvailability[tableId] === undefined) { alert('Please check availability first'); return; }
+            tableId = parseInt(tableId);
+            if (tableAvailability[tableId] === undefined) { alert('Նախ ստուգեք հասանելիությունը'); return; }
             if (!tableAvailability[tableId]) return;
             selectedTable = tableId;
-            ['1', '2', '3'].forEach(t => {
+            [1, 2, 3].forEach(t => {
                 const card = document.getElementById('tc-' + t);
-                if (tableAvailability[t] !== undefined)
-                    card.className = 'table-card ' + (t === tableId ? 'selected' : (tableAvailability[t] ? 'available' : 'unavailable'));
+                if (!card) return;
+                if (t === tableId) { card.style.border = '2px solid var(--moss)'; card.style.background = '#e8f0e4'; }
+                else if (tableAvailability[t] !== undefined) {
+                    card.style.border = tableAvailability[t] ? '2px solid #7aab72' : '2px solid var(--rule)';
+                    card.style.background = tableAvailability[t] ? '#f5faf4' : '';
+                }
             });
             document.getElementById('reserveBtn').style.opacity = '1';
         }
 
         async function makeReservation() {
-            if (!authToken) { alert('Please login to make a reservation'); openModal('loginModal'); return; }
-            if (!selectedTable) { alert('Please select a table'); return; }
+            if (!authToken) { alert('Ամրագրելու համար մուտք գործեք'); openModal('loginModal'); return; }
+            if (!selectedTable) { alert('Խնդրում ենք ընտրել սեղան'); return; }
             const start = document.getElementById('resStart').value;
             const end = document.getElementById('resEnd').value;
             const notes = document.getElementById('resNotes').value;
-            if (!start || !end) { alert('Please select times'); return; }
-            const tableName = selectedTable.replace('table-', 'Table ');
-            if (!confirm('Reserve ' + tableName + ' from ' + new Date(start).toLocaleString() + ' to ' + new Date(end).toLocaleString() + '?\n\nYou will get a reminder 15 minutes before. Confirm?')) return;
-            const result = await apiCall('/Reservations', {
-                method: 'POST',
-                body: JSON.stringify({ tableId: selectedTable, startTime: start, endTime: end, notes: notes })
-            });
+            if (!start || !end) { alert('Խնդրում ենք ընտրել ժամանակ'); return; }
+            if (!confirm('Ամրագրե՞լ Սեղան ' + selectedTable + ':\nՀաստատե՞լ:')) return;
+            const result = await apiCall('/Reservations', { method: 'POST', body: JSON.stringify({ tableId: parseInt(selectedTable), startTime: start, endTime: end, notes: notes }) });
             if (result) {
-                alert('Table reserved! You will get a notification 15 minutes before.');
+                alert('Սեղանը ամրագրված է! Ծանուցում կստանաք 15 րոպե առաջ։');
                 selectedTable = null;
                 document.getElementById('resStart').value = '';
                 document.getElementById('resEnd').value = '';
                 document.getElementById('resNotes').value = '';
                 tableAvailability = {};
-                ['table-1', 'table-2', 'table-3'].forEach(t => {
-                    document.getElementById('tc-' + t).className = 'table-card';
-                    document.getElementById('ts-' + t).textContent = 'Select time first';
-                    document.getElementById('ts-' + t).style.color = '';
+                [1, 2, 3].forEach(t => {
+                    const card = document.getElementById('tc-' + t);
+                    const status = document.getElementById('ts-' + t);
+                    card.style.border = '2px solid var(--rule)';
+                    card.style.background = '';
+                    card.style.opacity = '1';
+                    status.textContent = 'Նախ ընտրեք ժամանակը';
+                    status.style.color = '';
                 });
                 document.getElementById('reserveBtn').style.opacity = '0.5';
                 loadMyReservations();
@@ -1976,36 +1790,37 @@
             if (!data) return;
             const container = document.getElementById('myReservations');
             if (!container) return;
-            if (data.length === 0) { container.innerHTML = '<p style="color:var(--warm-gray);">No reservations yet.</p>'; return; }
+            if (data.length === 0) { container.innerHTML = '<p style="color:var(--warm-gray);">Ամրագրումներ դեռ չկան։</p>'; return; }
             container.innerHTML = data.map(r => {
-                const tableName = (r.tableId || '').replace('table-', 'Table ');
+                const tableName = r.tableName || ('Սեղան ' + r.tableId);
                 const start = new Date(r.startTime);
                 const end = new Date(r.endTime);
                 const badgeClass = r.status === 'Active' ? 'badge-pending' : r.status === 'Confirmed' ? 'badge-confirmed' : '';
+                const statusText = r.status === 'Active' ? 'Ակտիվ' : r.status === 'Confirmed' ? 'Հաստատված' : r.status === 'Cancelled' ? 'Չեղարկված' : r.status === 'Expired' ? 'Ժամկետանց' : r.status;
                 const canCancel = r.status === 'Active' || r.status === 'Confirmed';
                 const canConfirm = r.status === 'Active';
                 return '<div style="background:white;border:1px solid var(--rule);border-radius:12px;padding:1.5rem;">'
                     + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;">'
-                    + '<span style="font-weight:600;">' + (tableName || 'Table') + '</span>'
-                    + '<span class="status-badge ' + badgeClass + '">' + r.status + '</span></div>'
+                    + '<span style="font-weight:600;">' + tableName + '</span>'
+                    + '<span class="status-badge ' + badgeClass + '">' + statusText + '</span></div>'
                     + '<div style="font-size:0.82rem;color:var(--warm-gray);margin-bottom:0.5rem;">'
                     + start.toLocaleDateString() + ' ' + start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                     + ' - ' + end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</div>'
                     + (r.notes ? '<div style="font-size:0.78rem;color:var(--warm-gray);">' + r.notes + '</div>' : '')
                     + '<div style="display:flex;gap:0.5rem;margin-top:0.8rem;">'
-                    + (canConfirm ? '<button class="btn-moss" style="padding:0.4rem 0.9rem;font-size:0.75rem;" onclick="confirmReservation(' + r.id + ')">Confirm</button>' : '')
-                    + (canCancel ? '<button class="btn-secondary" style="padding:0.4rem 0.9rem;font-size:0.75rem;" onclick="cancelReservation(' + r.id + ')">Cancel</button>' : '')
+                    + (canConfirm ? '<button class="btn-moss" style="padding:0.4rem 0.9rem;font-size:0.75rem;" onclick="confirmReservation(' + r.id + ')">Հաստատել</button>' : '')
+                    + (canCancel ? '<button class="btn-secondary" style="padding:0.4rem 0.9rem;font-size:0.75rem;" onclick="cancelReservation(' + r.id + ')">Չեղարկել</button>' : '')
                     + '</div></div>';
             }).join('');
         }
 
         async function confirmReservation(id) {
             const result = await apiCall('/Reservations/' + id + '/confirm', { method: 'PUT' });
-            if (result) { alert(result.message); loadMyReservations(); }
+            if (result) { alert('Ամրագրումը հաստատված է!'); loadMyReservations(); }
         }
 
         async function cancelReservation(id) {
-            if (!confirm('Cancel this reservation?')) return;
+            if (!confirm('Չեղարկե՞լ այս ամրագրումը։')) return;
             const result = await apiCall('/Reservations/' + id, { method: 'DELETE' });
             if (result) { loadMyReservations(); }
         }

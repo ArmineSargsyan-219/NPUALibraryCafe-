@@ -202,7 +202,8 @@ public partial class LibraryCafeDbContext : DbContext
             entity.Property(e => e.Status).HasMaxLength(20).HasColumnName("status");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             entity.HasOne(d => d.Table).WithMany()
-                .HasForeignKey(d => d.TableId).HasConstraintName("reservations_table_id_fkey");
+           .HasForeignKey(d => d.TableId).HasConstraintName("reservations_table_id_fkey");
+            entity.Ignore("Userid");
         });
 
         modelBuilder.Entity<CafeTable>(entity =>

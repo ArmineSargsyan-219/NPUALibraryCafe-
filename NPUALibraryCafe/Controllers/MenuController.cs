@@ -15,15 +15,23 @@ namespace NPUALibraryCafe.API.Controllers
             _context = context;
         }
 
-        // GET: api/Menu
+        // GET: api/Menu  (kept for backwards compatibility)
         [HttpGet]
         public async Task<ActionResult> GetAllMenuItems()
         {
+            return await GetItems();
+        }
+
+        // GET: api/Menu/items
+        [HttpGet("items")]
+        public async Task<ActionResult> GetItems()
+        {
             try
             {
-                var menuItems = await _context.Menuitems
-                    .OrderBy(m => m.CategoryId)
-                    .ThenBy(m => m.Itemname)
+                var menuItems = await _context.Database
+                    .SqlQueryRaw<MenuItemDto>(
+                        "SELECT id, name, price, category_id, image_url, description FROM menu_items ORDER BY category_id, name"
+                    )
                     .ToListAsync();
 
                 return Ok(menuItems);
@@ -40,14 +48,17 @@ namespace NPUALibraryCafe.API.Controllers
         {
             try
             {
-                var menuItem = await _context.Menuitems.FindAsync(id);
+                var menuItems = await _context.Database
+                    .SqlQueryRaw<MenuItemDto>(
+                        "SELECT id, name, price, category_id, image_url, description FROM menu_items WHERE id = {0}", id
+                    )
+                    .ToListAsync();
 
-                if (menuItem == null)
-                {
+                var item = menuItems.FirstOrDefault();
+                if (item == null)
                     return NotFound(new { error = "Menu item not found" });
-                }
 
-                return Ok(menuItem);
+                return Ok(item);
             }
             catch (Exception ex)
             {
@@ -61,9 +72,10 @@ namespace NPUALibraryCafe.API.Controllers
         {
             try
             {
-                var menuItems = await _context.Menuitems
-                    .Where(m => m.CategoryId != null && m.CategoryId.ToLower() == category.ToLower())
-                    .OrderBy(m => m.Itemname)
+                var menuItems = await _context.Database
+                    .SqlQueryRaw<MenuItemDto>(
+                        "SELECT id, name, price, category_id, image_url, description FROM menu_items WHERE LOWER(category_id) = LOWER({0}) ORDER BY name", category
+                    )
                     .ToListAsync();
 
                 return Ok(menuItems);
@@ -81,13 +93,13 @@ namespace NPUALibraryCafe.API.Controllers
             try
             {
                 if (string.IsNullOrWhiteSpace(query))
-                {
                     return BadRequest(new { error = "Search query cannot be empty" });
-                }
 
-                var menuItems = await _context.Menuitems
-                    .Where(m => m.Itemname.ToLower().Contains(query.ToLower()))
-                    .OrderBy(m => m.Itemname)
+                var menuItems = await _context.Database
+                    .SqlQueryRaw<MenuItemDto>(
+                        "SELECT id, name, price, category_id, image_url, description FROM menu_items WHERE LOWER(name) LIKE LOWER({0}) ORDER BY name",
+                        $"%{query}%"
+                    )
                     .ToListAsync();
 
                 return Ok(menuItems);
@@ -97,5 +109,16 @@ namespace NPUALibraryCafe.API.Controllers
                 return StatusCode(500, new { error = "Search failed", details = ex.Message });
             }
         }
+    }
+
+    // DTO matching the actual menu_items table columns
+    public class MenuItemDto
+    {
+        public string Id { get; set; } = null!;
+        public string Name { get; set; } = null!;
+        public decimal Price { get; set; }
+        public string? Category_id { get; set; }
+        public string? Image_url { get; set; }
+        public string? Description { get; set; }
     }
 }

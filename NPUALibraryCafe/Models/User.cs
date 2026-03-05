@@ -30,5 +30,4 @@ public partial class User
     public virtual ICollection<Cafereview> Cafereviews { get; set; } = new List<Cafereview>();
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
-    public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
 }
