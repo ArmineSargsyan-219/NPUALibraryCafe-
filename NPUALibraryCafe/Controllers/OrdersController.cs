@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using System.Text.Json;
 using NPUALibraryCafe.Models;
 
 namespace NPUALibraryCafe.Controllers
@@ -18,12 +20,12 @@ namespace NPUALibraryCafe.Controllers
         }
 
         private int GetUserId() =>
-            int.TryParse(User.FindFirst("userId")?.Value, out int id) ? id : 0;
+            int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int id) ? id : 0;
 
         private string GetUserRole() =>
-            User.FindFirst("role")?.Value ?? "";
+            User.FindFirst(ClaimTypes.Role)?.Value ?? "";
 
-        // POST /api/Orders - Create order (User)
+        // POST /api/Orders - Create order
         [HttpPost]
         public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDto dto)
         {
@@ -40,55 +42,37 @@ namespace NPUALibraryCafe.Controllers
 
                 foreach (var item in dto.Items)
                 {
-                    var menuItem = await _context.Menuitems.FindAsync(item.ItemId);
+                    var menuItems = await _context.Database
+                        .SqlQueryRaw<MenuItemLookup>(
+                            "SELECT id, name, price FROM menu_items WHERE id = {0}", item.ItemId)
+                        .ToListAsync();
+                    var menuItem = menuItems.FirstOrDefault();
                     if (menuItem == null)
                         return BadRequest(new { error = $"Menu item {item.ItemId} not found" });
 
                     total += menuItem.Price * item.Quantity;
-                    itemDetails.Add(new { id = menuItem.Itemid, name = menuItem.Itemname, quantity = item.Quantity, price = menuItem.Price });
+                    itemDetails.Add(new { id = item.ItemId, name = menuItem.Name, qty = item.Quantity, price = menuItem.Price });
                 }
 
-                var order = new Cafeorder
-                {
-                    Userid = userId,
-                    Orderdate = DateTime.Now,
-                    Createdat = DateTime.Now,
-                    Updatedat = DateTime.Now,
-                    Totalamount = total,
-                    Items = System.Text.Json.JsonSerializer.Serialize(itemDetails),
-                    Status = "Pending"
-                };
-
-                _context.Cafeorders.Add(order);
-                await _context.SaveChangesAsync();
-
-                var payment = new Payment
-                {
-                    Orderid = order.Orderid,
-                    Userid = userId,
-                    Amount = total,
-                    Paymentmethod = string.IsNullOrEmpty(dto.PaymentMethod) ? "cash" : dto.PaymentMethod,
-                    Paymentdate = DateTime.Now
-                };
-                _context.Payments.Add(payment);
-                await _context.SaveChangesAsync();
+                var itemsJson = JsonSerializer.Serialize(itemDetails);
+                var orderIds = await _context.Database
+                    .SqlQueryRaw<OrderIdRow>(
+                        @"INSERT INTO orders (user_id, items, total_price, status, order_time, created_at, updated_at)
+                          VALUES ({0}, {1}::jsonb, {2}, 'Pending', NOW(), NOW(), NOW())
+                          RETURNING id",
+                        userId, itemsJson, total)
+                    .ToListAsync();
+                var orderId = orderIds.FirstOrDefault()?.Id ?? 0;
 
                 await NotificationsController.CreateNotification(
                     _context, userId,
-                    "Order Received! ☕",
-                    $"Your order has been received and is waiting for café staff to confirm. Total: {total} AMD",
+                    "Պատվեր ստացվեց ☕",
+                    $"Ձեր պատվերն ստացվեց և սպասում է հաստատման։ Ընդամենը՝ {total} AMD",
                     "order_pending",
-                    order.Orderid
+                    orderId
                 );
 
-                return Ok(new
-                {
-                    message = "Order created successfully",
-                    orderId = order.Orderid,
-                    totalAmount = total,
-                    status = "Pending",
-                    paymentId = payment.Paymentid
-                });
+                return Ok(new { message = "Պատվերը ընդունվեց!", orderId = orderId, totalAmount = total, status = "Pending" });
             }
             catch (Exception ex)
             {
@@ -119,13 +103,12 @@ namespace NPUALibraryCafe.Controllers
             return Ok(orders);
         }
 
-        // GET /api/Orders/pending
+        // GET /api/Orders/pending - Café staff sees active orders
         [HttpGet("pending")]
         public async Task<IActionResult> GetPendingOrders()
         {
             var role = GetUserRole();
-            if (role != "cafe staff" && role != "admin")
-                return Forbid();
+            if (role != "cafe staff" && role != "admin") return Forbid();
 
             var orders = await _context.Cafeorders
                 .Where(o => o.Status == "Pending" || o.Status == "Confirmed" || o.Status == "InProgress")
@@ -146,7 +129,7 @@ namespace NPUALibraryCafe.Controllers
             return Ok(orders);
         }
 
-        // GET /api/Orders/all
+        // GET /api/Orders/all - Admin
         [HttpGet("all")]
         public async Task<IActionResult> GetAllOrders()
         {
@@ -179,7 +162,6 @@ namespace NPUALibraryCafe.Controllers
 
             var order = await _context.Cafeorders.FindAsync(id);
             if (order == null) return NotFound(new { error = "Order not found" });
-            if (order.Status != "Pending") return BadRequest(new { error = "Order is not pending" });
 
             order.Status = "Confirmed";
             order.Updatedat = DateTime.Now;
@@ -187,11 +169,9 @@ namespace NPUALibraryCafe.Controllers
 
             await NotificationsController.CreateNotification(
                 _context, order.Userid,
-                "Order Confirmed! 👍",
-                "Your order has been confirmed by café staff and is being prepared!",
-                "order_confirmed",
-                order.Orderid
-            );
+                "Պատվերը հաստատվեց 👍",
+                "Ձեր պատվերը հաստատվեց սրճարանի անձնակազմի կողմից!",
+                "order_confirmed", id);
 
             return Ok(new { message = "Order confirmed", orderId = id });
         }
@@ -212,13 +192,11 @@ namespace NPUALibraryCafe.Controllers
 
             await NotificationsController.CreateNotification(
                 _context, order.Userid,
-                "Order In Progress! ☕",
-                "Your order is being prepared right now! Won't be long!",
-                "order_inprogress",
-                order.Orderid
-            );
+                "Պատվերը պատրաստվում է ☕",
+                "Ձեր պատվերն այժմ պատրաստվում է! Շուտով կլինի պատրաստ!",
+                "order_inprogress", id);
 
-            return Ok(new { message = "Order marked as in progress", orderId = id });
+            return Ok(new { message = "Order in progress", orderId = id });
         }
 
         // PUT /api/Orders/{id}/done
@@ -238,30 +216,11 @@ namespace NPUALibraryCafe.Controllers
 
             await NotificationsController.CreateNotification(
                 _context, order.Userid,
-                "✅ Order Ready! Come Pick Up!",
-                "Your order is ready! Please come to the café counter to pick it up and pay.",
-                "order_done",
-                order.Orderid
-            );
+                "✅ Պատվերը պատրաստ է!",
+                "Ձեր պատվերը պատրաստ է! Եկեք վերցնել սրճարանի կրպակից:",
+                "order_done", id);
 
-            return Ok(new { message = "Order marked as done", orderId = id });
-        }
-
-        // PUT /api/Orders/{id}/status
-        [HttpPut("{id}/status")]
-        public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusDto dto)
-        {
-            var role = GetUserRole();
-            if (role != "admin") return Forbid();
-
-            var order = await _context.Cafeorders.FindAsync(id);
-            if (order == null) return NotFound();
-
-            order.Status = dto.Status;
-            order.Updatedat = DateTime.Now;
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "Status updated" });
+            return Ok(new { message = "Order done", orderId = id });
         }
 
         // GET /api/Orders/{id}
@@ -276,8 +235,7 @@ namespace NPUALibraryCafe.Controllers
                 .FirstOrDefaultAsync(o => o.Orderid == id);
 
             if (order == null) return NotFound();
-            if (order.Userid != userId && role != "admin" && role != "cafe staff")
-                return Forbid();
+            if (order.Userid != userId && role != "admin" && role != "cafe staff") return Forbid();
 
             return Ok(new
             {
@@ -304,8 +262,11 @@ namespace NPUALibraryCafe.Controllers
         public int Quantity { get; set; }
     }
 
-    public class UpdateStatusDto
+    public class OrderIdRow { public int Id { get; set; } }
+    public class MenuItemLookup
     {
-        public string Status { get; set; } = "";
+        public string Id { get; set; } = "";
+        public string Name { get; set; } = "";
+        public decimal Price { get; set; }
     }
 }

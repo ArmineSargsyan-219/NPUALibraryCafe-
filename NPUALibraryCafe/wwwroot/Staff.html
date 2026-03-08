@@ -1,0 +1,1245 @@
+﻿<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ՀԱՊՀ — Աշխատակցի Վահանակ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ink: #141414;
+            --charcoal: #2a2a2a;
+            --warm-gray: #6b6560;
+            --rule: #e0dbd4;
+            --sand: #f5f0e8;
+            --cream: #faf8f4;
+            --moss: #3d5c3a;
+            --sage: #8aaa85;
+            --amber: #c4873a;
+            --terracotta: #b85540;
+            --blue: #3a5a80;
+            --font-display: 'Cormorant Garamond', Georgia, serif;
+            --font-body: 'Outfit', sans-serif;
+            --shadow: 0 4px 24px rgba(0,0,0,0.08);
+            --shadow-lg: 0 12px 48px rgba(0,0,0,0.14);
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: #f0f2f5;
+            color: var(--ink);
+            min-height: 100vh;
+        }
+
+        button, input, select, textarea {
+            font-family: var(--font-body);
+        }
+
+        /* LOGIN SCREEN */
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--ink);
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            width: 380px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .login-logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            color: var(--ink);
+            margin-bottom: 0.3rem;
+        }
+
+            .login-logo span {
+                font-style: italic;
+                color: var(--moss);
+            }
+
+        .login-sub {
+            font-size: 0.82rem;
+            color: var(--warm-gray);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+            .form-group label {
+                display: block;
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: var(--charcoal);
+                margin-bottom: 0.4rem;
+                letter-spacing: 0.05em;
+                text-transform: uppercase;
+            }
+
+            .form-group input {
+                width: 100%;
+                padding: 0.7rem 1rem;
+                border: 1px solid var(--rule);
+                border-radius: 8px;
+                font-size: 0.9rem;
+                outline: none;
+                transition: border-color 0.2s;
+            }
+
+                .form-group input:focus {
+                    border-color: var(--moss);
+                }
+
+        .btn-login {
+            width: 100%;
+            padding: 0.85rem;
+            background: var(--ink);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 0.5rem;
+        }
+
+            .btn-login:hover {
+                background: var(--moss);
+            }
+
+        .login-err {
+            color: var(--terracotta);
+            font-size: 0.8rem;
+            margin-top: 0.8rem;
+            text-align: center;
+            display: none;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 1.2rem;
+            font-size: 0.8rem;
+            color: var(--warm-gray);
+        }
+
+            .back-link a {
+                color: var(--moss);
+                cursor: pointer;
+                text-decoration: underline;
+            }
+
+        /* DASHBOARD LAYOUT */
+        .dashboard {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: white;
+            border-bottom: 1px solid var(--rule);
+            padding: 0 2rem;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+        }
+
+        .topbar-brand {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+        }
+
+            .topbar-brand span {
+                font-style: italic;
+                color: var(--moss);
+            }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .topbar-user {
+            font-size: 0.82rem;
+            color: var(--warm-gray);
+        }
+
+        .topbar-role {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.2rem 0.7rem;
+            border-radius: 100px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .role-cafe {
+            background: #fdf3e6;
+            color: var(--amber);
+        }
+
+        .role-library {
+            background: #e8f0e4;
+            color: var(--moss);
+        }
+
+        .role-admin {
+            background: #e8eef5;
+            color: var(--blue);
+        }
+
+        .btn-logout {
+            padding: 0.4rem 1rem;
+            background: none;
+            border: 1px solid var(--rule);
+            border-radius: 100px;
+            font-size: 0.78rem;
+            cursor: pointer;
+            color: var(--warm-gray);
+            transition: all 0.2s;
+        }
+
+            .btn-logout:hover {
+                border-color: var(--terracotta);
+                color: var(--terracotta);
+            }
+
+        .main-content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 300;
+            margin-bottom: 0.3rem;
+        }
+
+            .page-title em {
+                font-style: italic;
+                color: var(--moss);
+            }
+
+        .page-desc {
+            font-size: 0.85rem;
+            color: var(--warm-gray);
+            margin-bottom: 2rem;
+        }
+
+        /* STATS ROW */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.2rem 1.5rem;
+            border: 1px solid var(--rule);
+        }
+
+            .stat-card .num {
+                font-family: var(--font-display);
+                font-size: 2.2rem;
+                font-weight: 300;
+                line-height: 1;
+            }
+
+            .stat-card .lbl {
+                font-size: 0.72rem;
+                color: var(--warm-gray);
+                margin-top: 0.3rem;
+            }
+
+        .stat-pending .num {
+            color: var(--amber);
+        }
+
+        .stat-progress .num {
+            color: var(--blue);
+        }
+
+        .stat-done .num {
+            color: var(--moss);
+        }
+
+        /* ORDERS */
+        .orders-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tab-btn {
+            padding: 0.5rem 1.2rem;
+            border-radius: 100px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--rule);
+            background: white;
+            color: var(--warm-gray);
+            transition: all 0.2s;
+        }
+
+            .tab-btn.active {
+                background: var(--ink);
+                border-color: var(--ink);
+                color: white;
+            }
+
+        .orders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .order-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--rule);
+            transition: box-shadow 0.2s;
+        }
+
+            .order-card:hover {
+                box-shadow: var(--shadow);
+            }
+
+            .order-card.new-order {
+                border-color: var(--amber);
+                border-width: 2px;
+            }
+
+        .order-hdr {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .order-id {
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .order-time {
+            font-size: 0.72rem;
+            color: var(--warm-gray);
+        }
+
+        .order-user {
+            font-size: 0.82rem;
+            color: var(--charcoal);
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .order-items {
+            background: var(--sand);
+            border-radius: 8px;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .order-item-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            padding: 0.2rem 0;
+        }
+
+        .order-total {
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-align: right;
+            margin-bottom: 1rem;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-confirm {
+            flex: 1;
+            padding: 0.6rem;
+            background: var(--moss);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+            .btn-confirm:hover {
+                background: #2d4a2d;
+            }
+
+        .btn-inprogress {
+            flex: 1;
+            padding: 0.6rem;
+            background: var(--blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+            .btn-inprogress:hover {
+                background: #2a4060;
+            }
+
+        .btn-done {
+            flex: 1;
+            padding: 0.6rem;
+            background: #2d7a2d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .status-pill {
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 100px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .s-pending {
+            background: #fdf3e6;
+            color: var(--amber);
+        }
+
+        .s-confirmed {
+            background: #e8eef5;
+            color: var(--blue);
+        }
+
+        .s-inprogress {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .s-done {
+            background: #e8f5e8;
+            color: #2d7a2d;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem;
+            color: var(--warm-gray);
+            grid-column: 1/-1;
+        }
+
+            .empty-state .icon {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+            }
+
+        /* LIBRARY WORKER */
+        .lib-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .lib-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid var(--rule);
+        }
+
+            .lib-panel h3 {
+                font-family: var(--font-display);
+                font-size: 1.4rem;
+                margin-bottom: 1.5rem;
+            }
+
+                .lib-panel h3 em {
+                    font-style: italic;
+                    color: var(--moss);
+                }
+
+        .shelf-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+            .shelf-form input, .shelf-form select {
+                padding: 0.7rem 1rem;
+                border: 1px solid var(--rule);
+                border-radius: 8px;
+                font-size: 0.85rem;
+                outline: none;
+                transition: border-color 0.2s;
+            }
+
+                .shelf-form input:focus, .shelf-form select:focus {
+                    border-color: var(--moss);
+                }
+
+        .btn-save {
+            padding: 0.75rem;
+            background: var(--moss);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+            .btn-save:hover {
+                background: #2d4a2d;
+            }
+
+        .book-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .book-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--rule);
+            border-radius: 8px;
+            transition: background 0.15s;
+        }
+
+            .book-row:hover {
+                background: var(--sand);
+            }
+
+        .book-row-cover {
+            width: 36px;
+            height: 52px;
+            border-radius: 3px;
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--moss), #2d5228);
+            flex-shrink: 0;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .book-row-info {
+            flex: 1;
+        }
+
+        .book-row-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .book-row-author {
+            font-size: 0.75rem;
+            color: var(--warm-gray);
+        }
+
+        .book-row-shelf {
+            font-size: 0.72rem;
+            color: var(--moss);
+            font-weight: 500;
+        }
+
+        .book-row-actions {
+            display: flex;
+            gap: 0.4rem;
+        }
+
+        .btn-edit-shelf {
+            padding: 0.3rem 0.7rem;
+            background: none;
+            border: 1px solid var(--rule);
+            border-radius: 6px;
+            font-size: 0.72rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+            .btn-edit-shelf:hover {
+                border-color: var(--moss);
+                color: var(--moss);
+            }
+
+        .pdf-badge {
+            font-size: 0.65rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 100px;
+            font-weight: 600;
+        }
+
+        .pdf-yes {
+            background: #e8f5e8;
+            color: #2d7a2d;
+        }
+
+        .pdf-no {
+            background: #fdf3e6;
+            color: var(--amber);
+        }
+
+        /* PDF MODAL */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+            .modal-overlay.show {
+                display: flex;
+            }
+
+        .modal-box {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            width: 460px;
+            max-width: 95vw;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .modal-sub {
+            font-size: 0.82rem;
+            color: var(--warm-gray);
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+        }
+
+            .modal-actions button {
+                flex: 1;
+                padding: 0.7rem;
+                border-radius: 8px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                cursor: pointer;
+                border: none;
+            }
+
+        .btn-cancel-modal {
+            background: var(--sand);
+            color: var(--ink);
+        }
+
+        .btn-primary-modal {
+            background: var(--moss);
+            color: white;
+        }
+
+        /* NOTIFICATION TOAST */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--ink);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            box-shadow: var(--shadow-lg);
+            display: none;
+            z-index: 9999;
+            animation: slideUp 0.3s ease;
+            max-width: 320px;
+        }
+
+            .toast.show {
+                display: block;
+            }
+
+            .toast.success {
+                background: var(--moss);
+            }
+
+            .toast.error {
+                background: var(--terracotta);
+            }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .lib-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .orders-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN SCREEN -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <div class="login-logo">ՀԱՊՀ <span>Գրադարան-Սրճարան</span></div>
+            <p class="login-sub">Աշխատակցի մուտք</p>
+            <div class="form-group">
+                <label>Էլ. փոստ</label>
+                <input type="email" id="loginEmail" placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+                <label>Գաղտնաբառ</label>
+                <input type="password" id="loginPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+            </div>
+            <button class="btn-login" onclick="doLogin()">Մուտք գործել</button>
+            <div class="login-err" id="loginErr"></div>
+            <div class="back-link"><a onclick="window.location.href='web.html'">← Վերադառնալ կայք</a></div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="dashboard" id="dashboard">
+        <div class="topbar">
+            <div class="topbar-brand">ՀԱՊՀ <span>Աշխատակից</span></div>
+            <div class="topbar-right">
+                <span class="topbar-user" id="topbarUser"></span>
+                <span class="topbar-role" id="topbarRole"></span>
+                <button class="btn-logout" onclick="logout()">Ելք</button>
+            </div>
+        </div>
+        <div class="main-content">
+
+            <!-- CAFÉ WORKER DASHBOARD -->
+            <div id="cafeDashboard" style="display:none;">
+                <div class="page-title">Սրճարանի <em>Վահանակ</em></div>
+                <p class="page-desc">Կառավարեք մուտքային պատվերները — հաստատեք, նշեք ընթացքում կամ ավարտված</p>
+                <div class="stats-row">
+                    <div class="stat-card stat-pending"><div class="num" id="cntPending">0</div><div class="lbl">Սպասող</div></div>
+                    <div class="stat-card stat-progress"><div class="num" id="cntProgress">0</div><div class="lbl">Ընթացքում</div></div>
+                    <div class="stat-card stat-done"><div class="num" id="cntDone">0</div><div class="lbl">Ավարտված այսօր</div></div>
+                </div>
+                <div class="orders-tabs">
+                    <button class="tab-btn active" onclick="filterOrders('all', this)">Բոլորը</button>
+                    <button class="tab-btn" onclick="filterOrders('Pending', this)">Սպասող</button>
+                    <button class="tab-btn" onclick="filterOrders('Confirmed', this)">Հաստատված</button>
+                    <button class="tab-btn" onclick="filterOrders('InProgress', this)">Ընթացքում</button>
+                    <button class="tab-btn" onclick="filterOrders('Done', this)">Ավարտված</button>
+                </div>
+                <div class="orders-grid" id="ordersGrid"></div>
+            </div>
+
+            <!-- LIBRARY WORKER DASHBOARD -->
+            <div id="libraryDashboard" style="display:none;">
+                <div class="page-title">Գրադարանի <em>Վահանակ</em></div>
+                <p class="page-desc">Կառավարեք գրապահոց, հայտեր և ժամկետ անցած գրքեր</p>
+
+                <!-- Borrow request tabs -->
+                <div style="display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+                    <button class="tab-btn active" onclick="filterBorrowings('all',this)">Բոլոր Հայտերը</button>
+                    <button class="tab-btn" onclick="filterBorrowings('borrowed',this)">📖 Ձեռքում</button>
+                    <button class="tab-btn overdue-tab" onclick="filterBorrowings('overdue',this)">⚠️ Ժամկետ Անցած</button>
+                    <button class="tab-btn" onclick="filterBorrowings('returned',this)">↩️ Վերադարձված</button>
+                </div>
+                <div id="borrowingsGrid" style="display:flex;flex-direction:column;gap:0.8rem;margin-bottom:2.5rem;"></div>
+
+                <!-- Book management -->
+                <div class="page-title" style="font-size:1.2rem;margin-bottom:1rem;">Գրքերի <em>Կառավարում</em></div>
+                <div class="lib-grid">
+                    <!-- Book list -->
+                    <div class="lib-panel">
+                        <h3>Բոլոր <em>Գրքերը</em></h3>
+                        <input type="text" placeholder="Որոնել..." id="libSearch" oninput="filterLibBooks()" style="width:100%;padding:0.6rem 1rem;border:1px solid var(--rule);border-radius:8px;margin-bottom:1rem;outline:none;font-size:0.85rem;">
+                        <div class="book-list" id="libBookList"></div>
+                    </div>
+                    <!-- Edit panel -->
+                    <div class="lib-panel">
+                        <h3>Խմբագրել <em>Գիրք</em></h3>
+                        <div id="libEditEmpty" style="text-align:center;padding:3rem;color:var(--warm-gray);">
+                            <div style="font-size:2.5rem;margin-bottom:1rem;">📚</div>
+                            <p>Ձախ կողմից ընտրեք գիրք</p>
+                        </div>
+                        <div id="libEditForm" style="display:none;">
+                            <div style="font-weight:600;font-size:1rem;margin-bottom:0.3rem;" id="editBookTitle"></div>
+                            <div style="font-size:0.82rem;color:var(--warm-gray);margin-bottom:1.5rem;" id="editBookAuthor"></div>
+                            <div class="shelf-form">
+                                <div>
+                                    <label style="display:block;font-size:0.72rem;font-weight:600;color:var(--charcoal);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;">Դարակ</label>
+                                    <input type="text" id="editShelfNumber" placeholder="օրինակ՝ A-01">
+                                </div>
+                                <div>
+                                    <label style="display:block;font-size:0.72rem;font-weight:600;color:var(--charcoal);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;">Հասանելի օրինակներ</label>
+                                    <input type="number" id="editAvailable" min="0">
+                                </div>
+                                <div>
+                                    <label style="display:block;font-size:0.72rem;font-weight:600;color:var(--charcoal);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;">Ֆիզիկական օրինակներ</label>
+                                    <input type="number" id="editPhysical" min="0">
+                                </div>
+                                <button class="btn-save" onclick="saveShelf()">💾 Պահպանել դարակ</button>
+                                <hr style="border:none;border-top:1px solid var(--rule);">
+                                <div>
+                                    <label style="display:block;font-size:0.72rem;font-weight:600;color:var(--charcoal);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;">PDF Հղում</label>
+                                    <input type="url" id="editPdfUrl" placeholder="https://...">
+                                </div>
+                                <button class="btn-save" style="background:var(--blue);" onclick="savePdf()">📄 Պահպանել PDF</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- PDF VIEWER MODAL (for reading) -->
+    <div class="modal-overlay" id="pdfModal">
+        <div class="modal-box" style="width:90vw;max-width:900px;height:85vh;display:flex;flex-direction:column;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                <div class="modal-title" id="pdfModalTitle">PDF</div>
+                <button onclick="closeModal('pdfModal')" style="background:none;border:none;font-size:1.5rem;cursor:pointer;">✕</button>
+            </div>
+            <iframe id="pdfFrame" style="flex:1;border:none;border-radius:8px;" src=""></iframe>
+        </div>
+    </div>
+
+    <!-- SHELF EDIT MODAL -->
+    <div class="modal-overlay" id="shelfModal">
+        <div class="modal-box">
+            <div class="modal-title">Խմբագրել Դարակ</div>
+            <p class="modal-sub" id="shelfModalBook"></p>
+            <div class="form-group">
+                <label>Դարակի համար</label>
+                <input type="text" id="modalShelfNum" placeholder="օրինակ՝ A-01">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel-modal" onclick="closeModal('shelfModal')">Չեղարկել</button>
+                <button class="btn-primary-modal" onclick="saveModalShelf()">Պահպանել</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API = 'https://localhost:7296/api';
+        let authToken = null;
+        let currentUser = null;
+        let allOrders = [];
+        let allBooks = [];
+        let editingBookId = null;
+        let shelfModalBookId = null;
+        let orderRefreshInterval = null;
+
+        // ===== AUTH =====
+        async function doLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errEl = document.getElementById('loginErr');
+            errEl.style.display = 'none';
+
+            try {
+                const res = await fetch(API + '/Auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (!res.ok) { errEl.textContent = data.error || 'Մուտքը ձախողվեց'; errEl.style.display = 'block'; return; }
+
+                const role = data.user.role;
+                if (role !== 'cafe staff' && role !== 'coffee_worker' && role !== 'librarian' && role !== 'library_worker' && role !== 'admin') {
+                    errEl.textContent = 'Այս էջը միայն աշխատակիցների համար է'; errEl.style.display = 'block'; return;
+                }
+
+                authToken = data.token;
+                currentUser = data.user;
+                localStorage.setItem('staffToken', authToken);
+                localStorage.setItem('staffUser', JSON.stringify(currentUser));
+                initDashboard();
+            } catch (e) {
+                errEl.textContent = 'Կապի սխալ'; errEl.style.display = 'block';
+            }
+        }
+
+        function logout() {
+            authToken = null; currentUser = null;
+            localStorage.removeItem('staffToken'); localStorage.removeItem('staffUser');
+            if (orderRefreshInterval) clearInterval(orderRefreshInterval);
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+        }
+
+        async function apiCall(endpoint, options = {}) {
+            const headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken };
+            const res = await fetch(API + endpoint, { ...options, headers: { ...headers, ...options.headers } });
+            if (!res.ok) throw new Error(await res.text());
+            return await res.json();
+        }
+
+        function initDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('topbarUser').textContent = currentUser.name || currentUser.email;
+
+            const role = currentUser.role;
+            const roleEl = document.getElementById('topbarRole');
+
+            if (role === 'cafe staff' || role === 'coffee_worker') {
+                roleEl.textContent = 'Սրճարանի Աշխատող';
+                roleEl.className = 'topbar-role role-cafe';
+                document.getElementById('cafeDashboard').style.display = 'block';
+                loadOrders();
+                orderRefreshInterval = setInterval(loadOrders, 15000); // auto-refresh every 15s
+            } else if (role === 'librarian' || role === 'library_worker') {
+                roleEl.textContent = 'Գրադարանավար';
+                roleEl.className = 'topbar-role role-library';
+                document.getElementById('libraryDashboard').style.display = 'block';
+                loadLibraryBooks();
+                loadBorrowings();
+                setInterval(loadBorrowings, 30000);
+            } else if (role === 'admin') {
+                roleEl.textContent = 'Ադմին';
+                roleEl.className = 'topbar-role role-admin';
+                document.getElementById('cafeDashboard').style.display = 'block';
+                document.getElementById('libraryDashboard').style.display = 'block';
+                loadOrders();
+                loadLibraryBooks();
+                loadBorrowings();
+                orderRefreshInterval = setInterval(loadOrders, 15000);
+            }
+        }
+
+        // ===== CAFÉ WORKER =====
+        async function loadOrders() {
+            try {
+                const data = await apiCall('/Orders/pending');
+                allOrders = data;
+                updateOrderStats(data);
+                renderOrders(data);
+            } catch (e) { console.error(e); }
+        }
+
+        function updateOrderStats(orders) {
+            document.getElementById('cntPending').textContent = orders.filter(o => o.status === 'Pending').length;
+            document.getElementById('cntProgress').textContent = orders.filter(o => o.status === 'InProgress').length;
+            // Done today from separate count - approximate
+            document.getElementById('cntDone').textContent = orders.filter(o => o.status === 'Done').length;
+        }
+
+        function filterOrders(status, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const filtered = status === 'all' ? allOrders : allOrders.filter(o => o.status === status);
+            renderOrders(filtered);
+        }
+
+        function renderOrders(orders) {
+            const grid = document.getElementById('ordersGrid');
+            if (orders.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><div class="icon">✅</div><p>Ակտիվ պատվերներ չկան</p></div>';
+                return;
+            }
+            grid.innerHTML = orders.map(o => {
+                const time = new Date(o.orderDate);
+                const timeStr = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const statusClass = { Pending: 's-pending', Confirmed: 's-confirmed', InProgress: 's-inprogress', Done: 's-done' }[o.status] || '';
+                const statusText = { Pending: 'Սպասում', Confirmed: 'Հաստատված', InProgress: 'Ընթացքում', Done: 'Ավարտված' }[o.status] || o.status;
+                const isNew = o.status === 'Pending';
+
+                let actions = '';
+                if (o.status === 'Pending') {
+                    actions = '<button class="btn-confirm" onclick="updateOrder(' + o.orderId + ',\'confirm\')">✓ Հաստատել</button>';
+                } else if (o.status === 'Confirmed') {
+                    actions = '<button class="btn-inprogress" onclick="updateOrder(' + o.orderId + ',\'inprogress\')">⏳ Ընթացքում</button>';
+                } else if (o.status === 'InProgress') {
+                    actions = '<button class="btn-done" onclick="updateOrder(' + o.orderId + ',\'done\')">✅ Ավարտված</button>';
+                }
+
+                return '<div class="order-card' + (isNew ? ' new-order' : '') + '">'
+                    + '<div class="order-hdr"><span class="order-id">#' + o.orderId + '</span><span class="status-pill ' + statusClass + '">' + statusText + '</span></div>'
+                    + '<div class="order-time">🕐 ' + timeStr + ' — ' + o.orderType + '</div>'
+                    + '<div class="order-user">👤 ' + o.userName + '</div>'
+                    + '<div class="order-items">'
+                    + (() => {
+                        try {
+                            const items = typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []);
+                            return items.map(i => '<div class="order-item-row"><span>' + (i.qty || i.quantity || 1) + '× ' + (i.name || i.itemName || 'Item') + '</span><span>' + ((i.price || 0) * (i.qty || i.quantity || 1)) + ' AMD</span></div>').join('');
+                        } catch (e) { return '<div class="order-item-row"><span>' + (o.items || '') + '</span></div>'; }
+                    })()
+                    + '</div>'
+                    + '<div class="order-total">Ընդամենը՝ ' + o.totalAmount + ' AMD</div>'
+                    + (actions ? '<div class="order-actions">' + actions + '</div>' : '')
+                    + '</div>';
+            }).join('');
+        }
+
+        async function updateOrder(id, action) {
+            try {
+                await apiCall('/Orders/' + id + '/' + action, { method: 'PUT' });
+                const msgs = { confirm: 'Պատվերը հաստատվեց ✓', inprogress: 'Ընթացքում նշված ⏳', done: 'Ավարտված! Ծանուցում ուղարկվեց ✅' };
+                showToast(msgs[action] || 'Թարմացվեց', 'success');
+                await loadOrders();
+            } catch (e) {
+                showToast('Սխալ: ' + e.message, 'error');
+            }
+        }
+
+        // ===== LIBRARY BORROWINGS =====
+        let allBorrowings = [];
+        let currentBorrowFilter = 'all';
+
+        async function loadBorrowings() {
+            try {
+                const status = currentBorrowFilter === 'all' ? '' : currentBorrowFilter;
+                const url = currentBorrowFilter === 'overdue' ? '/Borrowings/overdue' : '/Borrowings/all' + (status ? '?status=' + status : '');
+                const data = await apiCall(url);
+                allBorrowings = data;
+                renderBorrowings(data);
+            } catch (e) { console.error(e); }
+        }
+
+        function filterBorrowings(status, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentBorrowFilter = status;
+            loadBorrowings();
+        }
+
+        function renderBorrowings(items) {
+            const grid = document.getElementById('borrowingsGrid');
+            if (!items || items.length === 0) {
+                grid.innerHTML = '<div class="empty-state" style="padding:2rem;text-align:center;color:#888;"><div style="font-size:2rem;margin-bottom:0.5rem;">📋</div><p>Հայտեր չկան</p></div>';
+                return;
+            }
+            const statusLabel = { requested: '⏳ Սպասում', approved: '✅ Հաստատված', borrowed: '📖 Ձեռքում', returned: '↩️ Վերադարձված', overdue: '⚠️ Ժամկետ Անցած', rejected: '❌ Մերժված' };
+            const statusColor = { requested: '#c4873a', approved: '#2d7a2d', borrowed: '#3a6ea5', returned: '#888', overdue: '#b85540', rejected: '#999' };
+            grid.innerHTML = items.map(b => {
+                const title = b.book_title || b.title || 'Անհայտ գիրք';
+                const author = b.book_author || b.author || '';
+                const status = statusLabel[b.status] || b.status;
+                const color = statusColor[b.status] || '#666';
+                const isOverdue = b.status === 'overdue' || (b.status === 'borrowed' && b.due_date && new Date(b.due_date) < new Date());
+                const rawDate = b.borrowed_at || b.requested_at || b.created_at;
+                const reqDate = rawDate ? new Date(rawDate).toLocaleDateString('hy-AM') : '—';
+                const dueDate = b.due_date ? new Date(b.due_date).toLocaleDateString('hy-AM') : null;
+                let actions = '';
+                if (b.status === 'requested') {
+                    actions = '<button class="btn-confirm" onclick="approveBorrowing(' + b.id + ')">✓ Հաստատել</button>'
+                        + '<button class="btn-done" style="background:#e74c3c;" onclick="rejectBorrowing(' + b.id + ')">✗ Մերժել</button>';
+                } else if (b.status === 'borrowed' || b.status === 'overdue') {
+                    actions = '<button class="btn-confirm" onclick="returnBorrowing(' + b.id + ')">↩️ Վերադարձված է</button>';
+                }
+                return '<div style="background:white;border-radius:10px;padding:1rem 1.2rem;border:1px solid ' + (isOverdue ? '#f5c2b8' : '#e5e0d8') + ';' + (isOverdue ? 'background:#fff8f7;' : '') + '">'
+                    + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;">'
+                    + '<div style="flex:1;min-width:200px;">'
+                    + '<div style="font-weight:700;font-size:0.95rem;">' + title + '</div>'
+                    + '<div style="font-size:0.78rem;color:#888;margin-bottom:0.4rem;">' + author + '</div>'
+                    + '<div style="font-size:0.82rem;"><strong>' + (b.user_name || '') + '</strong></div>'
+                    + '<div style="font-size:0.78rem;color:#888;">' + (b.user_email || '')
+                    + (b.user_phone ? ' · <strong style="color:#2d6a2d;">📞 ' + b.user_phone + '</strong>' : ' · <span style="color:#b85540;">Հեռ. չկա</span>') + '</div>'
+                    + '</div>'
+                    + '<div style="text-align:right;">'
+                    + '<span style="font-size:0.75rem;font-weight:700;color:' + color + ';">' + status + '</span>'
+                    + '<div style="font-size:0.75rem;color:#888;margin-top:0.3rem;">Ամսաթիվ՝ ' + reqDate + '</div>'
+                    + (dueDate ? '<div style="font-size:0.75rem;color:' + (isOverdue ? '#b85540' : '#888') + ';font-weight:' + (isOverdue ? '700' : '400') + ';">Վերադարձ՝ ' + dueDate + '</div>' : '')
+                    + '</div>'
+                    + '</div>'
+                    + (actions ? '<div style="display:flex;gap:0.5rem;margin-top:0.8rem;">' + actions + '</div>' : '')
+                    + '</div>';
+            }).join('');
+        }
+
+        async function approveBorrowing(id) {
+            try {
+                await apiCall('/Borrowings/' + id + '/approve', { method: 'PUT' });
+                showToast('Հաստատվեց — 14 օր ժամկետ ✓', 'success');
+                loadBorrowings();
+            } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
+        }
+
+        async function rejectBorrowing(id) {
+            const reason = prompt('Մերժման պատճառ (կամ թողեք դատարկ):') || '';
+            try {
+                await apiCall('/Borrowings/' + id + '/reject', { method: 'PUT', body: JSON.stringify({ reason }) });
+                showToast('Մերժված է', 'success');
+                loadBorrowings();
+            } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
+        }
+
+        async function returnBorrowing(id) {
+            try {
+                await apiCall('/Borrowings/' + id + '/return', { method: 'PUT' });
+                showToast('Գիրքը ընդունված է ✓', 'success');
+                loadBorrowings();
+            } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
+        }
+
+        // ===== LIBRARY WORKER =====
+        async function loadLibraryBooks() {
+            try {
+                const data = await apiCall('/Books');
+                allBooks = data;
+                renderLibBooks(data);
+            } catch (e) { console.error(e); }
+        }
+
+        function filterLibBooks() {
+            const q = document.getElementById('libSearch').value.toLowerCase();
+            const filtered = allBooks.filter(b => b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q));
+            renderLibBooks(filtered);
+        }
+
+        function renderLibBooks(books) {
+            document.getElementById('libBookList').innerHTML = books.map(b => {
+                const imgStyle = b.imagepath ? 'background-image:url(\'' + b.imagepath + '\');background-size:cover;background-position:center;' : '';
+                return '<div class="book-row">'
+                    + '<div class="book-row-cover" style="' + imgStyle + '"></div>'
+                    + '<div class="book-row-info">'
+                    + '<div class="book-row-title">' + b.title + '</div>'
+                    + '<div class="book-row-author">' + b.author + '</div>'
+                    + '<div class="book-row-shelf">' + (b.shelfNumber || b.shelfnumber || 'Դարակ նշված չէ') + '</div>'
+                    + '</div>'
+                    + '<div style="display:flex;flex-direction:column;gap:0.3rem;align-items:flex-end;">'
+                    + '<span class="pdf-badge ' + (b.pdfAvailable || b.pdfavailable ? 'pdf-yes' : 'pdf-no') + '">' + (b.pdfAvailable || b.pdfavailable ? 'PDF ✓' : 'PDF ✗') + '</span>'
+                    + '<button class="btn-edit-shelf" onclick="selectBook(' + b.bookId + ')">Խմբագրել</button>'
+                    + '</div>'
+                    + '</div>';
+            }).join('');
+        }
+
+        function selectBook(bookId) {
+            const book = allBooks.find(b => b.bookId === bookId);
+            if (!book) return;
+            editingBookId = bookId;
+            document.getElementById('libEditEmpty').style.display = 'none';
+            document.getElementById('libEditForm').style.display = 'block';
+            document.getElementById('editBookTitle').textContent = book.title;
+            document.getElementById('editBookAuthor').textContent = book.author;
+            document.getElementById('editShelfNumber').value = book.shelfNumber || book.shelfnumber || '';
+            document.getElementById('editAvailable').value = book.availableCopies || book.availablecopies || 0;
+            document.getElementById('editPhysical').value = book.physicalCopies || book.physicalcopies || 0;
+            document.getElementById('editPdfUrl').value = book.pdfUrl || book.pdfurl || '';
+        }
+
+        async function saveShelf() {
+            if (!editingBookId) return;
+            try {
+                await apiCall('/Books/' + editingBookId + '/shelf', {
+                    method: 'PUT',
+                    body: JSON.stringify({ shelfNumber: document.getElementById('editShelfNumber').value })
+                });
+                await apiCall('/Books/' + editingBookId + '/copies', {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        physicalCopies: parseInt(document.getElementById('editPhysical').value),
+                        availableCopies: parseInt(document.getElementById('editAvailable').value)
+                    })
+                });
+                showToast('Դարակը պահպանվեց ✓', 'success');
+                await loadLibraryBooks();
+            } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
+        }
+
+        async function savePdf() {
+            if (!editingBookId) return;
+            try {
+                await apiCall('/Books/' + editingBookId + '/pdf', {
+                    method: 'PUT',
+                    body: JSON.stringify({ pdfUrl: document.getElementById('editPdfUrl').value })
+                });
+                showToast('PDF հղումը պահպանվեց ✓', 'success');
+                await loadLibraryBooks();
+            } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
+        }
+
+        // ===== UTILS =====
+        function openModal(id) { document.getElementById(id).classList.add('show'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+        function showToast(msg, type) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show ' + (type || '');
+            setTimeout(() => t.className = 'toast', 3000);
+        }
+
+        // Init on load
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('staffToken');
+            const user = localStorage.getItem('staffUser');
+            if (token && user) {
+                authToken = token;
+                currentUser = JSON.parse(user);
+                initDashboard();
+            }
+        });
+    </script>
+</body>
+</html>

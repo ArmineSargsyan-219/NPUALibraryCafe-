@@ -98,7 +98,7 @@ namespace NPUALibraryCafe.Controllers
                 Message = message,
                 Type = type,
                 Relatedid = relatedId,
-                Createdat = DateTime.UtcNow
+                Createdat = DateTime.Now
             };
             context.Notifications.Add(notification);
             await context.SaveChangesAsync();

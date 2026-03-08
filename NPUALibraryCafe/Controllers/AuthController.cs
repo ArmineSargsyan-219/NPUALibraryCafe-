@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
-using System.Net.Mail;
 using System.Security.Claims;
 using System.Text;
 using NPUALibraryCafe.Models;
@@ -18,80 +16,34 @@ namespace NPUALibraryCafe.Controllers
         private readonly LibraryCafeDbContext _context;
         private readonly IConfiguration _configuration;
 
-        // Temporary in-memory store for verification codes
-        // Key: email, Value: (code, expiry)
-        private static readonly Dictionary<string, (string Code, DateTime Expiry, RegisterDto Data)> _pendingRegistrations = new();
-
         public AuthController(LibraryCafeDbContext context, IConfiguration configuration)
         {
             _context = context;
             _configuration = configuration;
         }
 
-        // POST: api/Auth/send-code
-        [HttpPost("send-code")]
-        public async Task<ActionResult> SendVerificationCode([FromBody] RegisterDto dto)
-        {
-            try
-            {
-                var existingUser = await _context.Users
-                    .FirstOrDefaultAsync(u => u.Email == dto.Email);
-
-                if (existingUser != null)
-                    return BadRequest(new { error = "User with this email already exists" });
-
-                // Generate 6-digit code
-                var code = new Random().Next(100000, 999999).ToString();
-                var expiry = DateTime.UtcNow.AddMinutes(10);
-
-                // Store pending registration
-                _pendingRegistrations[dto.Email] = (code, expiry, dto);
-
-                // Send email
-                await SendEmailAsync(dto.Email, dto.Name, code);
-
-                return Ok(new { message = "Verification code sent to your email" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = "Failed to send code", details = ex.Message });
-            }
-        }
-
         // POST: api/Auth/register
         [HttpPost("register")]
-        public async Task<ActionResult> Register([FromBody] VerifyDto dto)
+        public async Task<ActionResult> Register([FromBody] RegisterDto dto)
         {
             try
             {
-                if (!_pendingRegistrations.TryGetValue(dto.Email, out var pending))
-                    return BadRequest(new { error = "No pending registration for this email. Please request a new code." });
-
-                if (DateTime.UtcNow > pending.Expiry)
-                {
-                    _pendingRegistrations.Remove(dto.Email);
-                    return BadRequest(new { error = "Code has expired. Please request a new one." });
-                }
-
-                if (pending.Code != dto.Code)
-                    return BadRequest(new { error = "Invalid verification code" });
-
-                // Code is correct - create the user
-                _pendingRegistrations.Remove(dto.Email);
-
                 var existingUser = await _context.Users
                     .FirstOrDefaultAsync(u => u.Email == dto.Email);
-                if (existingUser != null)
-                    return BadRequest(new { error = "User with this email already exists" });
 
-                var hashedPassword = BCrypt.Net.BCrypt.HashPassword(pending.Data.Password);
+                if (existingUser != null)
+                {
+                    return BadRequest(new { error = "User with this email already exists" });
+                }
+
+                var hashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
                 var user = new User
                 {
-                    Fullname = pending.Data.Name,
-                    Email = pending.Data.Email,
+                    Fullname = dto.Name,
+                    Email = dto.Email,
                     Passwordhash = hashedPassword,
-                    Role = pending.Data.Role
+                    Role = dto.Role
                 };
 
                 _context.Users.Add(user);
@@ -128,10 +80,14 @@ namespace NPUALibraryCafe.Controllers
                     .FirstOrDefaultAsync(u => u.Email == dto.Email);
 
                 if (user == null)
+                {
                     return Unauthorized(new { error = "Invalid email or password" });
+                }
 
                 if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.Passwordhash))
+                {
                     return Unauthorized(new { error = "Invalid email or password" });
+                }
 
                 var token = GenerateJwtToken(user);
 
@@ -165,14 +121,23 @@ namespace NPUALibraryCafe.Controllers
                 var user = await _context.Users.FindAsync(userId);
 
                 if (user == null)
+                {
                     return NotFound(new { error = "User not found" });
+                }
+
+                // Get phone via raw SQL since User model may not have it yet
+                var phones = await _context.Database
+                    .SqlQueryRaw<PhoneRow>("SELECT phone FROM users WHERE id = {0}", userId)
+                    .ToListAsync();
+                var phone = phones.FirstOrDefault()?.Phone;
 
                 return Ok(new
                 {
                     id = user.Userid,
                     name = user.Fullname,
                     email = user.Email,
-                    role = user.Role
+                    role = user.Role,
+                    phone
                 });
             }
             catch (Exception ex)
@@ -181,47 +146,31 @@ namespace NPUALibraryCafe.Controllers
             }
         }
 
-        private async Task SendEmailAsync(string toEmail, string toName, string code)
+        // PUT: api/Auth/profile
+        [Authorize]
+        [HttpPut("profile")]
+        public async Task<ActionResult> UpdateProfile([FromBody] UpdateProfileDto dto)
         {
-            var fromEmail = "arminesargsyan699@gmail.com";
-            var appPassword = "qufeuwxnhibxqcie";
-
-            var smtp = new SmtpClient("smtp.gmail.com")
+            try
             {
-                Port = 587,
-                UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(fromEmail, appPassword),
-                EnableSsl = true,
-                DeliveryMethod = SmtpDeliveryMethod.Network
-            };
-
-            var mail = new MailMessage
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+                if (!string.IsNullOrEmpty(dto.Name))
+                    await _context.Database.ExecuteSqlRawAsync("UPDATE users SET name = {0} WHERE id = {1}", dto.Name, userId);
+                if (dto.Phone != null)
+                    await _context.Database.ExecuteSqlRawAsync("UPDATE users SET phone = {0} WHERE id = {1}", dto.Phone, userId);
+                return Ok(new { message = "Պրոֆիլը թարմացված է" });
+            }
+            catch (Exception ex)
             {
-                From = new MailAddress(fromEmail, "NPUA Library Café"),
-                Subject = "Your verification code",
-                IsBodyHtml = true,
-                Body = $@"
-                <div style='font-family:sans-serif;max-width:480px;margin:0 auto;padding:2rem;'>
-                    <h2 style='color:#3d5c3a;'>NPUA Library Café</h2>
-                    <p>Hi {toName},</p>
-                    <p>Your verification code is:</p>
-                    <div style='font-size:2.5rem;font-weight:bold;letter-spacing:0.5rem;color:#141414;
-                                background:#f5f0e8;padding:1.5rem;text-align:center;border-radius:8px;margin:1.5rem 0;'>
-                        {code}
-                    </div>
-                    <p style='color:#6b6560;font-size:0.9rem;'>This code expires in 10 minutes.</p>
-                </div>"
-            };
-
-            mail.To.Add(new MailAddress(toEmail, toName));
-            await smtp.SendMailAsync(mail);
+                return StatusCode(500, new { error = "Failed to update profile", details = ex.Message });
+            }
         }
 
         private string GenerateJwtToken(User user)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");
             var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT Secret Key not configured");
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
@@ -252,15 +201,13 @@ namespace NPUALibraryCafe.Controllers
         public string Role { get; set; } = "student";
     }
 
-    public class VerifyDto
-    {
-        public string Email { get; set; } = string.Empty;
-        public string Code { get; set; } = string.Empty;
-    }
-
     public class LoginDto
     {
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
     }
+
+    public class PhoneRow { public string? Phone { get; set; } }
+    public class UpdateProfileDto { public string? Name { get; set; } public string? Phone { get; set; } }
+
 }

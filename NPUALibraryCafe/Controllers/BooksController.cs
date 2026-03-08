@@ -38,7 +38,8 @@ namespace NPUALibraryCafe.Controllers
                     physicalCopies = b.Physicalcopies,
                     availableCopies = b.Availablecopies,
                     pdfAvailable = b.Pdfavailable,
-                    pdfUrl = b.Pdfurl
+                    pdfUrl = b.Pdfurl,
+                    imagepath = b.Imagepath
                 })
                 .ToListAsync();
 
@@ -62,7 +63,8 @@ namespace NPUALibraryCafe.Controllers
                     physicalCopies = b.Physicalcopies,
                     availableCopies = b.Availablecopies,
                     pdfAvailable = b.Pdfavailable,
-                    pdfUrl = b.Pdfurl
+                    pdfUrl = b.Pdfurl,
+                    imagepath = b.Imagepath
                 })
                 .ToListAsync();
 
@@ -209,12 +211,12 @@ namespace NPUALibraryCafe.Controllers
             if (book.Availablecopies <= 0)
                 return BadRequest(new { error = "No available copies" });
 
-            var dueDate = DateTime.UtcNow.AddDays(14);
+            var dueDate = DateTime.Now.AddDays(14);
             var borrowing = new Borrowing
             {
                 Userid = userId,
                 Bookid = id,
-                Borrowdate = DateTime.UtcNow,
+                Borrowdate = DateTime.Now,
                 Duedate = dueDate,
                 Returndate = null
             };
@@ -257,7 +259,7 @@ namespace NPUALibraryCafe.Controllers
                     shelfNumber = b.Book.Shelfnumber,
                     borrowDate = b.Borrowdate,
                     dueDate = b.Duedate,
-                    isOverdue = b.Duedate < DateTime.UtcNow
+                    isOverdue = b.Duedate < DateTime.Now
                 })
                 .ToListAsync();
 
@@ -277,7 +279,7 @@ namespace NPUALibraryCafe.Controllers
             if (borrowing == null) return NotFound(new { error = "Borrowing record not found" });
             if (borrowing.Returndate != null) return BadRequest(new { error = "Book already returned" });
 
-            borrowing.Returndate = DateTime.UtcNow;
+            borrowing.Returndate = DateTime.Now;
             borrowing.Book.Availablecopies++;
             await _context.SaveChangesAsync();
 
@@ -318,7 +320,7 @@ namespace NPUALibraryCafe.Controllers
                 Userid = userId,
                 Rating = dto.Rating,
                 Comment = dto.Comment,
-                Createdat = DateTime.UtcNow
+                Createdat = DateTime.Now
             };
 
             _context.Bookreviews.Add(review);
