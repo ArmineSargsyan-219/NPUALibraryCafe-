@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace NPUALibraryCafe.Models;
+namespace  LibCafe.Domain.Entities;
 
 [Table("borrowed_books")]
 public partial class Borrowing

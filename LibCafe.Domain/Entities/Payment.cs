@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace NPUALibraryCafe.Models;
+namespace  LibCafe.Domain.Entities;
 
 public partial class Payment
 {

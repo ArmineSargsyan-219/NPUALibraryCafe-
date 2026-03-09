@@ -914,7 +914,8 @@
                 if (!res.ok) { errEl.textContent = data.error || 'Մուտքը ձախողվեց'; errEl.style.display = 'block'; return; }
 
                 const role = data.user.role;
-                if (role !== 'cafe staff' && role !== 'coffee_worker' && role !== 'librarian' && role !== 'library_worker' && role !== 'admin') {
+                if (role === 'admin') { window.location.href = 'admin.html'; return; }
+                if (role !== 'cafe staff' && role !== 'coffee_worker' && role !== 'librarian' && role !== 'library_worker') {
                     errEl.textContent = 'Այս էջը միայն աշխատակիցների համար է'; errEl.style.display = 'block'; return;
                 }
 
@@ -1231,12 +1232,29 @@
         }
 
         // Init on load
-        window.addEventListener('load', () => {
+        window.addEventListener('load', async () => {
             const token = localStorage.getItem('staffToken');
             const user = localStorage.getItem('staffUser');
             if (token && user) {
                 authToken = token;
-                currentUser = JSON.parse(user);
+                // Always fetch fresh profile to get correct role
+                try {
+                    const res = await fetch(API + '/Auth/profile', {
+                        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }
+                    });
+                    if (res.ok) {
+                        const fresh = await res.json();
+                        currentUser = { ...JSON.parse(user), role: fresh.role, name: fresh.name };
+                        localStorage.setItem('staffUser', JSON.stringify(currentUser));
+                    } else {
+                        // Token expired
+                        localStorage.removeItem('staffToken');
+                        localStorage.removeItem('staffUser');
+                        return;
+                    }
+                } catch (e) {
+                    currentUser = JSON.parse(user);
+                }
                 initDashboard();
             }
         });

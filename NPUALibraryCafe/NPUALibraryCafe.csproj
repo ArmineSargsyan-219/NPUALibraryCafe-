@@ -17,4 +17,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\LibCafe.Domain\LibCafe.Domain.csproj" />
+    <ProjectReference Include="..\LibCafe.Infrastructure\LibCafe.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using LibCafe.Infrastructure.Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NPUALibraryCafe.Models;
 
 namespace NPUALibraryCafe.API.Controllers
 {

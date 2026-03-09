@@ -1998,6 +1998,7 @@
             const password = document.getElementById('regPassword').value;
             const role = document.getElementById('regRole').value;
             if (!name || !email || !password) { alert('Խնդրում ենք լրացնել բոլոր դաշտերը'); return; }
+            if (!email.endsWith('@polytechnic.am')) { alert('Գրանցվելու համար անհրաժեշտ է օգտագործել @polytechnic.am էլ. հասցե'); return; }
             const result = await apiCall('/Auth/send-code', { method: 'POST', body: JSON.stringify({ name, email, password, role }) });
             if (result) {
                 document.getElementById('regEmailDisplay').textContent = email;
@@ -2140,14 +2141,14 @@
             document.getElementById('myBorrowList').innerHTML = data.map(b => {
                 const status = statusLabel[b.status] || b.status;
                 const color = statusColor[b.status] || '#666';
-                const reqDate = new Date(b.requested_at).toLocaleDateString('hy-AM');
+                const reqDate = new Date(b.borrowed_at || b.requested_at).toLocaleDateString('hy-AM');
                 const dueDate = b.due_date ? new Date(b.due_date).toLocaleDateString('hy-AM') : null;
                 const isOverdue = b.status === 'overdue' || (b.status === 'borrowed' && b.due_date && new Date(b.due_date) < new Date());
                 return '<div style="background:white;border-radius:12px;padding:1.2rem 1.5rem;border:1px solid ' + (isOverdue ? '#f5c2b8' : 'var(--rule)') + ';' + (isOverdue ? 'background:#fff8f7;' : '') + '">'
                     + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;">'
                     + '<div style="flex:1;">'
-                    + '<div style="font-weight:700;margin-bottom:0.2rem;">' + b.title + '</div>'
-                    + '<div style="font-size:0.8rem;color:var(--warm-gray);">' + b.author + '</div>'
+                    + '<div style="font-weight:700;margin-bottom:0.2rem;">' + (b.book_title || b.title) + '</div>'
+                    + '<div style="font-size:0.8rem;color:var(--warm-gray);">' + (b.book_author || b.author) + '</div>'
                     + '</div>'
                     + '<span style="font-size:0.75rem;font-weight:700;color:' + color + ';white-space:nowrap;">' + status + '</span>'
                     + '</div>'
@@ -2311,9 +2312,9 @@
             // Populate start time options 08:00 - 18:30 (every 30 min)
             const startSel = document.getElementById('resStartTime');
             if (startSel && startSel.options.length <= 1) {
-                for (let h = 8; h <= 18; h++) {
+                for (let h = 8; h <= 17; h++) {
                     for (let m of [0, 30]) {
-                        if (h === 18 && m === 30) continue; // max start 18:30 to allow 30min booking
+                        if (h === 17 && m === 30) continue; // max start 18:30 to allow 30min booking
                         const label = pad(h) + ':' + pad(m);
                         startSel.add(new Option(label, label));
                     }
@@ -2334,7 +2335,7 @@
                 const endMins = startMins + delta;
                 const eh = Math.floor(endMins / 60);
                 const em = endMins % 60;
-                if (eh > 19 || (eh === 19 && em > 0)) break;
+                if (eh > 18 || (eh === 18 && em > 0)) break;
                 const label = pad(eh) + ':' + pad(em);
                 endSel.add(new Option(label + (delta === 60 ? ' (1 ժ)' : delta === 120 ? ' (2 ժ)' : delta === 180 ? ' (3 ժ)' : ''), label));
             }

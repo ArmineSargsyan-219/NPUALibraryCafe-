@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using LibCafe.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using NPUALibraryCafe.Models;
 
 // Fix for Npgsql DateTime UTC compatibility with 'timestamp without time zone'
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);

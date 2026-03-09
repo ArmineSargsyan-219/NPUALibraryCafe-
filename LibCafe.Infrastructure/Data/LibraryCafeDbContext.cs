@@ -1,10 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Xml;
+﻿using LibCafe.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
-namespace NPUALibraryCafe.Models;
-
+namespace LibCafe.Infrastructure.Data;
 public partial class LibraryCafeDbContext : DbContext
 {
     public LibraryCafeDbContext()

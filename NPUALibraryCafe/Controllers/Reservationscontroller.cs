@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using LibCafe.Domain.Entities;
+using LibCafe.Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NPUALibraryCafe.Models;
 using System.Security.Claims;
 
 namespace NPUALibraryCafe.Controllers
@@ -151,8 +152,8 @@ namespace NPUALibraryCafe.Controllers
             table.IsReserved = true;
 
             await _context.SaveChangesAsync();
-            
-           
+
+
 
             return Ok(new
             {

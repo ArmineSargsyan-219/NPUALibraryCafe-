@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using LibCafe.Domain.Entities;
+using LibCafe.Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NPUALibraryCafe.Models;
 
 namespace NPUALibraryCafe.Controllers
 {
