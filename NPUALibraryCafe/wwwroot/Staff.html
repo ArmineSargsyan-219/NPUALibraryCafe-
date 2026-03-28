@@ -41,7 +41,6 @@
             font-family: var(--font-body);
         }
 
-        /* LOGIN SCREEN */
         .login-screen {
             min-height: 100vh;
             display: flex;
@@ -143,7 +142,7 @@
                 text-decoration: underline;
             }
 
-        /* DASHBOARD LAYOUT */
+
         .dashboard {
             display: none;
             min-height: 100vh;
@@ -248,7 +247,6 @@
             margin-bottom: 2rem;
         }
 
-        /* STATS ROW */
         .stats-row {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -288,7 +286,6 @@
             color: var(--moss);
         }
 
-        /* ORDERS */
         .orders-tabs {
             display: flex;
             gap: 0.5rem;
@@ -474,7 +471,6 @@
                 margin-bottom: 1rem;
             }
 
-        /* LIBRARY WORKER */
         .lib-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -625,7 +621,6 @@
             color: var(--amber);
         }
 
-        /* PDF MODAL */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -688,7 +683,6 @@
             color: white;
         }
 
-        /* NOTIFICATION TOAST */
         .toast {
             position: fixed;
             bottom: 2rem;
@@ -746,7 +740,6 @@
 </head>
 <body>
 
-    <!-- LOGIN SCREEN -->
     <div class="login-screen" id="loginScreen">
         <div class="login-box">
             <div class="login-logo">ՀԱՊՀ <span>Գրադարան-Սրճարան</span></div>
@@ -765,7 +758,6 @@
         </div>
     </div>
 
-    <!-- DASHBOARD -->
     <div class="dashboard" id="dashboard">
         <div class="topbar">
             <div class="topbar-brand">ՀԱՊՀ <span>Աշխատակից</span></div>
@@ -777,7 +769,6 @@
         </div>
         <div class="main-content">
 
-            <!-- CAFÉ WORKER DASHBOARD -->
             <div id="cafeDashboard" style="display:none;">
                 <div class="page-title">Սրճարանի <em>Վահանակ</em></div>
                 <p class="page-desc">Կառավարեք մուտքային պատվերները — հաստատեք, նշեք ընթացքում կամ ավարտված</p>
@@ -796,12 +787,10 @@
                 <div class="orders-grid" id="ordersGrid"></div>
             </div>
 
-            <!-- LIBRARY WORKER DASHBOARD -->
             <div id="libraryDashboard" style="display:none;">
                 <div class="page-title">Գրադարանի <em>Վահանակ</em></div>
                 <p class="page-desc">Կառավարեք գրապահոց, հայտեր և ժամկետ անցած գրքեր</p>
 
-                <!-- Borrow request tabs -->
                 <div style="display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap;">
                     <button class="tab-btn active" onclick="filterBorrowings('all',this)">Բոլոր Հայտերը</button>
                     <button class="tab-btn" onclick="filterBorrowings('borrowed',this)">📖 Ձեռքում</button>
@@ -810,16 +799,13 @@
                 </div>
                 <div id="borrowingsGrid" style="display:flex;flex-direction:column;gap:0.8rem;margin-bottom:2.5rem;"></div>
 
-                <!-- Book management -->
                 <div class="page-title" style="font-size:1.2rem;margin-bottom:1rem;">Գրքերի <em>Կառավարում</em></div>
                 <div class="lib-grid">
-                    <!-- Book list -->
                     <div class="lib-panel">
                         <h3>Բոլոր <em>Գրքերը</em></h3>
                         <input type="text" placeholder="Որոնել..." id="libSearch" oninput="filterLibBooks()" style="width:100%;padding:0.6rem 1rem;border:1px solid var(--rule);border-radius:8px;margin-bottom:1rem;outline:none;font-size:0.85rem;">
                         <div class="book-list" id="libBookList"></div>
                     </div>
-                    <!-- Edit panel -->
                     <div class="lib-panel">
                         <h3>Խմբագրել <em>Գիրք</em></h3>
                         <div id="libEditEmpty" style="text-align:center;padding:3rem;color:var(--warm-gray);">
@@ -858,7 +844,6 @@
         </div>
     </div>
 
-    <!-- PDF VIEWER MODAL (for reading) -->
     <div class="modal-overlay" id="pdfModal">
         <div class="modal-box" style="width:90vw;max-width:900px;height:85vh;display:flex;flex-direction:column;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
@@ -869,7 +854,6 @@
         </div>
     </div>
 
-    <!-- SHELF EDIT MODAL -->
     <div class="modal-overlay" id="shelfModal">
         <div class="modal-box">
             <div class="modal-title">Խմբագրել Դարակ</div>
@@ -897,7 +881,6 @@
         let shelfModalBookId = null;
         let orderRefreshInterval = null;
 
-        // ===== AUTH =====
         async function doLogin() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
@@ -957,7 +940,7 @@
                 roleEl.className = 'topbar-role role-cafe';
                 document.getElementById('cafeDashboard').style.display = 'block';
                 loadOrders();
-                orderRefreshInterval = setInterval(loadOrders, 15000); // auto-refresh every 15s
+                orderRefreshInterval = setInterval(loadOrders, 15000); 
             } else if (role === 'librarian' || role === 'library_worker') {
                 roleEl.textContent = 'Գրադարանավար';
                 roleEl.className = 'topbar-role role-library';
@@ -977,7 +960,6 @@
             }
         }
 
-        // ===== CAFÉ WORKER =====
         async function loadOrders() {
             try {
                 const data = await apiCall('/Orders/pending');
@@ -990,7 +972,6 @@
         function updateOrderStats(orders) {
             document.getElementById('cntPending').textContent = orders.filter(o => o.status === 'Pending').length;
             document.getElementById('cntProgress').textContent = orders.filter(o => o.status === 'InProgress').length;
-            // Done today from separate count - approximate
             document.getElementById('cntDone').textContent = orders.filter(o => o.status === 'Done').length;
         }
 
@@ -1052,7 +1033,6 @@
             }
         }
 
-        // ===== LIBRARY BORROWINGS =====
         let allBorrowings = [];
         let currentBorrowFilter = 'all';
 
@@ -1142,7 +1122,6 @@
             } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
         }
 
-        // ===== LIBRARY WORKER =====
         async function loadLibraryBooks() {
             try {
                 const data = await apiCall('/Books');
@@ -1220,7 +1199,6 @@
             } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
         }
 
-        // ===== UTILS =====
         function openModal(id) { document.getElementById(id).classList.add('show'); }
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
@@ -1231,13 +1209,11 @@
             setTimeout(() => t.className = 'toast', 3000);
         }
 
-        // Init on load
         window.addEventListener('load', async () => {
             const token = localStorage.getItem('staffToken');
             const user = localStorage.getItem('staffUser');
             if (token && user) {
                 authToken = token;
-                // Always fetch fresh profile to get correct role
                 try {
                     const res = await fetch(API + '/Auth/profile', {
                         headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }
@@ -1247,7 +1223,6 @@
                         currentUser = { ...JSON.parse(user), role: fresh.role, name: fresh.name };
                         localStorage.setItem('staffUser', JSON.stringify(currentUser));
                     } else {
-                        // Token expired
                         localStorage.removeItem('staffToken');
                         localStorage.removeItem('staffUser');
                         return;

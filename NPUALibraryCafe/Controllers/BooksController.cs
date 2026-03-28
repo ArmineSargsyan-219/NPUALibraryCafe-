@@ -23,7 +23,6 @@ namespace NPUALibraryCafe.Controllers
         private string GetUserRole() =>
             User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "";
 
-        // GET /api/Books - All books with shelf info
         [HttpGet]
         public async Task<IActionResult> GetBooks()
         {
@@ -47,7 +46,6 @@ namespace NPUALibraryCafe.Controllers
             return Ok(books);
         }
 
-        // GET /api/Books/search?query=1984 - Search with shelf info
         [HttpGet("search")]
         public async Task<IActionResult> SearchBooks([FromQuery] string query)
         {
@@ -72,7 +70,6 @@ namespace NPUALibraryCafe.Controllers
             return Ok(books);
         }
 
-        // GET /api/Books/category/{category}
         [HttpGet("category/{category}")]
         public async Task<IActionResult> GetByCategory(string category)
         {
@@ -93,7 +90,6 @@ namespace NPUALibraryCafe.Controllers
             return Ok(books);
         }
 
-        // GET /api/Books/{id} - Single book
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBook(int id)
         {
@@ -115,7 +111,6 @@ namespace NPUALibraryCafe.Controllers
             });
         }
 
-        // PUT /api/Books/{id}/shelf - Library Worker: Update shelf number
         [HttpPut("{id}/shelf")]
         [Authorize]
         public async Task<IActionResult> UpdateShelf(int id, [FromBody] UpdateShelfDto dto)
@@ -133,7 +128,6 @@ namespace NPUALibraryCafe.Controllers
             return Ok(new { message = "Shelf number updated", bookId = id, shelfNumber = dto.ShelfNumber });
         }
 
-        // PUT /api/Books/{id}/copies - Library Worker: Update physical copies
         [HttpPut("{id}/copies")]
         [Authorize]
         public async Task<IActionResult> UpdateCopies(int id, [FromBody] UpdateCopiesDto dto)
@@ -152,7 +146,6 @@ namespace NPUALibraryCafe.Controllers
             return Ok(new { message = "Copies updated", bookId = id });
         }
 
-        // PUT /api/Books/{id}/pdf - Library Worker: Add PDF link
         [HttpPut("{id}/pdf")]
         [Authorize]
         public async Task<IActionResult> UpdatePdf(int id, [FromBody] UpdatePdfDto dto)
@@ -171,7 +164,6 @@ namespace NPUALibraryCafe.Controllers
             return Ok(new { message = "PDF link updated", bookId = id });
         }
 
-        // POST /api/Books - Admin/Librarian: Add new book
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> AddBook([FromBody] AddBookDto dto)
@@ -199,7 +191,6 @@ namespace NPUALibraryCafe.Controllers
             return Ok(new { message = "Book added successfully", bookId = book.Bookid });
         }
 
-        // POST /api/Books/{id}/borrow - User borrows a book
         [HttpPost("{id}/borrow")]
         [Authorize]
         public async Task<IActionResult> BorrowBook(int id)
@@ -240,7 +231,6 @@ namespace NPUALibraryCafe.Controllers
             });
         }
 
-        // GET /api/Books/borrowed - User's borrowed books
         [HttpGet("borrowed")]
         [Authorize]
         public async Task<IActionResult> GetBorrowedBooks()

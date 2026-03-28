@@ -239,12 +239,14 @@ namespace NPUALibraryCafe.Controllers
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Userid.ToString()),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role),
-                new Claim(ClaimTypes.Name, user.Fullname)
-            };
+             {
+                 new Claim(ClaimTypes.NameIdentifier, user.Userid.ToString()),
+                 new Claim("userId", user.Userid.ToString()), 
+                 new Claim(ClaimTypes.Email, user.Email),
+                 new Claim(ClaimTypes.Role, user.Role),
+                 new Claim("role", user.Role),                
+                 new Claim(ClaimTypes.Name, user.Fullname)
+             };
 
             var token = new JwtSecurityToken(
                 issuer: jwtSettings["Issuer"],

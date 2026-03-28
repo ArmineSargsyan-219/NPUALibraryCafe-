@@ -25,6 +25,7 @@
             --sage: #8aaa85;
             --amber: #c4873a;
             --terracotta: #b85540;
+            --blue: #3a6ea5;
             --font-display: 'Cormorant Garamond', Georgia, serif;
             --font-body: 'Outfit', sans-serif;
             --shadow: 0 4px 24px rgba(0,0,0,0.08);
@@ -103,7 +104,7 @@
                 left: 0;
             }
         }
-        /* ── NAV ── */
+
         nav {
             position: fixed;
             top: 0;
@@ -137,11 +138,11 @@
 
         .nav-right {
             display: flex;
-            gap: 1rem;
+            gap: 0.7rem;
             align-items: center;
             justify-content: flex-end;
         }
-        /* Logo */
+
         .nav-logo {
             font-family: var(--font-display);
             font-size: 1.25rem;
@@ -157,11 +158,36 @@
                 font-style: italic;
                 color: var(--moss);
             }
-        /* Secondary nav row — slides down on hover */
-        .nav-dropdown-wrap {
-            position: relative;
-            display: contents;
+
+        .lang-switcher {
+            display: flex;
+            gap: 0.25rem;
+            align-items: center;
         }
+
+        .lang-btn {
+            padding: 0.28rem 0.6rem;
+            border-radius: 100px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid var(--rule);
+            background: none;
+            color: var(--warm-gray);
+            transition: all 0.2s;
+            letter-spacing: 0.05em;
+        }
+
+            .lang-btn:hover {
+                border-color: var(--ink);
+                color: var(--ink);
+            }
+
+            .lang-btn.active {
+                background: var(--ink);
+                border-color: var(--ink);
+                color: white;
+            }
 
         .nav-pages-row {
             position: fixed;
@@ -179,11 +205,7 @@
             transition: height 0.22s ease;
         }
 
-            .nav-pages-row:hover {
-                height: 48px;
-            }
-
-            .nav-pages-row.open {
+            .nav-pages-row:hover, .nav-pages-row.open {
                 height: 48px;
             }
 
@@ -203,29 +225,10 @@
                 transition: color 0.18s, background 0.18s;
             }
 
-                .nav-pages-row .nav-link:hover,
-                .nav-pages-row .nav-link.active {
+                .nav-pages-row .nav-link:hover, .nav-pages-row .nav-link.active {
                     color: white;
                     background: rgba(255,255,255,0.1);
                 }
-        /* Keep old .nav-link for any leftover uses */
-        .nav-link {
-            font-size: 0.78rem;
-            font-weight: 500;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.78);
-            cursor: pointer;
-            transition: color 0.2s;
-            position: relative;
-            padding-bottom: 2px;
-            border: none;
-            background: none;
-        }
-
-            .nav-link:hover, .nav-link.active {
-                color: white;
-            }
 
         .notif-btn {
             position: relative;
@@ -978,6 +981,12 @@
             margin-top: 0.8rem;
         }
 
+        .menu-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
         .add-btn {
             width: 30px;
             height: 30px;
@@ -992,6 +1001,11 @@
             align-items: center;
             justify-content: center;
         }
+
+            .add-btn:hover {
+                background: var(--moss);
+                transform: scale(1.1);
+            }
 
         .fav-btn {
             width: 30px;
@@ -1016,17 +1030,6 @@
                 background: #fff0ee;
                 border-color: var(--terracotta);
             }
-
-        .menu-actions {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        .add-btn:hover {
-            background: var(--moss);
-            transform: scale(1.1);
-        }
 
         .cart-float {
             position: fixed;
@@ -1306,11 +1309,11 @@
 
     <div class="notif-dropdown" id="notifDropdown">
         <div class="notif-hdr">
-            <span class="notif-hdr-title">Ծանուցումներ</span>
-            <button class="notif-hdr-action" onclick="markAllRead()">Նշել բոլորը կարդացված</button>
+            <span class="notif-hdr-title" id="notifTitle">Ծանուցումներ</span>
+            <button class="notif-hdr-action" id="notifMarkAll" onclick="markAllRead()">Նշել բոլորը կարդացված</button>
         </div>
         <div class="notif-list" id="notifList">
-            <div class="notif-empty">Նոր ծանուցումներ չկան</div>
+            <div class="notif-empty" id="notifEmpty">Նոր ծանուցումներ չկան</div>
         </div>
     </div>
 
@@ -1319,6 +1322,10 @@
             <div class="nav-left"></div>
             <div class="nav-logo" onclick="showPage('home')">ՀԱՊՀ <span>Գրադարան-Սրճարան</span></div>
             <div class="nav-right">
+                <div class="lang-switcher">
+                    <button class="lang-btn active" data-lang="hy" onclick="setLang('hy')">ՀԱՅ</button>
+                    <button class="lang-btn" data-lang="en" onclick="setLang('en')">ENG</button>
+                </div>
                 <button class="notif-btn" onclick="toggleNotif()" id="notifBtn">
                     🔔
                     <div class="notif-dot" id="notifDot"></div>
@@ -1332,15 +1339,16 @@
             </div>
         </div>
     </nav>
+
     <div class="nav-pages-row" id="navPagesRow">
-        <button class="nav-link active" onclick="showPage('home')">Գլխավոր</button>
-        <button class="nav-link" onclick="showPage('library')">Գրադարան</button>
-        <button class="nav-link" onclick="showPage('cafe')">Սրճարան</button>
-        <button class="nav-link" onclick="showPage('reservations')">Ամրագրումներ</button>
-        <button class="nav-link" onclick="showPage('favorites')">Նախընտրածներ</button>
-        <button class="nav-link" onclick="showPage('myorders')">Իմ Պատվերները</button>
-        <button class="nav-link" onclick="showPage('myborrowing')">Իմ Գրքերը</button>
-        <button class="nav-link" onclick="showPage('profile')">Պրոֆիլ</button>
+        <button class="nav-link active" onclick="showPage('home')" id="nav-home">Գլխավոր</button>
+        <button class="nav-link" onclick="showPage('library')" id="nav-library">Գրադարան</button>
+        <button class="nav-link" onclick="showPage('cafe')" id="nav-cafe">Սրճարան</button>
+        <button class="nav-link" onclick="showPage('reservations')" id="nav-reservations">Ամրագրումներ</button>
+        <button class="nav-link" onclick="showPage('favorites')" id="nav-favorites">Նախընտրածներ</button>
+        <button class="nav-link" onclick="showPage('myorders')" id="nav-myorders">Իմ Պատվերները</button>
+        <button class="nav-link" onclick="showPage('myborrowing')" id="nav-myborrowing">Իմ Գրքերը</button>
+        <button class="nav-link" onclick="showPage('profile')" id="nav-profile">Պրոֆիլ</button>
     </div>
 
     <div class="page active" id="pg-home">
@@ -1350,22 +1358,22 @@
                 <div class="hero-img-caption">ՀԱՊՀ Գրադարան-Սրճարան · Երևան</div>
             </div>
             <div class="hero-text-panel">
-                <div class="hero-eyebrow">Հայաստանի Ազգային Պոլիտեխնիկական Համալսարան</div>
-                <h1 class="hero-h1">Որտեղ <em>Գրքերը</em><br>Հանդիպում են Սուրճին</h1>
-                <p class="hero-p">Տարածք՝ սովորելու, հայտնաբերելու և վայելելու — ձեր համալսարանի գրադարանն ու սրճարանը՝ մեկ տեղում։</p>
+                <div class="hero-eyebrow" id="heroEyebrow">Հայաստանի Ազգային Պոլիտեխնիկական Համալսարան</div>
+                <h1 class="hero-h1" id="heroH1">Որտեղ <em>Գրքերը</em><br>Հանդիպում են Սուրճին</h1>
+                <p class="hero-p" id="heroP">Տարածք՝ սովորելու, հայտնաբերելու և վայելելու — ձեր համալսարանի գրադարանն ու սրճարանը՝ մեկ տեղում։</p>
                 <div class="hero-btns">
-                    <button class="btn-primary" onclick="showPage('library')">Դիտել Գրադարանը</button>
-                    <button class="btn-outline" onclick="showPage('cafe')">Պատվիրել Սրճարանից</button>
+                    <button class="btn-primary" id="heroBtnLibrary" onclick="showPage('library')">Դիտել Գրադարանը</button>
+                    <button class="btn-outline" id="heroBtnCafe" onclick="showPage('cafe')">Պատվիրել Սրճարանից</button>
                 </div>
                 <div class="hero-stats">
-                    <div><div class="stat-num" id="statBooks">—</div><div class="stat-lbl">Գրքեր</div></div>
-                    <div><div class="stat-num" id="statMenu">—</div><div class="stat-lbl">Մենյուի կետեր</div></div>
-                    <div><div class="stat-num">32</div><div class="stat-lbl">Նստատեղեր</div></div>
+                    <div><div class="stat-num" id="statBooks">—</div><div class="stat-lbl" id="statLblBooks">Գրքեր</div></div>
+                    <div><div class="stat-num" id="statMenu">—</div><div class="stat-lbl" id="statLblMenu">Մենյուի կետեր</div></div>
+                    <div><div class="stat-num">32</div><div class="stat-lbl" id="statLblSeats">Նստատեղեր</div></div>
                 </div>
             </div>
         </div>
         <div class="marquee-strip">
-            <div class="marquee-track">
+            <div class="marquee-track" id="marqueeTrack">
                 <span class="marquee-item">Գրադարան <span class="marquee-dot"></span></span>
                 <span class="marquee-item">Սրճարան <span class="marquee-dot"></span></span>
                 <span class="marquee-item">Սեղանի Ամրագրում <span class="marquee-dot"></span></span>
@@ -1383,20 +1391,20 @@
         <div class="section">
             <div class="page-header">
                 <div>
-                    <div class="section-eyebrow">Գրադարան</div>
-                    <h2 class="section-title">Հայտնի <em>այս շաբաթ</em></h2>
+                    <div class="section-eyebrow" id="homeLibEyebrow">Գրադարան</div>
+                    <h2 class="section-title" id="homeTrending">Հայտնի <em>այս շաբաթ</em></h2>
                 </div>
-                <button class="btn-secondary" onclick="showPage('library')">Դիտել ամբողջ կատալոգը</button>
+                <button class="btn-secondary" id="homeViewAll" onclick="showPage('library')">Դիտել ամբողջ կատալոգը</button>
             </div>
             <div class="book-grid" id="homeBooks"></div>
         </div>
         <div class="section" style="background:var(--sand);">
             <div class="page-header">
                 <div>
-                    <div class="section-eyebrow">Սրճարանի Մենյու</div>
-                    <h2 class="section-title">Հայտնի <em>հիմա</em></h2>
+                    <div class="section-eyebrow" id="homeCafeEyebrow">Սրճարանի Մենյու</div>
+                    <h2 class="section-title" id="homePopular">Հայտնի <em>հիմա</em></h2>
                 </div>
-                <button class="btn-secondary" onclick="showPage('cafe')">Ամբողջ մենյու</button>
+                <button class="btn-secondary" id="homeFullMenu" onclick="showPage('cafe')">Ամբողջ մենյու</button>
             </div>
             <div class="menu-grid" id="homeMenu"></div>
         </div>
@@ -1406,13 +1414,13 @@
         <div class="section">
             <div class="page-header">
                 <div>
-                    <div class="section-eyebrow">Գրադարան</div>
-                    <h2 class="section-title">Դիտել <em>մեր հավաքածուն</em></h2>
+                    <div class="section-eyebrow" id="libEyebrow">Գրադարան</div>
+                    <h2 class="section-title" id="libTitle">Դիտել <em>մեր հավաքածուն</em></h2>
                 </div>
             </div>
             <div class="search-bar">
-                <input type="text" placeholder="Որոնել ըստ վերնագրի, հեղինակի կամ ISBN-ի..." id="bookSearch">
-                <button onclick="searchBooks()">Որոնել</button>
+                <input type="text" id="bookSearch" placeholder="Որոնել ըստ վերնագրի, հեղինակի կամ ISBN-ի...">
+                <button id="searchBtn" onclick="searchBooks()">Որոնել</button>
             </div>
             <div class="book-grid" id="libraryBooks"></div>
         </div>
@@ -1422,8 +1430,8 @@
         <div class="section">
             <div class="page-header">
                 <div>
-                    <div class="section-eyebrow">Սրճարան</div>
-                    <h2 class="section-title">Պատվիրել <em>մեր մենյուից</em></h2>
+                    <div class="section-eyebrow" id="cafeEyebrow">Սրճարան</div>
+                    <h2 class="section-title" id="cafeTitle">Պատվիրել <em>մեր մենյուից</em></h2>
                 </div>
             </div>
             <div class="menu-filter" id="menuFilter"></div>
@@ -1436,212 +1444,207 @@
             <div class="page-header">
                 <div>
                     <div class="page-hero-banner">
-                        <div class="section-eyebrow">Ամրագրումներ</div>
-                        <h2 class="section-title">Ամրագրել <em>սեղան</em></h2>
+                        <div class="section-eyebrow" id="resEyebrow">Ամրագրումներ</div>
+                        <h2 class="section-title" id="resTitle">Ամրագրել <em>սեղան</em></h2>
                     </div>
                 </div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;max-width:900px;">
                 <div style="background:white;border:1px solid var(--rule);border-radius:16px;padding:2rem;">
-                    <h3 style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:1.5rem;">Ընտրել ժամանակ</h3>
+                    <h3 style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:1.5rem;" id="resSelectTime">Ընտրել ժամանակ</h3>
                     <div class="form-group">
-                        <label>Ամսաթիվ</label>
+                        <label id="resDateLabel">Ամսաթիվ</label>
                         <input type="date" id="resDate" style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;" onchange="updateResEndTimes()">
                     </div>
                     <div class="form-group">
-                        <label>Մեկնարկի ժամ</label>
+                        <label id="resStartLabel">Մեկնարկի ժամ</label>
                         <select id="resStartTime" style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;background:white;" onchange="updateResEndTimes()">
-                            <option value="">Ընտրել...</option>
+                            <option value="" id="resSelectOpt">Ընտրել...</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Ավարտի ժամ</label>
+                        <label id="resEndLabel">Ավարտի ժամ</label>
                         <select id="resEndTime" style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;background:white;">
                             <option value="">Ընտրել...</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Նշումներ (կամընտիր)</label>
-                        <input type="text" id="resNotes" placeholder="օրինակ՝ թիմային հանդիպում, ուսումնական խումբ..." style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;">
+                        <label id="resNotesLabel">Նշումներ (կամընտիր)</label>
+                        <input type="text" id="resNotes" style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;">
                     </div>
-                    <button class="btn-primary" style="width:100%;" onclick="checkTableAvailability()">Ստուգել հասանելիությունը</button>
+                    <button class="btn-primary" style="width:100%;" id="resCheckBtn" onclick="checkTableAvailability()">Ստուգել հասանելիությունը</button>
                 </div>
                 <div style="background:white;border:1px solid var(--rule);border-radius:16px;padding:2rem;">
-                    <h3 style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:0.5rem;">Ընտրել սեղան</h3>
-                    <p style="font-size:0.8rem;color:var(--warm-gray);margin-bottom:1.5rem;">Նախ ընտրեք ժամանակը, ապա ընտրեք հասանելի սեղան</p>
+                    <h3 style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:0.5rem;" id="resSelectTable">Ընտրել սեղան</h3>
+                    <p style="font-size:0.8rem;color:var(--warm-gray);margin-bottom:1.5rem;" id="resSelectTableHint">Նախ ընտրեք ժամանակը, ապա ընտրեք հասանելի սեղան</p>
                     <div style="display:flex;flex-direction:column;gap:1rem;" id="tableMap">
                         <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;border:2px solid var(--rule);border-radius:12px;cursor:pointer;" id="tc-1" onclick="selectTable(1)">
-                            <div style="font-size:1.1rem;margin-right:0.5rem;">T1 [4 տեղ]</div>
-                            <div style="flex:1;"><div style="font-weight:600;font-size:0.9rem;">Սեղան 1</div><div style="font-size:0.75rem;color:var(--warm-gray);" id="ts-1">Նախ ընտրեք ժամանակը</div></div>
+                            <div style="font-size:1.1rem;margin-right:0.5rem;">T1 [4]</div>
+                            <div style="flex:1;"><div style="font-weight:600;font-size:0.9rem;" id="tname-1">Սեղան 1</div><div style="font-size:0.75rem;color:var(--warm-gray);" id="ts-1">Նախ ընտրեք ժամանակը</div></div>
                         </div>
                         <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;border:2px solid var(--rule);border-radius:12px;cursor:pointer;" id="tc-2" onclick="selectTable(2)">
-                            <div style="font-size:1.1rem;margin-right:0.5rem;">T2 [6 տեղ]</div>
-                            <div style="flex:1;"><div style="font-weight:600;font-size:0.9rem;">Սեղան 2</div><div style="font-size:0.75rem;color:var(--warm-gray);" id="ts-2">Նախ ընտրեք ժամանակը</div></div>
+                            <div style="font-size:1.1rem;margin-right:0.5rem;">T2 [6]</div>
+                            <div style="flex:1;"><div style="font-weight:600;font-size:0.9rem;" id="tname-2">Սեղան 2</div><div style="font-size:0.75rem;color:var(--warm-gray);" id="ts-2">Նախ ընտրեք ժամանակը</div></div>
                         </div>
                         <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;border:2px solid var(--rule);border-radius:12px;cursor:pointer;" id="tc-3" onclick="selectTable(3)">
-                            <div style="font-size:1.1rem;margin-right:0.5rem;">T3 [4 տեղ]</div>
-                            <div style="flex:1;"><div style="font-weight:600;font-size:0.9rem;">Սեղան 3</div><div style="font-size:0.75rem;color:var(--warm-gray);" id="ts-3">Նախ ընտրեք ժամանակը</div></div>
+                            <div style="font-size:1.1rem;margin-right:0.5rem;">T3 [4]</div>
+                            <div style="flex:1;"><div style="font-weight:600;font-size:0.9rem;" id="tname-3">Սեղան 3</div><div style="font-size:0.75rem;color:var(--warm-gray);" id="ts-3">Նախ ընտրեք ժամանակը</div></div>
                         </div>
                     </div>
                     <button class="btn-moss" style="width:100%;margin-top:1.5rem;opacity:0.5;" id="reserveBtn" onclick="makeReservation()">Ամրագրել Սեղանը</button>
                 </div>
             </div>
             <div style="margin-top:3rem;">
-                <h3 style="font-family:var(--font-display);font-size:1.5rem;margin-bottom:1.5rem;">Իմ <em>Ամրագրումները</em></h3>
+                <h3 style="font-family:var(--font-display);font-size:1.5rem;margin-bottom:1.5rem;" id="myResTitle">Իմ <em>Ամրագրումները</em></h3>
                 <div id="myReservations" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;"></div>
             </div>
         </div>
     </div>
 
     <button class="cart-float" id="cartFloat" onclick="renderCartModal();openModal('cartModal')">
-        🛒 Զամբյուղ <span class="cart-badge" id="cartBadge">0</span>
+        🛒 <span id="cartLabel">Զամբյուղ</span> <span class="cart-badge" id="cartBadge">0</span>
     </button>
 
     <div class="modal-overlay" id="loginModal">
         <div class="modal-box">
             <div class="modal-header">
-                <h2 class="modal-title">Բարի Վերադարձ</h2>
-                <p class="modal-subtitle">Մուտք գործել ձեր հաշիվ</p>
+                <h2 class="modal-title" id="loginTitle">Բարի Վերադարձ</h2>
+                <p class="modal-subtitle" id="loginSubtitle">Մուտք գործել ձեր հաշիվ</p>
             </div>
             <form onsubmit="login(event)">
-                <div class="form-group"><label>Էլ. փոստ</label><input type="email" id="loginEmail" required></div>
-                <div class="form-group"><label>Գաղտնաբառ</label><input type="password" id="loginPassword" required></div>
+                <div class="form-group"><label id="loginEmailLabel">Էլ. փոստ</label><input type="email" id="loginEmail" required></div>
+                <div class="form-group"><label id="loginPasswordLabel">Գաղտնաբառ</label><input type="password" id="loginPassword" required></div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="closeModal('loginModal')">Չեղարկել</button>
-                    <button type="submit" class="btn-primary">Մուտք</button>
+                    <button type="button" class="btn-secondary" id="loginCancelBtn" onclick="closeModal('loginModal')">Չեղարկել</button>
+                    <button type="submit" class="btn-primary" id="loginSubmitBtn">Մուտք</button>
                 </div>
             </form>
-            <div class="modal-switch">Հաշիվ չունե՞ք։ <button onclick="switchModal('loginModal','registerModal')">Գրանցվել</button></div>
+            <div class="modal-switch"><span id="loginNoAccount">Հաշիվ չունե՞ք։</span> <button onclick="switchModal('loginModal','registerModal')" id="loginRegisterLink">Գրանցվել</button></div>
         </div>
     </div>
 
     <div class="modal-overlay" id="registerModal">
         <div class="modal-box">
             <div class="modal-header">
-                <h2 class="modal-title">Ստեղծել Հաշիվ</h2>
-                <p class="modal-subtitle">Միանալ ՀԱՊՀ Գրադարան-Սրճարանին</p>
+                <h2 class="modal-title" id="regTitle">Ստեղծել Հաշիվ</h2>
+                <p class="modal-subtitle" id="regSubtitle">Միանալ ՀԱՊՀ Գրադարան-Սրճարանին</p>
             </div>
             <div id="registerStep1">
-                <div class="form-group"><label>Անուն Ազգանուն</label><input type="text" id="regName" required></div>
-                <div class="form-group"><label>Էլ. փոստ</label><input type="email" id="regEmail" required></div>
-                <div class="form-group"><label>Գաղտնաբառ</label><input type="password" id="regPassword" required></div>
+                <div class="form-group"><label id="regNameLabel">Անուն Ազգանուն</label><input type="text" id="regName" required></div>
+                <div class="form-group"><label id="regEmailLabel">Էլ. փոստ</label><input type="email" id="regEmail" required></div>
+                <div class="form-group"><label id="regPasswordLabel">Գաղտնաբառ</label><input type="password" id="regPassword" required></div>
                 <input type="hidden" id="regRole" value="user">
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="closeModal('registerModal')">Չեղարկել</button>
-                    <button type="button" class="btn-primary" onclick="sendVerificationCode()">Ուղարկել Կոդ</button>
+                    <button type="button" class="btn-secondary" id="regCancelBtn" onclick="closeModal('registerModal')">Չեղարկել</button>
+                    <button type="button" class="btn-primary" id="regSendCodeBtn" onclick="sendVerificationCode()">Ուղարկել Կոդ</button>
                 </div>
             </div>
             <div id="registerStep2" style="display:none;">
-                <p style="color:var(--warm-gray);font-size:0.85rem;margin-bottom:1.5rem;">6-նիշ կոդ ուղարկվեց <strong id="regEmailDisplay"></strong> հասցեին։ Մուտքագրեք ստորև։</p>
+                <p style="color:var(--warm-gray);font-size:0.85rem;margin-bottom:1.5rem;" id="regCodeSentMsg">6-նիշ կոդ ուղարկվեց <strong id="regEmailDisplay"></strong> հասցեին։</p>
                 <div class="form-group">
-                    <label>Հաստատման Կոդ</label>
+                    <label id="regCodeLabel">Հաստատման Կոդ</label>
                     <input type="text" id="regCode" maxlength="6" placeholder="000000" style="font-size:1.5rem;letter-spacing:0.5rem;text-align:center;">
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="backToStep1()">Հետ</button>
-                    <button type="button" class="btn-primary" onclick="register()">Հաստատել և Գրանցվել</button>
+                    <button type="button" class="btn-secondary" id="regBackBtn" onclick="backToStep1()">Հետ</button>
+                    <button type="button" class="btn-primary" id="regConfirmBtn" onclick="register()">Հաստատել և Գրանցվել</button>
                 </div>
-                <p style="text-align:center;margin-top:1rem;font-size:0.8rem;color:var(--warm-gray);">Չստացա՞ք։ <button onclick="sendVerificationCode()" style="background:none;border:none;color:var(--moss);cursor:pointer;font-weight:500;">Կրկին ուղարկել</button></p>
+                <p style="text-align:center;margin-top:1rem;font-size:0.8rem;color:var(--warm-gray);" id="regResendMsg">Չստացա՞ք։ <button onclick="sendVerificationCode()" style="background:none;border:none;color:var(--moss);cursor:pointer;font-weight:500;" id="regResendBtn">Կրկին ուղարկել</button></p>
             </div>
-            <div class="modal-switch">Արդեն հաշիվ ունե՞ք։ <button onclick="switchModal('registerModal','loginModal')">Մուտք</button></div>
+            <div class="modal-switch"><span id="regHasAccount">Արդեն հաշիվ ունե՞ք։</span> <button onclick="switchModal('registerModal','loginModal')" id="regLoginLink">Մուտք</button></div>
         </div>
     </div>
 
-    <!-- PROFILE PAGE -->
     <div class="page" id="pg-profile">
         <div class="section">
             <div class="page-hero-banner">
-                <div class="section-eyebrow">Անձնական Տվյալներ</div>
-                <h2 class="section-title">Իմ <em>Պրոֆիլը</em></h2>
+                <div class="section-eyebrow" id="profileEyebrow">Անձնական Տվյալներ</div>
+                <h2 class="section-title" id="profileTitle">Իմ <em>Պրոֆիլը</em></h2>
             </div>
             <div id="profileNotLoggedIn" style="display:none;text-align:center;padding:3rem;color:var(--warm-gray);">
-                <p style="margin-bottom:1rem;">Պրոֆիլը տեսնելու համար մուտք գործեք</p>
-                <button class="btn-primary" onclick="openModal('loginModal')">Մուտք</button>
+                <p style="margin-bottom:1rem;" id="profileLoginMsg">Պրոֆիլը տեսնելու համար մուտք գործեք</p>
+                <button class="btn-primary" onclick="openModal('loginModal')" id="profileLoginBtn">Մուտք</button>
             </div>
             <div id="profileForm" style="max-width:480px;display:none;">
                 <div style="background:white;border-radius:16px;padding:2rem;border:1px solid var(--rule);display:flex;flex-direction:column;gap:1.2rem;">
                     <div>
-                        <label style="font-size:0.78rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--warm-gray);display:block;margin-bottom:0.4rem;">Անուն</label>
-                        <input id="profileName" type="text" class="form-input" style="width:100%;" placeholder="Ձեր անուն ազգանունը">
+                        <label style="font-size:0.78rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--warm-gray);display:block;margin-bottom:0.4rem;" id="profileNameLabel">Անուն</label>
+                        <input id="profileName" type="text" style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;">
                     </div>
                     <div>
-                        <label style="font-size:0.78rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--warm-gray);display:block;margin-bottom:0.4rem;">Էլ. հասցե</label>
-                        <input id="profileEmail" type="email" class="form-input" style="width:100%;background:#f5f5f5;" disabled placeholder="email@example.com">
+                        <label style="font-size:0.78rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--warm-gray);display:block;margin-bottom:0.4rem;" id="profileEmailLabel">Էլ. հասցե</label>
+                        <input id="profileEmail" type="email" style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;background:#f5f5f5;" disabled>
                     </div>
                     <div>
-                        <label style="font-size:0.78rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--warm-gray);display:block;margin-bottom:0.4rem;">Հեռախոսահամար <span style="color:var(--terracotta);">*</span></label>
-                        <input id="profilePhone" type="tel" class="form-input" style="width:100%;" placeholder="+374 XX XXX XXX">
-                        <div style="font-size:0.72rem;color:var(--warm-gray);margin-top:0.3rem;">Անհրաժեշտ է գրքի հայտ ներկայացնելու համար</div>
+                        <label style="font-size:0.78rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--warm-gray);display:block;margin-bottom:0.4rem;" id="profilePhoneLabel">Հեռախոսահամար <span style="color:var(--terracotta);">*</span></label>
+                        <input id="profilePhone" type="tel" style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;" placeholder="+374 XX XXX XXX">
+                        <div style="font-size:0.72rem;color:var(--warm-gray);margin-top:0.3rem;" id="profilePhoneHint">Անհրաժեշտ է գրքի հայտ ներկայացնելու համար</div>
                     </div>
-                    <button class="btn-primary" onclick="saveProfile()" style="margin-top:0.5rem;">Պահպանել</button>
+                    <button class="btn-primary" onclick="saveProfile()" style="margin-top:0.5rem;" id="profileSaveBtn">Պահպանել</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MY BORROWINGS PAGE -->
     <div class="page" id="pg-myborrowing">
         <div class="section">
             <div class="page-hero-banner">
-                <div class="section-eyebrow">Գրադարան</div>
-                <h2 class="section-title">Իմ <em>Գրքերը</em></h2>
+                <div class="section-eyebrow" id="borrowEyebrow">Գրադարան</div>
+                <h2 class="section-title" id="borrowTitle">Իմ <em>Գրքերը</em></h2>
             </div>
             <div id="myBorrowNotLoggedIn" style="display:none;text-align:center;padding:3rem;color:var(--warm-gray);">
-                <p style="margin-bottom:1rem;">Մուտք գործեք ձեր գրքերը տեսնելու համար</p>
-                <button class="btn-primary" onclick="openModal('loginModal')">Մուտք</button>
+                <p style="margin-bottom:1rem;" id="borrowLoginMsg">Մուտք գործեք ձեր գրքերը տեսնելու համար</p>
+                <button class="btn-primary" onclick="openModal('loginModal')" id="borrowLoginBtn">Մուտք</button>
             </div>
             <div id="myBorrowEmpty" style="display:none;text-align:center;padding:3rem;color:var(--warm-gray);">
                 <div style="font-size:3rem;margin-bottom:1rem;">📚</div>
-                <p style="margin-bottom:1rem;">Դեռ ոչ մի հայտ չկա</p>
-                <button class="btn-secondary" onclick="showPage('library')">Դիտել Գրադարանը</button>
+                <p style="margin-bottom:1rem;" id="borrowEmptyMsg">Դեռ ոչ մի հայտ չկա</p>
+                <button class="btn-secondary" onclick="showPage('library')" id="borrowBrowseBtn">Դիտել Գրադարանը</button>
             </div>
             <div id="myBorrowList" style="display:flex;flex-direction:column;gap:1rem;max-width:640px;"></div>
         </div>
     </div>
 
-    <!-- CART MODAL -->
     <div class="modal-overlay" id="cartModal">
-        <div class="modal" style="max-width:480px;width:95vw;">
-            <h2 class="modal-title">🛒 Ձեր Զամբյուղը</h2>
+        <div class="modal-box" style="max-width:480px;width:95vw;">
+            <h2 class="modal-title" id="cartTitle">🛒 Ձեր Զամբյուղը</h2>
             <div id="cartModalItems" style="margin:1rem 0;max-height:320px;overflow-y:auto;"></div>
             <div id="cartModalEmpty" style="text-align:center;padding:2rem;color:var(--warm-gray);display:none;">
                 <div style="font-size:2.5rem;margin-bottom:0.5rem;">🛒</div>
-                <p>Զամբյուղը դատարկ է</p>
+                <p id="cartEmptyMsg">Զամբյուղը դատարկ է</p>
             </div>
             <div id="cartModalTotal" style="font-weight:700;font-size:1.1rem;text-align:right;margin-bottom:1rem;padding-top:0.5rem;border-top:1px solid var(--rule);"></div>
             <div style="display:flex;gap:0.8rem;">
-                <button class="btn-secondary" style="flex:1;" onclick="closeModal('cartModal')">Փակել</button>
+                <button class="btn-secondary" style="flex:1;" id="cartCloseBtn" onclick="closeModal('cartModal')">Փակել</button>
                 <button class="btn-primary" style="flex:2;" id="cartCheckoutBtn" onclick="checkout()">✓ Հաստատել Պատվերը</button>
             </div>
         </div>
     </div>
 
-    <!-- MY ORDERS PAGE -->
     <div class="page" id="pg-myorders">
         <div class="section">
             <div class="page-header">
                 <div>
                     <div class="page-hero-banner">
-                        <div class="section-eyebrow">Իմ Պատվերները</div>
-                        <h2 class="section-title">Պատվերների <em>Պատմություն</em></h2>
+                        <div class="section-eyebrow" id="ordersEyebrow">Իմ Պատվերները</div>
+                        <h2 class="section-title" id="ordersTitle">Պատվերների <em>Պատմություն</em></h2>
                     </div>
                 </div>
             </div>
             <div id="myOrdersNotLoggedIn" style="display:none;text-align:center;padding:3rem;color:var(--warm-gray);">
                 <div style="font-size:3rem;margin-bottom:1rem;">🛒</div>
-                <p style="margin-bottom:1rem;">Պատվերները տեսնելու համար մուտք գործեք</p>
-                <button class="btn-primary" onclick="openModal('loginModal')">Մուտք</button>
+                <p style="margin-bottom:1rem;" id="ordersLoginMsg">Պատվերները տեսնելու համար մուտք գործեք</p>
+                <button class="btn-primary" onclick="openModal('loginModal')" id="ordersLoginBtn">Մուտք</button>
             </div>
             <div id="myOrdersEmpty" style="display:none;text-align:center;padding:3rem;color:var(--warm-gray);">
                 <div style="font-size:3rem;margin-bottom:1rem;">📋</div>
-                <p style="margin-bottom:1rem;">Դեռ պատվերներ չկան</p>
-                <button class="btn-secondary" onclick="showPage('cafe')">Դիտել Մենյուն</button>
+                <p style="margin-bottom:1rem;" id="ordersEmptyMsg">Դեռ պատվերներ չկան</p>
+                <button class="btn-secondary" onclick="showPage('cafe')" id="ordersBrowseBtn">Դիտել Մենյուն</button>
             </div>
             <div id="myOrdersList" style="display:flex;flex-direction:column;gap:1rem;max-width:600px;"></div>
         </div>
     </div>
 
-    <!-- PDF READER MODAL -->
     <div class="modal-overlay" id="pdfReaderModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:2000;align-items:center;justify-content:center;">
         <div style="background:white;border-radius:16px;width:92vw;height:90vh;display:flex;flex-direction:column;padding:1.5rem;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
@@ -1652,22 +1655,21 @@
         </div>
     </div>
 
-    <!-- FAVORITES PAGE -->
     <div class="page" id="pg-favorites">
         <div class="section">
             <div class="page-hero-banner">
-                <div class="section-eyebrow">Նախընտրածներ</div>
-                <h2 class="section-title">Իմ <em>Նախընտրածները</em></h2>
+                <div class="section-eyebrow" id="favEyebrow">Նախընտրածներ</div>
+                <h2 class="section-title" id="favTitle">Իմ <em>Նախընտրածները</em></h2>
             </div>
             <div id="favNotLoggedIn" style="display:none;text-align:center;padding:3rem;color:var(--warm-gray);">
                 <div style="font-size:3rem;margin-bottom:1rem;">❤️</div>
-                <p style="margin-bottom:1rem;">Նախընտրածները տեսնելու համար մուտք գործեք</p>
-                <button class="btn-primary" onclick="openModal('loginModal')">Մուտք</button>
+                <p style="margin-bottom:1rem;" id="favLoginMsg">Նախընտրածները տեսնելու համար մուտք գործեք</p>
+                <button class="btn-primary" onclick="openModal('loginModal')" id="favLoginBtn">Մուտք</button>
             </div>
             <div id="favEmpty" style="display:none;text-align:center;padding:3rem;color:var(--warm-gray);">
                 <div style="font-size:3rem;margin-bottom:1rem;">🤍</div>
-                <p style="margin-bottom:1rem;">Դեռ նախընտրածներ չկան</p>
-                <button class="btn-secondary" onclick="showPage('cafe')">Դիտել Մենյուն</button>
+                <p style="margin-bottom:1rem;" id="favEmptyMsg">Դեռ նախընտրածներ չկան</p>
+                <button class="btn-secondary" onclick="showPage('cafe')" id="favBrowseBtn">Դիտել Մենյուն</button>
             </div>
             <div class="menu-grid" id="favGrid"></div>
         </div>
@@ -1676,29 +1678,29 @@
     <footer>
         <div class="footer-grid">
             <div>
-                <div class="footer-logo">ՀԱՊՀ Գրադարան-Սրճարան</div>
-                <p class="footer-tagline">Համալսարանական տարածք, որտեղ գիտելիքն ու համայնքը հանդիպում են հիանալի սուրճի շուրջ։ Բաց երկուշաբթիից - շաբաթ։</p>
+                <div class="footer-logo" id="footerLogo">ՀԱՊՀ Գրադարան-Սրճարան</div>
+                <p class="footer-tagline" id="footerTagline">Համալսարանական տարածք, որտեղ գիտելիքն ու համայնքը հանդիպում են հիանալի սուրճի շուրջ։ Բաց երկուշաբթիից - շաբաթ։</p>
             </div>
             <div class="footer-col">
-                <h4>Գրադարան</h4>
-                <button onclick="showPage('library')">Դիտել Կատալոգը</button>
-                <button onclick="showPage('library')">Վերցնել Գիրք</button>
-                <button onclick="showPage('library')">PDF Հասանելիություն</button>
+                <h4 id="footerLibH">Գրադարան</h4>
+                <button onclick="showPage('library')" id="footerLib1">Դիտել Կատալոգը</button>
+                <button onclick="showPage('library')" id="footerLib2">Վերցնել Գիրք</button>
+                <button onclick="showPage('library')" id="footerLib3">PDF Հասանելիություն</button>
             </div>
             <div class="footer-col">
-                <h4>Սրճարան</h4>
-                <button onclick="showPage('cafe')">Ամբողջ Մենյու</button>
-                <button onclick="showPage('cafe')">Պատվիրել Առցանց</button>
+                <h4 id="footerCafeH">Սրճարան</h4>
+                <button onclick="showPage('cafe')" id="footerCafe1">Ամբողջ Մենյու</button>
+                <button onclick="showPage('cafe')" id="footerCafe2">Պատվիրել Առցանց</button>
             </div>
             <div class="footer-col">
-                <h4>Հաշիվ</h4>
-                <button onclick="openModal('loginModal')">Իմ Էջը</button>
-                <button onclick="showPage('reservations')">Ամրագրումներ</button>
+                <h4 id="footerAccountH">Հաշիվ</h4>
+                <button onclick="openModal('loginModal')" id="footerAccount1">Իմ Էջը</button>
+                <button onclick="showPage('reservations')" id="footerAccount2">Ամրագրումներ</button>
             </div>
         </div>
         <div class="footer-bottom">
-            <span>© 2026 ՀԱՊՀ Գրադարան-Սրճարան</span>
-            <span>Հայաստանի Ազգային Պոլիտեխնիկական Համալսարան</span>
+            <span id="footerCopy">© 2026 ՀԱՊՀ Գրադարան-Սրճարան</span>
+            <span id="footerUniv">Հայաստանի Ազգային Պոլիտեխնիկական Համալսարան</span>
         </div>
     </footer>
 
@@ -1711,25 +1713,365 @@
         let userPhone = null;
         let booksData = [];
         let menuData = [];
+        let favMenuIds = new Set();
+        let favBookIds = new Set();
+        let selectedTable = null;
+        let tableAvailability = {};
+
+        const TR = {
+            hy: {
+                nav_home: 'Գլխավոր', nav_library: 'Գրադարան', nav_cafe: 'Սրճարան',
+                nav_reservations: 'Ամրագրումներ', nav_favorites: 'Նախընտրածներ',
+                nav_myorders: 'Իմ Պատվերները', nav_myborrowing: 'Իմ Գրքերը', nav_profile: 'Պրոֆիլ',
+                login: 'Մուտք', logout: 'Ելք',
+                heroEyebrow: 'Հայաստանի Ազգային Պոլիտեխնիկական Համալսարան',
+                heroH1: 'Որտեղ <em>Գրքերը</em><br>Հանդիպում են Սուրճին',
+                heroP: 'Տարածք՝ սովորելու, հայտնաբերելու և վայելելու — ձեր համալսարանի գրադարանն ու սրճարանը՝ մեկ տեղում։',
+                heroBtnLibrary: 'Դիտել Գրադարանը', heroBtnCafe: 'Պատվիրել Սրճարանից',
+                statLblBooks: 'Գրքեր', statLblMenu: 'Մենյուի կետեր', statLblSeats: 'Նստատեղեր',
+                homeLibEyebrow: 'Գրադարան', homeTrending: 'Հայտնի <em>այս շաբաթ</em>',
+                homeViewAll: 'Դիտել ամբողջ կատալոգը', homeCafeEyebrow: 'Սրճարանի Մենյու',
+                homePopular: 'Հայտնի <em>հիմա</em>', homeFullMenu: 'Ամբողջ մենյու',
+                libEyebrow: 'Գրադարան', libTitle: 'Դիտել <em>մեր հավաքածուն</em>',
+                searchPlaceholder: 'Որոնել ըստ վերնագրի, հեղինակի կամ ISBN-ի...', searchBtn: 'Որոնել',
+                cafeEyebrow: 'Սրճարան', cafeTitle: 'Պատվիրել <em>մեր մենյուից</em>',
+                resEyebrow: 'Ամրագրումներ', resTitle: 'Ամրագրել <em>սեղան</em>',
+                resSelectTime: 'Ընտրել ժամանակ', resDateLabel: 'Ամսաթիվ',
+                resStartLabel: 'Մեկնարկի ժամ', resEndLabel: 'Ավարտի ժամ',
+                resNotesLabel: 'Նշումներ (կամընտիր)', resSelectOpt: 'Ընտրել...',
+                resCheckBtn: 'Ստուգել հասանելիությունը', resSelectTable: 'Ընտրել սեղան',
+                resSelectTableHint: 'Նախ ընտրեք ժամանակը, ապա ընտրեք հասանելի սեղան',
+                resTablePrefix: 'Սեղան', resSelectTimeFirst: 'Նախ ընտրեք ժամանակը',
+                resAvailable: 'Հասանելի', resReserved: 'Ամրագրված',
+                reserveBtn: 'Ամրագրել Սեղանը', myResTitle: 'Իմ <em>Ամրագրումները</em>',
+                cartLabel: 'Զամբյուղ', cartTitle: '🛒 Ձեր Զամբյուղը',
+                cartEmptyMsg: 'Զամբյուղը դատարկ է', cartCloseBtn: 'Փակել',
+                cartCheckoutBtn: '✓ Հաստատել Պատվերը', cartTotal: 'Ընդամենը՝',
+                notifTitle: 'Ծանուցումներ', notifMarkAll: 'Նշել բոլորը կարդացված',
+                notifEmpty: 'Նոր ծանուցումներ չկան',
+                loginTitle: 'Բարի Վերադարձ', loginSubtitle: 'Մուտք գործել ձեր հաշիվ',
+                loginEmailLabel: 'Էլ. փոստ', loginPasswordLabel: 'Գաղտնաբառ',
+                loginCancelBtn: 'Չեղարկել', loginSubmitBtn: 'Մուտք',
+                loginNoAccount: 'Հաշիվ չունե՞ք։', loginRegisterLink: 'Գրանցվել',
+                regTitle: 'Ստեղծել Հաշիվ', regSubtitle: 'Միանալ ՀԱՊՀ Գրադարան-Սրճարանին',
+                regNameLabel: 'Անուն Ազգանուն', regEmailLabel: 'Էլ. փոստ',
+                regPasswordLabel: 'Գաղտնաբառ', regCancelBtn: 'Չեղարկել',
+                regSendCodeBtn: 'Ուղարկել Կոդ', regCodeLabel: 'Հաստատման Կոդ',
+                regBackBtn: 'Հետ', regConfirmBtn: 'Հաստատել և Գրանցվել',
+                regResendBtn: 'Կրկին ուղարկել', regHasAccount: 'Արդեն հաշիվ ունե՞ք։',
+                regLoginLink: 'Մուտք',
+                profileEyebrow: 'Անձնական Տվյալներ', profileTitle: 'Իմ <em>Պրոֆիլը</em>',
+                profileLoginMsg: 'Պրոֆիլը տեսնելու համար մուտք գործեք', profileLoginBtn: 'Մուտք',
+                profileNameLabel: 'Անուն', profileEmailLabel: 'Էլ. հասցե',
+                profilePhoneLabel: 'Հեռախոսահամար', profilePhoneHint: 'Անհրաժեշտ է գրքի հայտ ներկայացնելու համար',
+                profileSaveBtn: 'Պահպանել',
+                borrowEyebrow: 'Գրադարան', borrowTitle: 'Իմ <em>Գրքերը</em>',
+                borrowLoginMsg: 'Մուտք գործեք ձեր գրքերը տեսնելու համար', borrowLoginBtn: 'Մուտք',
+                borrowEmptyMsg: 'Դեռ ոչ մի հայտ չկա', borrowBrowseBtn: 'Դիտել Գրադարանը',
+                ordersEyebrow: 'Իմ Պատվերները', ordersTitle: 'Պատվերների <em>Պատմություն</em>',
+                ordersLoginMsg: 'Պատվերները տեսնելու համար մուտք գործեք', ordersLoginBtn: 'Մուտք',
+                ordersEmptyMsg: 'Դեռ պատվերներ չկան', ordersBrowseBtn: 'Դիտել Մենյուն',
+                ordersPrefix: 'Պատվեր #',
+                favEyebrow: 'Նախընտրածներ', favTitle: 'Իմ <em>Նախընտրածները</em>',
+                favLoginMsg: 'Նախընտրածները տեսնելու համար մուտք գործեք', favLoginBtn: 'Մուտք',
+                favEmptyMsg: 'Դեռ նախընտրածներ չկան', favBrowseBtn: 'Դիտել Մենյուն',
+                footerTagline: 'Համալսարանական տարածք, որտեղ գիտելիքն ու համայնքը հանդիպում են հիանալի սուրճի շուրջ։ Բաց երկուշաբթիից - շաբաթ։',
+                footerLibH: 'Գրադարան', footerLib1: 'Դիտել Կատալոգը', footerLib2: 'Վերցնել Գիրք', footerLib3: 'PDF Հասանելիություն',
+                footerCafeH: 'Սրճարան', footerCafe1: 'Ամբողջ Մենյու', footerCafe2: 'Պատվիրել Առցանց',
+                footerAccountH: 'Հաշիվ', footerAccount1: 'Իմ Էջը', footerAccount2: 'Ամրագրումներ',
+                footerCopy: '© 2026 ՀԱՊՀ Գրադարան-Սրճարան', footerUniv: 'Հայաստանի Ազգային Պոլիտեխնիկական Համալսարան',
+                shelf: 'Դարակ', available: 'հասանելի', requestBook: '📚 Պահանջել',
+                unavailable: 'Հասանելի չէ', readPdf: '📄 Կարդալ PDF',
+                remove: 'Հեռացնել', bookSection: '📚 Գրքեր', cafeSection: '☕ Սրճարան',
+                just_now: 'Հենց նոր', min_ago: 'րոպե առաջ', hr_ago: 'ժամ առաջ',
+                cat_hot: 'Տաք Ըմպելիքներ', cat_cold: 'Սառը Ըմպելիքներ', cat_food: 'Ուտելիք', cat_snack: 'Նախուտեստ', cat_all: 'Բոլորը',
+                alert_loginToOrder: 'Պատվեր տալու համար մուտք գործեք',
+                alert_loginToFav: 'Նախընտրածներ ավելացնելու համար մուտք գործեք',
+                alert_loginToRequest: 'Պահանջելու համար մուտք գործեք',
+                alert_phoneRequired: 'Գրքի հայտ ներկայացնելու համար նախ մուտքագրեք ձեր հեռախոսահամարը պրոֆիլի էջում',
+                alert_loginSuccess: 'Մուտքը հաջողվեց!', alert_logoutSuccess: 'Ելքը հաջողվեց',
+                alert_orderReceived: '✅ Պատվերը ընդունվեց! Ընդհանուր՝ ',
+                alert_phoneRequiredSave: 'Խնդրում ենք մուտքագրել հեռախոսահամարը',
+                alert_profileSaved: '✅ Պրոֆիլը պահպանված է',
+                alert_fillAll: 'Խնդրում ենք լրացնել բոլոր դաշտերը',
+                alert_emailDomain: 'Գրանցվելու համար անհրաժեշտ է օգտագործել @polytechnic.am էլ. հասցե',
+                alert_enterCode: 'Խնդրում ենք մուտքագրել 6-նիշ կոդը',
+                alert_regSuccess: 'Գրանցումը հաջողվեց! Խնդրում ենք մուտք գործել։',
+                alert_selectTime: 'Խնդրում ենք ընտրել ամսաթիվը և ժամերը',
+                alert_endAfterStart: 'Ավարտի ժամանակը պետք է լինի մեկնարկից հետո',
+                alert_futureTime: 'Մեկնարկի ժամանակը պետք է լինի ապագայում',
+                alert_loginToReserve: 'Ամրագրելու համար մուտք գործեք',
+                alert_selectTable: 'Խնդրում ենք ընտրել սեղան',
+                alert_selectTimeFull: 'Խնդրում ենք ընտրել ամսաթիվը, մեկնարկի և ավարտի ժամը',
+                alert_checkFirst: 'Նախ ստուգեք հասանելիությունը',
+                alert_resConfirmed: 'Սեղանը ամրագրված է! Ծանուցում կստանաք 15 րոպե առաջ։',
+                confirm_reserve: 'Ամրագրե՞լ Սեղան ', confirm_ok: 'Հաստատե՞լ',
+                confirm_cancelRes: 'Չեղարկե՞լ այս ամրագրումը։',
+                alert_resConfirmedOk: 'Ամրագրումը հաստատված է!',
+                resStatus_Active: 'Ակտիվ', resStatus_Confirmed: 'Հաստատված',
+                resStatus_Cancelled: 'Չեղարկված', resStatus_Expired: 'Ժամկետանց',
+                resConfirmBtn: 'Հաստատել', resCancelBtn: 'Չեղարկել',
+                noReservations: 'Ամրագրումներ դեռ չկան։',
+                orderStatus_Pending: '⏳ Սպասում', orderStatus_Confirmed: '👍 Հաստատված',
+                orderStatus_InProgress: '☕ Պատրաստվում', orderStatus_Done: '✅ Պատրաստ', orderStatus_Cancelled: '❌ Չեղարկված',
+                borrowStatus_borrowed: '📖 Ձեռքիս', borrowStatus_returned: '↩️ Վերադարձված', borrowStatus_overdue: '⚠️ Ժամկետ անցած',
+                borrowDate: 'Հայտ՝', borrowDue: 'Վերադարձ՝', borrowOverdueMsg: '⚠️ Խնդրում ենք անհապաղ վերադարձնել գիրքը գրադարան',
+                resCodeSent: ' հասցեին։ Մուտքագրեք ստորև։', regCodeSentPre: '6-նիշ կոդ ուղարկվեց ',
+                regResendMsg: 'Չստացա՞ք։',
+                marquee: ['Գրադարան', 'Սրճարան', 'Սեղանի Ամրագրում', 'Ուսումնական Տարածք', 'Թարմ Սուրճ', 'Գրքեր Վերցնել']
+            },
+            en: {
+                nav_home: 'Home', nav_library: 'Library', nav_cafe: 'Café',
+                nav_reservations: 'Reservations', nav_favorites: 'Favorites',
+                nav_myorders: 'My Orders', nav_myborrowing: 'My Books', nav_profile: 'Profile',
+                login: 'Login', logout: 'Logout',
+                heroEyebrow: 'National Polytechnic University of Armenia',
+                heroH1: 'Where <em>Books</em><br>Meet Coffee',
+                heroP: 'A space to study, discover, and savour — your campus library and café, reimagined as one.',
+                heroBtnLibrary: 'Browse Library', heroBtnCafe: 'Order from Café',
+                statLblBooks: 'Books', statLblMenu: 'Menu items', statLblSeats: 'Seats',
+                homeLibEyebrow: 'Library', homeTrending: 'Trending <em>this week</em>',
+                homeViewAll: 'View full catalogue', homeCafeEyebrow: 'Café Menu',
+                homePopular: 'Popular <em>right now</em>', homeFullMenu: 'Full menu',
+                libEyebrow: 'Library', libTitle: 'Browse <em>our collection</em>',
+                searchPlaceholder: 'Search by title, author, or ISBN...', searchBtn: 'Search',
+                cafeEyebrow: 'Café', cafeTitle: 'Order <em>from our menu</em>',
+                resEyebrow: 'Reservations', resTitle: 'Reserve <em>a table</em>',
+                resSelectTime: 'Select time', resDateLabel: 'Date',
+                resStartLabel: 'Start time', resEndLabel: 'End time',
+                resNotesLabel: 'Notes (optional)', resSelectOpt: 'Select...',
+                resCheckBtn: 'Check availability', resSelectTable: 'Select a table',
+                resSelectTableHint: 'First select a time, then choose an available table',
+                resTablePrefix: 'Table', resSelectTimeFirst: 'Select a time first',
+                resAvailable: 'Available', resReserved: 'Reserved',
+                reserveBtn: 'Reserve Table', myResTitle: 'My <em>Reservations</em>',
+                cartLabel: 'Cart', cartTitle: '🛒 Your Cart',
+                cartEmptyMsg: 'Your cart is empty', cartCloseBtn: 'Close',
+                cartCheckoutBtn: '✓ Place Order', cartTotal: 'Total:',
+                notifTitle: 'Notifications', notifMarkAll: 'Mark all as read',
+                notifEmpty: 'No new notifications',
+                loginTitle: 'Welcome Back', loginSubtitle: 'Login to your account',
+                loginEmailLabel: 'Email', loginPasswordLabel: 'Password',
+                loginCancelBtn: 'Cancel', loginSubmitBtn: 'Login',
+                loginNoAccount: "Don't have an account?", loginRegisterLink: 'Register',
+                regTitle: 'Create Account', regSubtitle: 'Join NPUA Library Café',
+                regNameLabel: 'Full Name', regEmailLabel: 'Email',
+                regPasswordLabel: 'Password', regCancelBtn: 'Cancel',
+                regSendCodeBtn: 'Send Code', regCodeLabel: 'Verification Code',
+                regBackBtn: 'Back', regConfirmBtn: 'Confirm & Register',
+                regResendBtn: 'Resend', regHasAccount: 'Already have an account?',
+                regLoginLink: 'Login',
+                profileEyebrow: 'Personal Details', profileTitle: 'My <em>Profile</em>',
+                profileLoginMsg: 'Please login to view your profile', profileLoginBtn: 'Login',
+                profileNameLabel: 'Name', profileEmailLabel: 'Email',
+                profilePhoneLabel: 'Phone number', profilePhoneHint: 'Required to request books',
+                profileSaveBtn: 'Save',
+                borrowEyebrow: 'Library', borrowTitle: 'My <em>Books</em>',
+                borrowLoginMsg: 'Login to view your books', borrowLoginBtn: 'Login',
+                borrowEmptyMsg: 'No requests yet', borrowBrowseBtn: 'Browse Library',
+                ordersEyebrow: 'My Orders', ordersTitle: 'Order <em>History</em>',
+                ordersLoginMsg: 'Please login to view your orders', ordersLoginBtn: 'Login',
+                ordersEmptyMsg: 'No orders yet', ordersBrowseBtn: 'Browse Menu',
+                ordersPrefix: 'Order #',
+                favEyebrow: 'Favorites', favTitle: 'My <em>Favorites</em>',
+                favLoginMsg: 'Please login to view favorites', favLoginBtn: 'Login',
+                favEmptyMsg: 'No favorites yet', favBrowseBtn: 'Browse Menu',
+                footerTagline: 'A campus space where knowledge and community meet over great coffee. Open Monday – Saturday.',
+                footerLibH: 'Library', footerLib1: 'Browse Catalogue', footerLib2: 'Borrow a Book', footerLib3: 'PDF Access',
+                footerCafeH: 'Café', footerCafe1: 'Full Menu', footerCafe2: 'Order Online',
+                footerAccountH: 'Account', footerAccount1: 'My Profile', footerAccount2: 'Reservations',
+                footerCopy: '© 2026 NPUA Library Café', footerUniv: 'National Polytechnic University of Armenia',
+                shelf: 'Shelf', available: 'available', requestBook: '📚 Request',
+                unavailable: 'Unavailable', readPdf: '📄 Read PDF',
+                remove: 'Remove', bookSection: '📚 Books', cafeSection: '☕ Café',
+                just_now: 'Just now', min_ago: 'min ago', hr_ago: 'hr ago',
+                cat_hot: 'Hot Drinks', cat_cold: 'Cold Drinks', cat_food: 'Food', cat_snack: 'Snacks', cat_all: 'All',
+                alert_loginToOrder: 'Please login to place an order',
+                alert_loginToFav: 'Please login to add favorites',
+                alert_loginToRequest: 'Please login to request a book',
+                alert_phoneRequired: 'Please add your phone number in your profile before requesting books',
+                alert_loginSuccess: 'Login successful!', alert_logoutSuccess: 'Logged out successfully',
+                alert_orderReceived: '✅ Order placed! Total: ',
+                alert_phoneRequiredSave: 'Please enter your phone number',
+                alert_profileSaved: '✅ Profile saved',
+                alert_fillAll: 'Please fill in all fields',
+                alert_emailDomain: 'Please use a @polytechnic.am email to register',
+                alert_enterCode: 'Please enter the 6-digit code',
+                alert_regSuccess: 'Registration successful! Please login.',
+                alert_selectTime: 'Please select date and times',
+                alert_endAfterStart: 'End time must be after start time',
+                alert_futureTime: 'Start time must be in the future',
+                alert_loginToReserve: 'Please login to make a reservation',
+                alert_selectTable: 'Please select a table',
+                alert_selectTimeFull: 'Please select date, start and end time',
+                alert_checkFirst: 'Please check availability first',
+                alert_resConfirmed: 'Table reserved! You will receive a reminder 15 minutes before.',
+                confirm_reserve: 'Reserve Table ', confirm_ok: 'Confirm?',
+                confirm_cancelRes: 'Cancel this reservation?',
+                alert_resConfirmedOk: 'Reservation confirmed!',
+                resStatus_Active: 'Active', resStatus_Confirmed: 'Confirmed',
+                resStatus_Cancelled: 'Cancelled', resStatus_Expired: 'Expired',
+                resConfirmBtn: 'Confirm', resCancelBtn: 'Cancel',
+                noReservations: 'No reservations yet.',
+                orderStatus_Pending: '⏳ Pending', orderStatus_Confirmed: '👍 Confirmed',
+                orderStatus_InProgress: '☕ In Progress', orderStatus_Done: '✅ Ready', orderStatus_Cancelled: '❌ Cancelled',
+                borrowStatus_borrowed: '📖 Borrowed', borrowStatus_returned: '↩️ Returned', borrowStatus_overdue: '⚠️ Overdue',
+                borrowDate: 'Requested:', borrowDue: 'Due:', borrowOverdueMsg: '⚠️ Please return this book to the library immediately',
+                resCodeSent: '. Enter it below.', regCodeSentPre: 'A 6-digit code was sent to ',
+                regResendMsg: "Didn't receive it?",
+                marquee: ['Library', 'Café', 'Table Reservations', 'Study Space', 'Fresh Coffee', 'Borrow Books']
+            }
+        };
+
+        let lang = localStorage.getItem('lang') || 'hy';
+        function t(key) { return TR[lang][key] || TR['en'][key] || key; }
+
+        function applyTranslations() {
+            const ids = [
+                'nav-home', 'nav-library', 'nav-cafe', 'nav-reservations', 'nav-favorites',
+                'nav-myorders', 'nav-myborrowing', 'nav-profile',
+                'loginBtn', 'logoutBtn',
+                'heroEyebrow', 'heroP', 'heroBtnLibrary', 'heroBtnCafe',
+                'statLblBooks', 'statLblMenu', 'statLblSeats',
+                'homeLibEyebrow', 'homeViewAll', 'homeCafeEyebrow', 'homeFullMenu',
+                'libEyebrow', 'searchBtn', 'cafeEyebrow',
+                'resEyebrow', 'resSelectTime', 'resDateLabel', 'resStartLabel', 'resEndLabel',
+                'resNotesLabel', 'resCheckBtn', 'resSelectTable', 'resSelectTableHint', 'reserveBtn',
+                'cartLabel', 'cartCloseBtn', 'cartCheckoutBtn', 'cartEmptyMsg',
+                'notifTitle', 'notifMarkAll', 'notifEmpty',
+                'loginTitle', 'loginSubtitle', 'loginEmailLabel', 'loginPasswordLabel',
+                'loginCancelBtn', 'loginSubmitBtn', 'loginNoAccount', 'loginRegisterLink',
+                'regTitle', 'regSubtitle', 'regNameLabel', 'regEmailLabel', 'regPasswordLabel',
+                'regCancelBtn', 'regSendCodeBtn', 'regCodeLabel', 'regBackBtn', 'regConfirmBtn',
+                'regResendBtn', 'regHasAccount', 'regLoginLink', 'regResendMsg',
+                'profileEyebrow', 'profileLoginMsg', 'profileLoginBtn',
+                'profileNameLabel', 'profileEmailLabel', 'profilePhoneLabel', 'profilePhoneHint', 'profileSaveBtn',
+                'borrowEyebrow', 'borrowLoginMsg', 'borrowLoginBtn', 'borrowEmptyMsg', 'borrowBrowseBtn',
+                'ordersEyebrow', 'ordersLoginMsg', 'ordersLoginBtn', 'ordersEmptyMsg', 'ordersBrowseBtn',
+                'favEyebrow', 'favLoginMsg', 'favLoginBtn', 'favEmptyMsg', 'favBrowseBtn',
+                'footerTagline', 'footerLibH', 'footerLib1', 'footerLib2', 'footerLib3',
+                'footerCafeH', 'footerCafe1', 'footerCafe2',
+                'footerAccountH', 'footerAccount1', 'footerAccount2',
+                'footerCopy', 'footerUniv',
+                'cartTitle', 'profileLoginBtn'
+            ];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const key = id.replace('nav-', 'nav_').replace('loginBtn', 'login').replace('logoutBtn', 'logout');
+                const val = t(key) || t(id);
+                if (val && val !== id) el.textContent = val;
+            });
+
+            const htmlIds = {
+                'heroH1': t('heroH1'),
+                'homeTrending': t('homeTrending'),
+                'homePopular': t('homePopular'),
+                'libTitle': t('libTitle'),
+                'cafeTitle': t('cafeTitle'),
+                'resTitle': t('resTitle'),
+                'myResTitle': t('myResTitle'),
+                'profileTitle': t('profileTitle'),
+                'borrowTitle': t('borrowTitle'),
+                'ordersTitle': t('ordersTitle'),
+                'favTitle': t('favTitle'),
+                'cartTitle': t('cartTitle'),
+                'favEyebrow': t('favEyebrow'),
+                'ordersEyebrow': t('ordersEyebrow'),
+            };
+            Object.entries(htmlIds).forEach(([id, val]) => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = val;
+            });
+
+            document.getElementById('bookSearch').placeholder = t('searchPlaceholder');
+            [1, 2, 3].forEach(i => {
+                const el = document.getElementById('ts-' + i);
+                if (el && (el.textContent === TR['hy'].resSelectTimeFirst || el.textContent === TR['en'].resSelectTimeFirst)) {
+                    el.textContent = t('resSelectTimeFirst');
+                }
+                const nameEl = document.getElementById('tname-' + i);
+                if (nameEl) nameEl.textContent = t('resTablePrefix') + ' ' + i;
+            });
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+            updateMarquee();
+        }
+
+        function updateMarquee() {
+            const items = t('marquee');
+            const track = document.getElementById('marqueeTrack');
+            const doubled = [...items, ...items];
+            track.innerHTML = doubled.map(item =>
+                '<span class="marquee-item">' + item + ' <span class="marquee-dot"></span></span>'
+            ).join('');
+        }
+
+        function setLang(l) {
+            lang = l;
+            localStorage.setItem('lang', l);
+            applyTranslations();
+            if (booksData.length) {
+                document.getElementById('homeBooks').innerHTML = booksData.slice(0, 6).map(renderBook).join('');
+                document.getElementById('libraryBooks').innerHTML = booksData.map(renderBook).join('');
+            }
+            if (menuData.length) {
+                rebuildMenuFilter();
+                document.getElementById('homeMenu').innerHTML = menuData.slice(0, 4).map(i => renderMenuItem(i, false)).join('');
+                renderMenuItems(menuData);
+            }
+            if (authToken) loadNotifications();
+        }
+
+        function getCatLabel(cat) {
+            const map = { hot: 'cat_hot', cold: 'cat_cold', food: 'cat_food', snack: 'cat_snack', all: 'cat_all' };
+            return t(map[cat] || cat) || cat;
+        }
+
+        function rebuildMenuFilter() {
+            const cats = [...new Set(menuData.map(i => i.category_id).filter(Boolean))];
+            document.getElementById('menuFilter').innerHTML = ['all', ...cats].map((cat, i) =>
+                '<button class="filter-pill ' + (i === 0 ? 'active' : '') + '" onclick="filterMenu(\'' + cat + '\')">' + getCatLabel(cat) + '</button>'
+            ).join('');
+        }
 
         window.addEventListener('load', async () => {
             setTimeout(() => document.getElementById('loader').classList.add('hidden'), 800);
+            applyTranslations();
+
             authToken = localStorage.getItem('authToken');
             if (authToken) {
                 currentUser = JSON.parse(localStorage.getItem('currentUser'));
                 updateUIForLoggedInUser();
-                // Fetch phone in background
-                apiCall('/Auth/profile').then(data => {
-                    if (data && data.phone) userPhone = data.phone;
-                });
+                const profile = await apiCallSilent('/Auth/profile');
+                if (!profile) {
+                    authToken = null; currentUser = null;
+                    localStorage.removeItem('authToken'); localStorage.removeItem('currentUser');
+                    document.getElementById('userPill').style.display = 'none';
+                    document.getElementById('loginBtn').style.display = 'block';
+                    document.getElementById('logoutBtn').style.display = 'none';
+                } else {
+                    userPhone = profile.phone || null;
+                }
             }
+
             await loadBooks();
             await loadMenu();
-            await loadFavoriteIds();
-            loadNotifications();
+            if (authToken) {
+                await loadFavoriteIds();
+                loadNotifications();
+            }
         });
 
-        // Nav hover expand
+        async function apiCallSilent(endpoint, options = {}) {
+            const headers = { 'Content-Type': 'application/json' };
+            if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
+            try {
+                const r = await fetch(API_BASE + endpoint, { ...options, headers: { ...headers, ...options.headers } });
+                if (!r.ok) return null;
+                return await r.json();
+            } catch { return null; }
+        }
+
         const mainNav = document.getElementById('mainNav');
         const pagesRow = document.getElementById('navPagesRow');
         let navLeaveTimer;
@@ -1745,14 +2087,11 @@
         });
 
         function showPage(pageName) {
-            // update pages row nav
             document.querySelectorAll('#navPagesRow .nav-link').forEach(b => b.classList.remove('active'));
-            const activeBtn = document.querySelector('#navPagesRow [onclick="showPage(\'' + pageName + '\')"]');
-            if (activeBtn) activeBtn.classList.add('active');
+            const btn = document.getElementById('nav-' + pageName);
+            if (btn) btn.classList.add('active');
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-link, #navDropdown .nav-link').forEach(l => l.classList.remove('active'));
             document.getElementById('pg-' + pageName).classList.add('active');
-            document.querySelectorAll('[onclick="showPage(\'' + pageName + '\')"]').forEach(b => b.classList.add('active'));
             window.scrollTo(0, 0);
             if (pageName === 'reservations') { initReservationInputs(); loadMyReservations(); }
             if (pageName === 'favorites') loadFavorites();
@@ -1765,14 +2104,10 @@
             const headers = { 'Content-Type': 'application/json' };
             if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
             try {
-                const response = await fetch(API_BASE + endpoint, { ...options, headers: { ...headers, ...options.headers } });
-                if (!response.ok) throw new Error(await response.text());
-                return await response.json();
-            } catch (error) {
-                console.error('API Error:', error);
-                alert('Սխալ: ' + error.message);
-                return null;
-            }
+                const r = await fetch(API_BASE + endpoint, { ...options, headers: { ...headers, ...options.headers } });
+                if (!r.ok) throw new Error(await r.text());
+                return await r.json();
+            } catch (e) { console.error('API Error:', e); alert('Error: ' + e.message); return null; }
         }
 
         async function loadBooks() {
@@ -1795,77 +2130,58 @@
             const available = book.availableCopies || book.availablecopies || book.Availablecopies || 0;
             const favBtn = bookId ? '<button class="fav-btn ' + (isFav ? 'active' : '') + '" style="position:absolute;top:0.5rem;right:0.5rem;" onclick="toggleBookFavorite(event,' + bookId + ')">' + (isFav ? '❤️' : '🤍') + '</button>' : '';
             const borrowBtn = bookId && available > 0
-                ? '<button class="btn-primary borrow-btn" data-bookid="' + bookId + '" style="margin-top:0.6rem;width:100%;padding:0.4rem;font-size:0.78rem;">📚 Պահանջել</button>'
-                : '<button disabled style="margin-top:0.6rem;width:100%;padding:0.4rem;font-size:0.78rem;border-radius:6px;border:none;background:#ddd;color:#999;cursor:not-allowed;">Հասանելի չէ</button>';
+                ? '<button class="btn-primary borrow-btn" data-bookid="' + bookId + '" style="margin-top:0.6rem;width:100%;padding:0.4rem;font-size:0.78rem;">' + t('requestBook') + '</button>'
+                : '<button disabled style="margin-top:0.6rem;width:100%;padding:0.4rem;font-size:0.78rem;border-radius:6px;border:none;background:#ddd;color:#999;cursor:not-allowed;">' + t('unavailable') + '</button>';
             const pdfBtn = (book.pdfAvailable || book.pdfavailable) && (book.pdfUrl || book.pdfurl)
-                ? '<button class="pdf-open-btn" data-url="' + (book.pdfUrl || book.pdfurl) + '" data-title="' + book.title + '" style="margin-top:0.4rem;width:100%;padding:0.35rem;background:var(--blue,#3a6ea5);color:white;border:none;border-radius:6px;font-size:0.72rem;cursor:pointer;font-family:var(--font-body);">📄 Կարդալ PDF</button>'
+                ? '<button class="pdf-open-btn" data-url="' + (book.pdfUrl || book.pdfurl) + '" data-title="' + book.title + '" style="margin-top:0.4rem;width:100%;padding:0.35rem;background:#3a6ea5;color:white;border:none;border-radius:6px;font-size:0.72rem;cursor:pointer;font-family:var(--font-body);">' + t('readPdf') + '</button>'
                 : '';
             return '<div class="book-card" style="position:relative;">'
                 + '<div class="book-cover ' + noImg + '" style="' + imgStyle + '">' + (!book.imagepath ? '📖' : '') + '</div>'
                 + favBtn
                 + '<div class="book-info"><div class="book-ttl">' + book.title + '</div><div class="book-auth">' + book.author + '</div>'
-                + (book.shelfnumber ? '<div class="book-shelf">Դարակ ' + book.shelfnumber + '</div>' : '')
-                + '<div class="book-avail">' + available + ' հասանելի</div>'
+                + (book.shelfnumber ? '<div class="book-shelf">' + t('shelf') + ' ' + book.shelfnumber + '</div>' : '')
+                + '<div class="book-avail">' + available + ' ' + t('available') + '</div>'
                 + borrowBtn + pdfBtn
                 + '</div></div>';
         }
 
-        // Borrow button event delegation
-        document.addEventListener('click', function (e) {
+        document.addEventListener('click', e => {
             const btn = e.target.closest('.borrow-btn');
-            if (!btn) return;
-            const bookId = btn.getAttribute('data-bookid');
-            requestBook(bookId);
+            if (btn) requestBook(btn.getAttribute('data-bookid'));
         });
-
-        // PDF button event delegation
-        document.addEventListener('click', function (e) {
+        document.addEventListener('click', e => {
             const btn = e.target.closest('.pdf-open-btn');
-            if (!btn) return;
-            openPdf(btn.getAttribute('data-url'), btn.getAttribute('data-title'));
+            if (btn) openPdf(btn.getAttribute('data-url'), btn.getAttribute('data-title'));
         });
 
         async function requestBook(bookId) {
-            if (!authToken) { alert('Պահանջելու համար մուտք գործեք'); openModal('loginModal'); return; }
-            if (!userPhone) {
-                alert('Գրքի հայտ ներկայացնելու համար նախ մուտքագրեք ձեր հեռախոսահամարը պրոֆիլի էջում');
-                showPage('profile');
-                return;
-            }
+            if (!authToken) { alert(t('alert_loginToRequest')); openModal('loginModal'); return; }
+            if (!userPhone) { alert(t('alert_phoneRequired')); showPage('profile'); return; }
             const result = await apiCall('/Borrowings/request/' + bookId, { method: 'POST' });
             if (result) alert('✅ ' + result.message);
         }
+
         function searchBooks() {
             const query = document.getElementById('bookSearch').value.toLowerCase();
             const filtered = booksData.filter(b => b.title.toLowerCase().includes(query) || b.author.toLowerCase().includes(query));
             document.getElementById('libraryBooks').innerHTML = filtered.map(renderBook).join('');
         }
 
-        const categoryLabels = { 'hot': 'Տաք Ըմպելիքներ', 'cold': 'Սառը Ըմպելիքներ', 'food': 'Ուտելիք', 'snack': 'Նախուտեստ' };
-
         async function loadMenu() {
             const data = await apiCall('/Menu');
             if (!data) return;
             menuData = data;
             document.getElementById('statMenu').textContent = data.length;
-            const cats = [...new Set(data.map(i => i.category_id).filter(Boolean))];
-            const categories = ['all', ...cats];
-            document.getElementById('menuFilter').innerHTML = categories.map((cat, i) =>
-                '<button class="filter-pill ' + (i === 0 ? 'active' : '') + '" onclick="filterMenu(\'' + cat + '\')">' + (cat === 'all' ? 'Բոլորը' : (categoryLabels[cat] || cat)) + '</button>'
-            ).join('');
-            document.getElementById('homeMenu').innerHTML = data.slice(0, 4).map(item => renderMenuItem(item, false)).join('');
+            rebuildMenuFilter();
+            document.getElementById('homeMenu').innerHTML = data.slice(0, 4).map(i => renderMenuItem(i, false)).join('');
             renderMenuItems(data);
         }
 
         const menuStore = {};
 
-        // Event delegation for add-to-cart buttons — avoids quote escaping issues
-        document.addEventListener('click', function (e) {
+        document.addEventListener('click', e => {
             const btn = e.target.closest('.cart-add-btn');
-            if (!btn) return;
-            const itemId = btn.getAttribute('data-id');
-            const item = menuStore[itemId];
-            if (item) addToCart(item);
+            if (btn) { const item = menuStore[btn.getAttribute('data-id')]; if (item) addToCart(item, btn); }
         });
 
         function renderMenuItem(item, inFavPage) {
@@ -1875,64 +2191,49 @@
             const price = item.price || item.Price || 0;
             const desc = item.description || item.Description || '';
             const rating = item.rating || item.Rating || null;
-            const itemId = item.id || item.Id || item.item_id || item.menu_item_id || item.Menu_item_id || '';
-            const category = categoryLabels[item.category_id || item.Category_id] || item.category_id || item.Category_id || '';
-            // Store safely by id to avoid JSON-in-onclick issues
+            const itemId = item.id || item.Id || item.item_id || '';
+            const category = getCatLabel(item.category_id || item.Category_id || '');
             menuStore[itemId] = { id: itemId, name, price, image_url: imageUrl, category_id: item.category_id || item.Category_id, description: desc };
             const isFav = favMenuIds.has(itemId);
-            const favBtn = '<button class="fav-btn ' + (isFav ? 'active' : '') + '" onclick="toggleFavorite(event,\'' + itemId + '\')"> ' + (isFav ? '❤️' : '🤍') + '</button>';
-            const removeBtn = inFavPage ? '<button class="btn-secondary" style="padding:0.3rem 0.8rem;font-size:0.72rem;" onclick="toggleFavorite(event,\'' + itemId + '\',true)">Հեռացնել</button>' : '';
+            const favBtn = '<button class="fav-btn ' + (isFav ? 'active' : '') + '" onclick="toggleFavorite(event,\'' + itemId + '\')">' + (isFav ? '❤️' : '🤍') + '</button>';
+            const removeBtn = inFavPage ? '<button class="btn-secondary" style="padding:0.3rem 0.8rem;font-size:0.72rem;" onclick="toggleFavorite(event,\'' + itemId + '\',true)">' + t('remove') + '</button>' : '';
             const ratingHtml = rating ? ' <span style="font-size:0.7rem;color:var(--warm-gray);">⭐ ' + rating + '</span>' : '';
             return '<div class="menu-card"><div class="menu-img ' + (!imageUrl ? 'no-img' : '') + '" ' + imgStyle + '>'
                 + (!imageUrl ? '☕' : '') + '<span class="menu-cat-tag">' + category + '</span></div>'
-                + '<div class="menu-info">'
-                + '<div class="menu-name">' + name + '</div>'
-                + (desc ? '<div style="font-size:0.73rem;color:var(--warm-gray);margin:0.15rem 0 0.3rem;"> ' + desc + '</div>' : '')
+                + '<div class="menu-info"><div class="menu-name">' + name + '</div>'
+                + (desc ? '<div style="font-size:0.73rem;color:var(--warm-gray);margin:0.15rem 0 0.3rem;">' + desc + '</div>' : '')
                 + '<div class="menu-footer"><span class="menu-price">' + price + ' AMD' + ratingHtml + '</span>'
                 + '<div class="menu-actions">' + favBtn + (inFavPage ? removeBtn : '<button class="add-btn cart-add-btn" data-id="' + itemId + '">+</button>') + '</div>'
                 + '</div></div></div>';
         }
 
-
         function renderMenuItems(items) {
-            document.getElementById('cafeMenu').innerHTML = items.map(item => renderMenuItem(item, false)).join('');
+            document.getElementById('cafeMenu').innerHTML = items.map(i => renderMenuItem(i, false)).join('');
         }
 
         function filterMenu(category) {
             document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
             event.target.classList.add('active');
             const filtered = category === 'all' ? menuData : menuData.filter(i => i.category_id === category);
-            document.getElementById('cafeMenu').innerHTML = filtered.map(item => renderMenuItem(item, false)).join('');
+            renderMenuItems(filtered);
         }
 
-        function addToCart(item) {
-            const id = item.id || item.Id || '';
-            const existing = cart.find(i => (i.id || i.Id) === id);
-            if (existing) { existing._qty = (existing._qty || 1) + 1; }
+        function addToCart(item, btn) {
+            const id = item.id || '';
+            const existing = cart.find(i => i.id === id);
+            if (existing) existing._qty = (existing._qty || 1) + 1;
             else { item._qty = 1; cart.push(item); }
             updateCartUI();
-            event.target.textContent = '✓';
-            event.target.style.background = 'var(--moss)';
-            setTimeout(() => { event.target.textContent = '+'; event.target.style.background = 'var(--ink)'; }, 1000);
+            if (btn) { btn.textContent = '✓'; btn.style.background = 'var(--moss)'; setTimeout(() => { btn.textContent = '+'; btn.style.background = 'var(--ink)'; }, 1000); }
         }
 
-        function removeFromCart(id) {
-            cart = cart.filter(i => (i.id || i.Id) !== id);
-            updateCartUI(); renderCartModal();
-        }
-
-        function changeQty(id, delta) {
-            const item = cart.find(i => (i.id || i.Id) === id);
-            if (!item) return;
-            item._qty = Math.max(1, (item._qty || 1) + delta);
-            updateCartUI(); renderCartModal();
-        }
+        function removeFromCart(id) { cart = cart.filter(i => i.id !== id); updateCartUI(); renderCartModal(); }
+        function changeQty(id, delta) { const item = cart.find(i => i.id === id); if (item) { item._qty = Math.max(1, (item._qty || 1) + delta); updateCartUI(); renderCartModal(); } }
 
         function updateCartUI() {
             const total = cart.reduce((s, i) => s + (i._qty || 1), 0);
             document.getElementById('cartBadge').textContent = total;
-            if (cart.length > 0) document.getElementById('cartFloat').classList.add('show');
-            else document.getElementById('cartFloat').classList.remove('show');
+            document.getElementById('cartFloat').classList.toggle('show', cart.length > 0);
         }
 
         function renderCartModal() {
@@ -1940,37 +2241,33 @@
             const emptyEl = document.getElementById('cartModalEmpty');
             const totalEl = document.getElementById('cartModalTotal');
             const checkoutBtn = document.getElementById('cartCheckoutBtn');
-            if (cart.length === 0) {
-                el.innerHTML = ''; emptyEl.style.display = 'block'; totalEl.textContent = ''; checkoutBtn.disabled = true; return;
-            }
+            if (cart.length === 0) { el.innerHTML = ''; emptyEl.style.display = 'block'; totalEl.textContent = ''; checkoutBtn.disabled = true; return; }
             emptyEl.style.display = 'none'; checkoutBtn.disabled = false;
-            let grandTotal = 0;
+            let grand = 0;
             el.innerHTML = cart.map(item => {
-                const id = item.id || item.Id || '';
-                const qty = item._qty || 1;
-                const price = item.price || item.Price || 0;
-                grandTotal += price * qty;
+                const id = item.id || ''; const qty = item._qty || 1; const price = item.price || 0;
+                grand += price * qty;
                 return '<div style="display:flex;align-items:center;gap:0.8rem;padding:0.7rem 0;border-bottom:1px solid var(--rule);">'
-                    + '<div style="flex:1;font-size:0.88rem;font-weight:500;">' + (item.name || item.Name || '') + '</div>'
+                    + '<div style="flex:1;font-size:0.88rem;font-weight:500;">' + (item.name || '') + '</div>'
                     + '<div style="display:flex;align-items:center;gap:0.4rem;">'
-                    + '<button onclick=\'changeQty(\'' + id + '\',-1)\' style="width:26px;height:26px;border-radius:50%;border:1px solid var(--rule);background:none;cursor:pointer;">−</button>'
+                    + '<button onclick=\'changeQty("' + id + '",-1)\' style="width:26px;height:26px;border-radius:50%;border:1px solid var(--rule);background:none;cursor:pointer;">−</button>'
                     + '<span style="min-width:20px;text-align:center;font-weight:600;">' + qty + '</span>'
-                    + '<button onclick=\'changeQty(\'' + id + '\',1)\' style="width:26px;height:26px;border-radius:50%;border:1px solid var(--rule);background:none;cursor:pointer;">+</button>'
+                    + '<button onclick=\'changeQty("' + id + '",1)\' style="width:26px;height:26px;border-radius:50%;border:1px solid var(--rule);background:none;cursor:pointer;">+</button>'
                     + '</div>'
                     + '<div style="font-size:0.85rem;color:var(--warm-gray);min-width:70px;text-align:right;">' + (price * qty) + ' AMD</div>'
-                    + '<button onclick=\'removeFromCart(\'' + id + '\')\' style="background:none;border:none;color:var(--terracotta);cursor:pointer;font-size:1rem;padding:0;">✕</button>'
+                    + '<button onclick=\'removeFromCart("' + id + '")\' style="background:none;border:none;color:var(--terracotta);cursor:pointer;font-size:1rem;padding:0;">✕</button>'
                     + '</div>';
             }).join('');
-            totalEl.innerHTML = '<strong>Ընդամենը՝ ' + grandTotal + ' AMD</strong>';
+            totalEl.innerHTML = '<strong>' + t('cartTotal') + ' ' + grand + ' AMD</strong>';
         }
 
         async function checkout() {
-            if (!authToken) { closeModal('cartModal'); alert('Պատվեր տալու համար մուտք գործեք'); openModal('loginModal'); return; }
+            if (!authToken) { closeModal('cartModal'); alert(t('alert_loginToOrder')); openModal('loginModal'); return; }
             if (cart.length === 0) return;
-            const items = cart.map(item => ({ itemId: item.id || item.Id || '', quantity: item._qty || 1 }));
+            const items = cart.map(item => ({ itemId: item.id || '', quantity: item._qty || 1 }));
             const result = await apiCall('/Orders', { method: 'POST', body: JSON.stringify({ items, orderType: 'pickup', paymentMethod: 'cash' }) });
             if (result) {
-                closeModal('cartModal'); alert('✅ Պատվերը ընդունվեց! Ընդհանուր՝ ' + result.totalAmount + ' AMD');
+                closeModal('cartModal'); alert(t('alert_orderReceived') + result.totalAmount + ' AMD');
                 cart = []; updateCartUI();
                 if (document.getElementById('pg-myorders').classList.contains('active')) loadMyOrders();
             }
@@ -1981,14 +2278,10 @@
             const result = await apiCall('/Auth/login', { method: 'POST', body: JSON.stringify({ email: document.getElementById('loginEmail').value, password: document.getElementById('loginPassword').value }) });
             if (result && result.token) {
                 authToken = result.token; currentUser = result.user;
-                localStorage.setItem('authToken', authToken);
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                localStorage.setItem('authToken', authToken); localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 const role = currentUser.role;
-                if (role === 'cafe staff' || role === 'coffee_worker' || role === 'librarian' || role === 'library_worker') {
-                    window.location.href = 'staff.html';
-                    return;
-                }
-                updateUIForLoggedInUser(); closeModal('loginModal'); alert('Մուտքը հաջողվեց!'); loadFavoriteIds();
+                if (role === 'cafe staff' || role === 'coffee_worker' || role === 'librarian' || role === 'library_worker') { window.location.href = 'staff.html'; return; }
+                updateUIForLoggedInUser(); closeModal('loginModal'); alert(t('alert_loginSuccess')); loadFavoriteIds();
             }
         }
 
@@ -1997,26 +2290,24 @@
             const email = document.getElementById('regEmail').value;
             const password = document.getElementById('regPassword').value;
             const role = document.getElementById('regRole').value;
-            if (!name || !email || !password) { alert('Խնդրում ենք լրացնել բոլոր դաշտերը'); return; }
-            if (!email.endsWith('@polytechnic.am')) { alert('Գրանցվելու համար անհրաժեշտ է օգտագործել @polytechnic.am էլ. հասցե'); return; }
+            if (!name || !email || !password) { alert(t('alert_fillAll')); return; }
+            if (!email.endsWith('@polytechnic.am')) { alert(t('alert_emailDomain')); return; }
             const result = await apiCall('/Auth/send-code', { method: 'POST', body: JSON.stringify({ name, email, password, role }) });
             if (result) {
                 document.getElementById('regEmailDisplay').textContent = email;
+                document.getElementById('regCodeSentMsg').innerHTML = t('regCodeSentPre') + '<strong>' + email + '</strong>' + t('resCodeSent');
                 document.getElementById('registerStep1').style.display = 'none';
                 document.getElementById('registerStep2').style.display = 'block';
             }
         }
 
-        function backToStep1() {
-            document.getElementById('registerStep1').style.display = 'block';
-            document.getElementById('registerStep2').style.display = 'none';
-        }
+        function backToStep1() { document.getElementById('registerStep1').style.display = 'block'; document.getElementById('registerStep2').style.display = 'none'; }
 
         async function register() {
             const code = document.getElementById('regCode').value;
-            if (!code || code.length !== 6) { alert('Խնդրում ենք մուտքագրել 6-նիշ կոդը'); return; }
+            if (!code || code.length !== 6) { alert(t('alert_enterCode')); return; }
             const result = await apiCall('/Auth/register', { method: 'POST', body: JSON.stringify({ email: document.getElementById('regEmail').value, code }) });
-            if (result) { alert('Գրանցումը հաջողվեց! Խնդրում ենք մուտք գործել։'); backToStep1(); document.getElementById('regCode').value = ''; switchModal('registerModal', 'loginModal'); }
+            if (result) { alert(t('alert_regSuccess')); backToStep1(); document.getElementById('regCode').value = ''; switchModal('registerModal', 'loginModal'); }
         }
 
         function logout() {
@@ -2025,7 +2316,7 @@
             document.getElementById('userPill').style.display = 'none';
             document.getElementById('loginBtn').style.display = 'block';
             document.getElementById('logoutBtn').style.display = 'none';
-            alert('Ելքը հաջողվեց');
+            alert(t('alert_logoutSuccess'));
         }
 
         function updateUIForLoggedInUser() {
@@ -2042,7 +2333,7 @@
             const data = await apiCall('/Notifications');
             if (!data || !data.notifications) return;
             const list = document.getElementById('notifList');
-            if (data.notifications.length === 0) { list.innerHTML = '<div class="notif-empty">Նոր ծանուցումներ չկան</div>'; return; }
+            if (data.notifications.length === 0) { list.innerHTML = '<div class="notif-empty">' + t('notifEmpty') + '</div>'; return; }
             list.innerHTML = data.notifications.map(n =>
                 '<div class="notif-item ' + (n.isRead ? '' : 'unread') + '">'
                 + '<div class="ni-icon ' + (n.type.includes('order') ? 'ni-order' : 'ni-res') + '">' + getNotifIcon(n.type) + '</div>'
@@ -2062,9 +2353,9 @@
         function formatTime(dateStr) {
             const date = new Date(dateStr);
             const diff = Math.floor((new Date() - date) / 60000);
-            if (diff < 1) return 'Հենց նոր';
-            if (diff < 60) return diff + ' րոպե առաջ';
-            if (diff < 1440) return Math.floor(diff / 60) + ' ժամ առաջ';
+            if (diff < 1) return t('just_now');
+            if (diff < 60) return diff + ' ' + t('min_ago');
+            if (diff < 1440) return Math.floor(diff / 60) + ' ' + t('hr_ago');
             return date.toLocaleDateString();
         }
 
@@ -2083,20 +2374,14 @@
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
             overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(overlay.id); });
         });
-
         document.addEventListener('click', e => {
             const dropdown = document.getElementById('notifDropdown');
             const btn = document.getElementById('notifBtn');
             if (!dropdown.contains(e.target) && !btn.contains(e.target)) dropdown.classList.remove('show');
         });
 
-        // ===== ՊՐՈՖԻԼ =====
         async function loadProfile() {
-            if (!authToken) {
-                document.getElementById('profileNotLoggedIn').style.display = 'block';
-                document.getElementById('profileForm').style.display = 'none';
-                return;
-            }
+            if (!authToken) { document.getElementById('profileNotLoggedIn').style.display = 'block'; document.getElementById('profileForm').style.display = 'none'; return; }
             document.getElementById('profileNotLoggedIn').style.display = 'none';
             document.getElementById('profileForm').style.display = 'flex';
             const data = await apiCall('/Auth/profile');
@@ -2110,87 +2395,57 @@
         async function saveProfile() {
             const name = document.getElementById('profileName').value.trim();
             const phone = document.getElementById('profilePhone').value.trim();
-            if (!phone) { alert('Խնդրում ենք մուտքագրել հեռախոսահամարը'); return; }
+            if (!phone) { alert(t('alert_phoneRequiredSave')); return; }
             const result = await apiCall('/Auth/profile', { method: 'PUT', body: JSON.stringify({ name, phone }) });
-            if (result) {
-                userPhone = phone;
-                // Update stored user
-                if (currentUser) { currentUser.phone = phone; localStorage.setItem('currentUser', JSON.stringify(currentUser)); }
-                alert('✅ Պրոֆիլը պահպանված է');
-            }
+            if (result) { userPhone = phone; if (currentUser) { currentUser.phone = phone; localStorage.setItem('currentUser', JSON.stringify(currentUser)); } alert(t('alert_profileSaved')); }
         }
 
-        // ===== ԻՄ ԳՐՔԵՐԸ =====
         async function loadMyBorrowings() {
-            if (!authToken) {
-                document.getElementById('myBorrowNotLoggedIn').style.display = 'block';
-                document.getElementById('myBorrowList').innerHTML = '';
-                return;
-            }
+            if (!authToken) { document.getElementById('myBorrowNotLoggedIn').style.display = 'block'; document.getElementById('myBorrowList').innerHTML = ''; return; }
             document.getElementById('myBorrowNotLoggedIn').style.display = 'none';
             const data = await apiCall('/Borrowings/my');
             if (!data) return;
-            if (data.length === 0) {
-                document.getElementById('myBorrowEmpty').style.display = 'block';
-                document.getElementById('myBorrowList').innerHTML = '';
-                return;
-            }
+            if (data.length === 0) { document.getElementById('myBorrowEmpty').style.display = 'block'; document.getElementById('myBorrowList').innerHTML = ''; return; }
             document.getElementById('myBorrowEmpty').style.display = 'none';
-            const statusLabel = { borrowed: '📖 Ձեռքիս', returned: '↩️ Վերադարձված', overdue: '⚠️ Ժամկետ անցած' };
+            const statusLabel = { borrowed: t('borrowStatus_borrowed'), returned: t('borrowStatus_returned'), overdue: t('borrowStatus_overdue') };
             const statusColor = { requested: '#c4873a', approved: '#2d7a2d', borrowed: '#3a6ea5', returned: '#888', overdue: '#b85540', rejected: '#888' };
             document.getElementById('myBorrowList').innerHTML = data.map(b => {
                 const status = statusLabel[b.status] || b.status;
                 const color = statusColor[b.status] || '#666';
-                const reqDate = new Date(b.borrowed_at || b.requested_at).toLocaleDateString('hy-AM');
-                const dueDate = b.due_date ? new Date(b.due_date).toLocaleDateString('hy-AM') : null;
+                const reqDate = new Date(b.borrowed_at || b.requested_at).toLocaleDateString();
+                const dueDate = b.due_date ? new Date(b.due_date).toLocaleDateString() : null;
                 const isOverdue = b.status === 'overdue' || (b.status === 'borrowed' && b.due_date && new Date(b.due_date) < new Date());
                 return '<div style="background:white;border-radius:12px;padding:1.2rem 1.5rem;border:1px solid ' + (isOverdue ? '#f5c2b8' : 'var(--rule)') + ';' + (isOverdue ? 'background:#fff8f7;' : '') + '">'
                     + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;">'
-                    + '<div style="flex:1;">'
-                    + '<div style="font-weight:700;margin-bottom:0.2rem;">' + (b.book_title || b.title) + '</div>'
-                    + '<div style="font-size:0.8rem;color:var(--warm-gray);">' + (b.book_author || b.author) + '</div>'
-                    + '</div>'
-                    + '<span style="font-size:0.75rem;font-weight:700;color:' + color + ';white-space:nowrap;">' + status + '</span>'
-                    + '</div>'
-                    + '<div style="font-size:0.78rem;color:var(--warm-gray);margin-top:0.5rem;">Հայտ՝ ' + reqDate + (dueDate ? ' · Վերադարձ՝ <strong style="color:' + (isOverdue ? '#b85540' : 'inherit') + ';">' + dueDate + '</strong>' : '') + '</div>'
+                    + '<div style="flex:1;"><div style="font-weight:700;margin-bottom:0.2rem;">' + (b.book_title || b.title) + '</div>'
+                    + '<div style="font-size:0.8rem;color:var(--warm-gray);">' + (b.book_author || b.author) + '</div></div>'
+                    + '<span style="font-size:0.75rem;font-weight:700;color:' + color + ';white-space:nowrap;">' + status + '</span></div>'
+                    + '<div style="font-size:0.78rem;color:var(--warm-gray);margin-top:0.5rem;">' + t('borrowDate') + ' ' + reqDate + (dueDate ? ' · ' + t('borrowDue') + ' <strong style="color:' + (isOverdue ? '#b85540' : 'inherit') + ';">' + dueDate + '</strong>' : '') + '</div>'
                     + (b.notes ? '<div style="font-size:0.78rem;color:var(--warm-gray);margin-top:0.3rem;">📝 ' + b.notes + '</div>' : '')
-                    + (isOverdue ? '<div style="margin-top:0.6rem;font-size:0.78rem;color:#b85540;font-weight:600;">⚠️ Խնդրում ենք անհապաղ վերադարձնել գիրքը գրադարան</div>' : '')
+                    + (isOverdue ? '<div style="margin-top:0.6rem;font-size:0.78rem;color:#b85540;font-weight:600;">' + t('borrowOverdueMsg') + '</div>' : '')
                     + '</div>';
             }).join('');
         }
 
-        // ===== ԻՄ ՊԱՏՎԵՐՆԵՐԸ =====
         async function loadMyOrders() {
-            if (!authToken) {
-                document.getElementById('myOrdersNotLoggedIn').style.display = 'block';
-                document.getElementById('myOrdersList').innerHTML = '';
-                return;
-            }
+            if (!authToken) { document.getElementById('myOrdersNotLoggedIn').style.display = 'block'; document.getElementById('myOrdersList').innerHTML = ''; return; }
             document.getElementById('myOrdersNotLoggedIn').style.display = 'none';
             const data = await apiCall('/Orders/my-orders');
             if (!data) return;
-            if (data.length === 0) {
-                document.getElementById('myOrdersEmpty').style.display = 'block';
-                document.getElementById('myOrdersList').innerHTML = '';
-                return;
-            }
+            if (data.length === 0) { document.getElementById('myOrdersEmpty').style.display = 'block'; document.getElementById('myOrdersList').innerHTML = ''; return; }
             document.getElementById('myOrdersEmpty').style.display = 'none';
-            const statusLabel = { Pending: '⏳ Սպասում', Confirmed: '👍 Հաստատված', InProgress: '☕ Պատրաստվում', Done: '✅ Պատրաստ', Cancelled: '❌ Չեղարկված' };
+            const statusLabel = { Pending: t('orderStatus_Pending'), Confirmed: t('orderStatus_Confirmed'), InProgress: t('orderStatus_InProgress'), Done: t('orderStatus_Done'), Cancelled: t('orderStatus_Cancelled') };
             const statusColor = { Pending: '#c4873a', Confirmed: '#3a5a80', InProgress: '#856404', Done: '#2d7a2d', Cancelled: '#b85540' };
             document.getElementById('myOrdersList').innerHTML = data.map(o => {
-                const date = new Date(o.orderDate).toLocaleString('hy-AM', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                const date = new Date(o.orderDate).toLocaleString(lang === 'hy' ? 'hy-AM' : 'en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
                 const status = statusLabel[o.status] || o.status;
                 const color = statusColor[o.status] || '#6b6560';
                 let itemsHtml = '';
-                try {
-                    const items = typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []);
-                    itemsHtml = items.map(i => '<span style="font-size:0.8rem;color:var(--warm-gray);">' + (i.qty || i.quantity || 1) + '× ' + (i.name || i.itemName || '') + '</span>').join(', ');
-                } catch (e) { itemsHtml = o.items || ''; }
+                try { const items = typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []); itemsHtml = items.map(i => '<span style="font-size:0.8rem;color:var(--warm-gray);">' + (i.qty || i.quantity || 1) + '× ' + (i.name || i.itemName || '') + '</span>').join(', '); } catch { itemsHtml = o.items || ''; }
                 return '<div style="background:white;border-radius:12px;padding:1.2rem 1.5rem;border:1px solid var(--rule);">'
                     + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">'
-                    + '<span style="font-weight:700;">Պատվեր #' + o.orderId + '</span>'
-                    + '<span style="font-size:0.75rem;font-weight:700;color:' + color + ';">' + status + '</span>'
-                    + '</div>'
+                    + '<span style="font-weight:700;">' + t('ordersPrefix') + o.orderId + '</span>'
+                    + '<span style="font-size:0.75rem;font-weight:700;color:' + color + ';">' + status + '</span></div>'
                     + '<div style="font-size:0.78rem;color:var(--warm-gray);margin-bottom:0.5rem;">' + date + '</div>'
                     + '<div style="margin-bottom:0.5rem;">' + itemsHtml + '</div>'
                     + '<div style="font-weight:600;text-align:right;">' + o.totalAmount + ' AMD</div>'
@@ -2198,45 +2453,27 @@
             }).join('');
         }
 
-        // ===== ՆԱԽԸՆՏՐԱԾՆԵՐ =====
-        let favMenuIds = new Set();
-        let favBookIds = new Set();
-
         async function loadFavoriteIds() {
             if (!authToken) return;
             const data = await apiCall('/Favorites/ids');
-            if (data) {
-                favMenuIds = new Set(data.menuItemIds || []);
-                favBookIds = new Set((data.bookIds || []).map(String));
-            }
+            if (data) { favMenuIds = new Set(data.menuItemIds || []); favBookIds = new Set((data.bookIds || []).map(String)); }
         }
 
         async function loadFavorites() {
-            if (!authToken) {
-                document.getElementById('favNotLoggedIn').style.display = 'block';
-                document.getElementById('favEmpty').style.display = 'none';
-                document.getElementById('favGrid').innerHTML = '';
-                return;
-            }
+            if (!authToken) { document.getElementById('favNotLoggedIn').style.display = 'block'; document.getElementById('favEmpty').style.display = 'none'; document.getElementById('favGrid').innerHTML = ''; return; }
             document.getElementById('favNotLoggedIn').style.display = 'none';
             const data = await apiCall('/Favorites');
             if (!data) return;
-            const menuItems = data.menuItems || [];
-            const books = data.books || [];
-            if (menuItems.length === 0 && books.length === 0) {
-                document.getElementById('favEmpty').style.display = 'block';
-                document.getElementById('favGrid').innerHTML = '';
-                return;
-            }
+            const menuItems = data.menuItems || []; const books = data.books || [];
+            if (menuItems.length === 0 && books.length === 0) { document.getElementById('favEmpty').style.display = 'block'; document.getElementById('favGrid').innerHTML = ''; return; }
             document.getElementById('favEmpty').style.display = 'none';
             let html = '';
             if (books.length > 0) {
-                html += '<div style="grid-column:1/-1;font-family:var(--font-display);font-size:1.3rem;color:var(--ink);margin-bottom:0.5rem;">📚 Գրքեր</div>';
-                html += '<div style="grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1.5rem;margin-bottom:2rem;">'
-                    + books.map(b => renderFavBook(b)).join('') + '</div>';
+                html += '<div style="grid-column:1/-1;font-family:var(--font-display);font-size:1.3rem;color:var(--ink);margin-bottom:0.5rem;">' + t('bookSection') + '</div>';
+                html += '<div style="grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1.5rem;margin-bottom:2rem;">' + books.map(renderFavBook).join('') + '</div>';
             }
             if (menuItems.length > 0) {
-                html += '<div style="grid-column:1/-1;font-family:var(--font-display);font-size:1.3rem;color:var(--ink);margin-bottom:0.5rem;">☕ Սրճարան</div>';
+                html += '<div style="grid-column:1/-1;font-family:var(--font-display);font-size:1.3rem;color:var(--ink);margin-bottom:0.5rem;">' + t('cafeSection') + '</div>';
                 html += menuItems.map(item => renderMenuItem(item, true)).join('');
             }
             document.getElementById('favGrid').innerHTML = html;
@@ -2251,44 +2488,35 @@
                 + '<button class="fav-btn active" style="position:absolute;top:0.5rem;right:0.5rem;" onclick=\'toggleBookFavorite(event,' + bookId + ',true)\'>❤️</button>'
                 + '<div class="book-info"><div class="book-ttl">' + (book.title || book.Title) + '</div>'
                 + '<div class="book-auth">' + (book.author || book.Author) + '</div>'
-                + (book.shelfnumber ? '<div class="book-shelf">Դարակ ' + book.shelfnumber + '</div>' : '')
+                + (book.shelfnumber ? '<div class="book-shelf">' + t('shelf') + ' ' + book.shelfnumber + '</div>' : '')
                 + '</div></div>';
         }
 
         async function toggleFavorite(e, itemId, forceRemove) {
             e.stopPropagation();
-            if (!authToken) { alert('Նախընտրածներ ավելացնելու համար մուտք գործեք'); openModal('loginModal'); return; }
+            if (!authToken) { alert(t('alert_loginToFav')); openModal('loginModal'); return; }
             const btn = e.currentTarget;
             if (favMenuIds.has(itemId) || forceRemove) {
                 await apiCall('/Favorites/menu/' + itemId, { method: 'DELETE' });
-                favMenuIds.delete(itemId);
-                btn.textContent = '🤍';
-                btn.classList.remove('active');
+                favMenuIds.delete(itemId); btn.textContent = '🤍'; btn.classList.remove('active');
                 if (forceRemove) loadFavorites();
             } else {
                 await apiCall('/Favorites/menu', { method: 'POST', body: JSON.stringify({ menuItemId: itemId }) });
-                favMenuIds.add(itemId);
-                btn.textContent = '❤️';
-                btn.classList.add('active');
+                favMenuIds.add(itemId); btn.textContent = '❤️'; btn.classList.add('active');
             }
         }
 
         async function toggleBookFavorite(e, bookId, forceRemove) {
             e.stopPropagation();
-            if (!authToken) { alert('Նախընտրածներ ավելացնելու համար մուտք գործեք'); openModal('loginModal'); return; }
-            const btn = e.currentTarget;
-            const id = String(bookId);
+            if (!authToken) { alert(t('alert_loginToFav')); openModal('loginModal'); return; }
+            const btn = e.currentTarget; const id = String(bookId);
             if (favBookIds.has(id) || forceRemove) {
                 await apiCall('/Favorites/book/' + bookId, { method: 'DELETE' });
-                favBookIds.delete(id);
-                btn.textContent = '🤍';
-                btn.classList.remove('active');
+                favBookIds.delete(id); btn.textContent = '🤍'; btn.classList.remove('active');
                 if (forceRemove) loadFavorites();
             } else {
                 await apiCall('/Favorites/book', { method: 'POST', body: JSON.stringify({ bookId: parseInt(bookId) }) });
-                favBookIds.add(id);
-                btn.textContent = '❤️';
-                btn.classList.add('active');
+                favBookIds.add(id); btn.textContent = '❤️'; btn.classList.add('active');
             }
         }
 
@@ -2298,122 +2526,102 @@
             document.getElementById('pdfReaderModal').style.display = 'flex';
         }
 
-        // ===== ԱՄՐԱԳՐՈՒՄՆԵՐ =====
         function initReservationInputs() {
             const now = new Date();
             const pad = n => String(n).padStart(2, '0');
             const today = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
             const dateEl = document.getElementById('resDate');
-            if (dateEl && !dateEl._initialized) {
-                dateEl._initialized = true;
-                dateEl.min = today;
-                dateEl.value = today;
-            }
-            // Populate start time options 08:00 - 18:30 (every 30 min)
+            if (dateEl && !dateEl._initialized) { dateEl._initialized = true; dateEl.min = today; dateEl.value = today; }
             const startSel = document.getElementById('resStartTime');
             if (startSel && startSel.options.length <= 1) {
                 for (let h = 8; h <= 17; h++) {
                     for (let m of [0, 30]) {
-                        if (h === 17 && m === 30) continue; // max start 18:30 to allow 30min booking
-                        const label = pad(h) + ':' + pad(m);
-                        startSel.add(new Option(label, label));
+                        if (h === 17 && m === 30) continue;
+                        startSel.add(new Option(pad(h) + ':' + pad(m), pad(h) + ':' + pad(m)));
                     }
                 }
             }
+            document.getElementById('resSelectOpt').textContent = t('resSelectOpt');
         }
 
         function updateResEndTimes() {
             const pad = n => String(n).padStart(2, '0');
             const startVal = document.getElementById('resStartTime').value;
             const endSel = document.getElementById('resEndTime');
-            endSel.innerHTML = '<option value="">Ընտրել...</option>';
+            endSel.innerHTML = '<option value="">' + t('resSelectOpt') + '</option>';
             if (!startVal) return;
             const [sh, sm] = startVal.split(':').map(Number);
             const startMins = sh * 60 + sm;
-            // End options: start+30min to start+3h, max 19:00
             for (let delta = 30; delta <= 180; delta += 30) {
                 const endMins = startMins + delta;
-                const eh = Math.floor(endMins / 60);
-                const em = endMins % 60;
+                const eh = Math.floor(endMins / 60); const em = endMins % 60;
                 if (eh > 18 || (eh === 18 && em > 0)) break;
                 const label = pad(eh) + ':' + pad(em);
-                endSel.add(new Option(label + (delta === 60 ? ' (1 ժ)' : delta === 120 ? ' (2 ժ)' : delta === 180 ? ' (3 ժ)' : ''), label));
+                endSel.add(new Option(label + (delta === 60 ? ' (1h)' : delta === 120 ? ' (2h)' : delta === 180 ? ' (3h)' : ''), label));
             }
         }
-        let selectedTable = null;
-        let tableAvailability = {};
 
         async function checkTableAvailability() {
-            const dateVal2 = document.getElementById('resDate').value;
-            const startTime2 = document.getElementById('resStartTime').value;
-            const endTime2 = document.getElementById('resEndTime').value;
-            if (!dateVal2 || !startTime2 || !endTime2) { alert('Խնդրում ենք ընտրել ամսաթիվը և ժամերը'); return; }
-            const start = dateVal2 + 'T' + startTime2;
-            const end = dateVal2 + 'T' + endTime2;
-            if (!start || !end) { alert('Խնդրում ենք ընտրել մեկնարկի և ավարտի ժամանակը'); return; }
-            if (new Date(end) <= new Date(start)) { alert('Ավարտի ժամանակը պետք է լինի մեկնարկից հետո'); return; }
-            if (new Date(start) <= new Date()) { alert('Մեկնարկի ժամանակը պետք է լինի ապագայում'); return; }
+            const dateVal = document.getElementById('resDate').value;
+            const startTime = document.getElementById('resStartTime').value;
+            const endTime = document.getElementById('resEndTime').value;
+            if (!dateVal || !startTime || !endTime) { alert(t('alert_selectTime')); return; }
+            const start = dateVal + 'T' + startTime; const end = dateVal + 'T' + endTime;
+            if (new Date(end) <= new Date(start)) { alert(t('alert_endAfterStart')); return; }
+            if (new Date(start) <= new Date()) { alert(t('alert_futureTime')); return; }
             const data = await apiCall('/Reservations/tables?startTime=' + encodeURIComponent(start) + '&endTime=' + encodeURIComponent(end));
             if (!data) return;
             selectedTable = null;
             document.getElementById('reserveBtn').style.opacity = '0.5';
-            data.forEach(t => {
-                tableAvailability[t.id] = t.available;
-                const card = document.getElementById('tc-' + t.id);
-                const status = document.getElementById('ts-' + t.id);
+            data.forEach(tbl => {
+                tableAvailability[tbl.id] = tbl.available;
+                const card = document.getElementById('tc-' + tbl.id);
+                const status = document.getElementById('ts-' + tbl.id);
                 if (!card) return;
-                card.style.border = t.available ? '2px solid #7aab72' : '2px solid var(--rule)';
-                card.style.background = t.available ? '#f5faf4' : '';
-                card.style.opacity = t.available ? '1' : '0.5';
-                status.textContent = t.available ? 'Հասանելի' : 'Ամրագրված';
-                status.style.color = t.available ? 'var(--moss)' : 'var(--terracotta)';
+                card.style.border = tbl.available ? '2px solid #7aab72' : '2px solid var(--rule)';
+                card.style.background = tbl.available ? '#f5faf4' : '';
+                card.style.opacity = tbl.available ? '1' : '0.5';
+                status.textContent = tbl.available ? t('resAvailable') : t('resReserved');
+                status.style.color = tbl.available ? 'var(--moss)' : 'var(--terracotta)';
             });
         }
 
         function selectTable(tableId) {
             tableId = parseInt(tableId);
-            if (tableAvailability[tableId] === undefined) { alert('Նախ ստուգեք հասանելիությունը'); return; }
+            if (tableAvailability[tableId] === undefined) { alert(t('alert_checkFirst')); return; }
             if (!tableAvailability[tableId]) return;
             selectedTable = tableId;
-            [1, 2, 3].forEach(t => {
-                const card = document.getElementById('tc-' + t);
+            [1, 2, 3].forEach(t2 => {
+                const card = document.getElementById('tc-' + t2);
                 if (!card) return;
-                if (t === tableId) { card.style.border = '2px solid var(--moss)'; card.style.background = '#e8f0e4'; }
-                else if (tableAvailability[t] !== undefined) {
-                    card.style.border = tableAvailability[t] ? '2px solid #7aab72' : '2px solid var(--rule)';
-                    card.style.background = tableAvailability[t] ? '#f5faf4' : '';
-                }
+                if (t2 === tableId) { card.style.border = '2px solid var(--moss)'; card.style.background = '#e8f0e4'; }
+                else if (tableAvailability[t2] !== undefined) { card.style.border = tableAvailability[t2] ? '2px solid #7aab72' : '2px solid var(--rule)'; card.style.background = tableAvailability[t2] ? '#f5faf4' : ''; }
             });
             document.getElementById('reserveBtn').style.opacity = '1';
         }
 
         async function makeReservation() {
-            if (!authToken) { alert('Ամրագրելու համար մուտք գործեք'); openModal('loginModal'); return; }
-            if (!selectedTable) { alert('Խնդրում ենք ընտրել սեղան'); return; }
+            if (!authToken) { alert(t('alert_loginToReserve')); openModal('loginModal'); return; }
+            if (!selectedTable) { alert(t('alert_selectTable')); return; }
             const dateVal = document.getElementById('resDate').value;
             const startTime = document.getElementById('resStartTime').value;
             const endTime = document.getElementById('resEndTime').value;
             const notes = document.getElementById('resNotes').value;
-            if (!dateVal || !startTime || !endTime) { alert('Խնդրում ենք ընտրել ամսաթիվը, մեկնարկի և ավարտի ժամը'); return; }
-            const start = dateVal + 'T' + startTime;
-            const end = dateVal + 'T' + endTime;
-            if (!confirm('Ամրագրե՞լ Սեղան ' + selectedTable + ':\nՀաստատե՞լ:')) return;
-            const result = await apiCall('/Reservations', { method: 'POST', body: JSON.stringify({ tableId: parseInt(selectedTable), startTime: start, endTime: end, notes: notes }) });
+            if (!dateVal || !startTime || !endTime) { alert(t('alert_selectTimeFull')); return; }
+            if (!confirm(t('confirm_reserve') + selectedTable + '\n' + t('confirm_ok'))) return;
+            const result = await apiCall('/Reservations', { method: 'POST', body: JSON.stringify({ tableId: parseInt(selectedTable), startTime: dateVal + 'T' + startTime, endTime: dateVal + 'T' + endTime, notes }) });
             if (result) {
-                alert('Սեղանը ամրագրված է! Ծանուցում կստանաք 15 րոպե առաջ։');
+                alert(t('alert_resConfirmed'));
                 selectedTable = null;
                 document.getElementById('resStartTime').value = '';
-                document.getElementById('resEndTime').innerHTML = '<option value="">Ընտրել...</option>';
+                document.getElementById('resEndTime').innerHTML = '<option value="">' + t('resSelectOpt') + '</option>';
                 document.getElementById('resNotes').value = '';
                 tableAvailability = {};
-                [1, 2, 3].forEach(t => {
-                    const card = document.getElementById('tc-' + t);
-                    const status = document.getElementById('ts-' + t);
-                    card.style.border = '2px solid var(--rule)';
-                    card.style.background = '';
-                    card.style.opacity = '1';
-                    status.textContent = 'Նախ ընտրեք ժամանակը';
-                    status.style.color = '';
+                [1, 2, 3].forEach(i => {
+                    const card = document.getElementById('tc-' + i);
+                    const status = document.getElementById('ts-' + i);
+                    if (card) { card.style.border = '2px solid var(--rule)'; card.style.background = ''; card.style.opacity = '1'; }
+                    if (status) { status.textContent = t('resSelectTimeFirst'); status.style.color = ''; }
                 });
                 document.getElementById('reserveBtn').style.opacity = '0.5';
                 loadMyReservations();
@@ -2426,13 +2634,13 @@
             if (!data) return;
             const container = document.getElementById('myReservations');
             if (!container) return;
-            if (data.length === 0) { container.innerHTML = '<p style="color:var(--warm-gray);">Ամրագրումներ դեռ չկան։</p>'; return; }
+            if (data.length === 0) { container.innerHTML = '<p style="color:var(--warm-gray);">' + t('noReservations') + '</p>'; return; }
             container.innerHTML = data.map(r => {
-                const tableName = r.tableName || ('Սեղան ' + r.tableId);
-                const start = new Date(r.startTime);
-                const end = new Date(r.endTime);
+                const tableName = r.tableName || (t('resTablePrefix') + ' ' + r.tableId);
+                const start = new Date(r.startTime); const end = new Date(r.endTime);
+                const statusMap = { Active: t('resStatus_Active'), Confirmed: t('resStatus_Confirmed'), Cancelled: t('resStatus_Cancelled'), Expired: t('resStatus_Expired') };
                 const badgeClass = r.status === 'Active' ? 'badge-pending' : r.status === 'Confirmed' ? 'badge-confirmed' : '';
-                const statusText = r.status === 'Active' ? 'Ակտիվ' : r.status === 'Confirmed' ? 'Հաստատված' : r.status === 'Cancelled' ? 'Չեղարկված' : r.status === 'Expired' ? 'Ժամկետանց' : r.status;
+                const statusText = statusMap[r.status] || r.status;
                 const canCancel = r.status === 'Active' || r.status === 'Confirmed';
                 const canConfirm = r.status === 'Active';
                 return '<div style="background:white;border:1px solid var(--rule);border-radius:12px;padding:1.5rem;">'
@@ -2444,25 +2652,25 @@
                     + ' - ' + end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</div>'
                     + (r.notes ? '<div style="font-size:0.78rem;color:var(--warm-gray);">' + r.notes + '</div>' : '')
                     + '<div style="display:flex;gap:0.5rem;margin-top:0.8rem;">'
-                    + (canConfirm ? '<button class="btn-moss" style="padding:0.4rem 0.9rem;font-size:0.75rem;" onclick="confirmReservation(' + r.id + ')">Հաստատել</button>' : '')
-                    + (canCancel ? '<button class="btn-secondary" style="padding:0.4rem 0.9rem;font-size:0.75rem;" onclick="cancelReservation(' + r.id + ')">Չեղարկել</button>' : '')
+                    + (canConfirm ? '<button class="btn-moss" style="padding:0.4rem 0.9rem;font-size:0.75rem;" onclick="confirmReservation(' + r.id + ')">' + t('resConfirmBtn') + '</button>' : '')
+                    + (canCancel ? '<button class="btn-secondary" style="padding:0.4rem 0.9rem;font-size:0.75rem;" onclick="cancelReservation(' + r.id + ')">' + t('resCancelBtn') + '</button>' : '')
                     + '</div></div>';
             }).join('');
         }
 
         async function confirmReservation(id) {
             const result = await apiCall('/Reservations/' + id + '/confirm', { method: 'PUT' });
-            if (result) { alert('Ամրագրումը հաստատված է!'); loadMyReservations(); }
+            if (result) { alert(t('alert_resConfirmedOk')); loadMyReservations(); }
         }
 
         async function cancelReservation(id) {
-            if (!confirm('Չեղարկե՞լ այս ամրագրումը։')) return;
+            if (!confirm(t('confirm_cancelRes'))) return;
             const result = await apiCall('/Reservations/' + id, { method: 'DELETE' });
-            if (result) { loadMyReservations(); }
+            if (result) loadMyReservations();
         }
 
         setInterval(async () => {
-            try { await fetch(API_BASE + '/Reservations/check-reminders', { method: 'POST' }); if (authToken) loadNotifications(); } catch (e) { }
+            try { await fetch(API_BASE + '/Reservations/check-reminders', { method: 'POST' }); if (authToken) loadNotifications(); } catch { }
         }, 60000);
     </script>
 </body>
