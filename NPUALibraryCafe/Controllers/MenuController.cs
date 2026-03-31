@@ -1,70 +1,51 @@
-﻿using LibCafe.Infrastructure.Data;
+﻿using LibCafe.Domain.Entities;
+using LibCafe.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using NPUALibraryCafe.DTOs.Menu;
 
-namespace NPUALibraryCafe.API.Controllers
+namespace NPUALibraryCafe.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class MenuController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class MenuController : ControllerBase
+    private readonly IMenuitemRepository _menuRepository;
+
+    public MenuController(IMenuitemRepository menuRepository)
     {
-        private readonly LibraryCafeDbContext _context;
-        public MenuController(LibraryCafeDbContext context) { _context = context; }
-
-        [HttpGet]
-        public async Task<ActionResult> GetAllMenuItems()
-        {
-            try
-            {
-                var items = await _context.Database
-                    .SqlQueryRaw<MenuItemDto>(
-                        "SELECT id, name, description, category_id, price, image_url, available, rating FROM menu_items WHERE available = true ORDER BY category_id, name")
-                    .ToListAsync();
-                return Ok(items);
-            }
-            catch (Exception ex) { return StatusCode(500, new { error = ex.Message }); }
-        }
-
-        [HttpGet("category/{category}")]
-        public async Task<ActionResult> GetByCategory(string category)
-        {
-            try
-            {
-                var items = await _context.Database
-                    .SqlQueryRaw<MenuItemDto>(
-                        "SELECT id, name, description, category_id, price, image_url, available, rating FROM menu_items WHERE available = true AND category_id = {0} ORDER BY name",
-                        category)
-                    .ToListAsync();
-                return Ok(items);
-            }
-            catch (Exception ex) { return StatusCode(500, new { error = ex.Message }); }
-        }
-
-        [HttpGet("search")]
-        public async Task<ActionResult> Search([FromQuery] string query)
-        {
-            try
-            {
-                var items = await _context.Database
-                    .SqlQueryRaw<MenuItemDto>(
-                        "SELECT id, name, description, category_id, price, image_url, available, rating FROM menu_items WHERE available = true AND (LOWER(name) LIKE {0} OR LOWER(description) LIKE {0}) ORDER BY name",
-                        $"%{query.ToLower()}%")
-                    .ToListAsync();
-                return Ok(items);
-            }
-            catch (Exception ex) { return StatusCode(500, new { error = ex.Message }); }
-        }
+        _menuRepository = menuRepository;
     }
 
-    public class MenuItemDto
+    [HttpGet]
+    public async Task<IActionResult> GetAllMenuItems()
     {
-        public string Id { get; set; } = "";
-        public string Name { get; set; } = "";
-        public string? Description { get; set; }
-        public string? Category_id { get; set; }
-        public decimal Price { get; set; }
-        public string? Image_url { get; set; }
-        public bool Available { get; set; }
-        public decimal? Rating { get; set; }
+        var items = await _menuRepository.GetAllAvailableAsync();
+        return Ok(items.Select(ToDto));
     }
+
+    [HttpGet("category/{category}")]
+    public async Task<IActionResult> GetByCategory(string category)
+    {
+        var items = await _menuRepository.GetByCategoryAsync(category);
+        return Ok(items.Select(ToDto));
+    }
+
+    [HttpGet("search")]
+    public async Task<IActionResult> Search([FromQuery] string query)
+    {
+        var items = await _menuRepository.SearchAsync(query);
+        return Ok(items.Select(ToDto));
+    }
+
+    private static MenuItemResponseDto ToDto(Menuitem m) => new()
+    {
+        Id = m.Itemid,
+        Name = m.Itemname,
+        Description = m.Description,
+        CategoryId = m.CategoryId,
+        Price = m.Price,
+        ImagePath = m.Imagepath,
+        Available = m.Available,
+        Rating = m.Rating
+    };
 }

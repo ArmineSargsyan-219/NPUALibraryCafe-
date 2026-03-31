@@ -7,17 +7,25 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 
-// Fix for Npgsql DateTime UTC compatibility with 'timestamp without time zone'
+
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
 builder.Services.AddControllers();
 
 
 builder.Services.AddScoped<IBookRepository, BookRepository>();
-// Configure Swagger/OpenAPI
+builder.Services.AddScoped<IBorrowingRepository, BorrowingRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<ICafeorderRepository, CafeorderRepository>();
+builder.Services.AddScoped<IMenuitemRepository, MenuitemRepository>();
+builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -28,7 +36,7 @@ builder.Services.AddSwaggerGen(c =>
         Description = "API for Library and Cafe Management System"
     });
 
-    // Add JWT authentication to Swagger
+    
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below.",
@@ -54,12 +62,10 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Configure Database Context
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<LibraryCafeDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"];
 
@@ -82,7 +88,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Configure CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -95,20 +100,18 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "NPUA Library Cafe API v1");
-        c.RoutePrefix = string.Empty; // Makes Swagger UI the root page
+        c.RoutePrefix = string.Empty; 
     });
 }
 
 app.UseHttpsRedirection();
 
-// Enable static files (for images)
 app.UseStaticFiles();
 
 app.UseCors("AllowAll");

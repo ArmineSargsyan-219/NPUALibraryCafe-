@@ -23,13 +23,12 @@ public partial class LibraryCafeDbContext : DbContext
     public virtual DbSet<Payment> Payments { get; set; }
     public virtual DbSet<Systemsetting> Systemsettings { get; set; }
     public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<Favorite> Favorites { get; set; }
     public virtual DbSet<Notification> Notifications { get; set; }
     public virtual DbSet<Reservation> Reservations { get; set; }
     public virtual DbSet<CafeTable> CafeTables { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseNpgsql("Host=ep-still-surf-ahge1fih-pooler.c-3.us-east-1.aws.neon.tech;Database=neondb;Username=neondb_owner;Password=npg_I2Zonf1PYzCH;SSL Mode=Require;Channel Binding=Require");
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Book>(entity =>
@@ -83,6 +82,17 @@ public partial class LibraryCafeDbContext : DbContext
                 .HasForeignKey(d => d.Bookid).HasConstraintName("borrowed_books_book_id_fkey");
             entity.HasOne(d => d.User).WithMany(p => p.Borrowings)
                 .HasForeignKey(d => d.Userid).HasConstraintName("borrowed_books_user_id_fkey");
+        });
+
+        modelBuilder.Entity<Favorite>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("favorites_pkey");
+            entity.ToTable("favorites");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.UserId).HasMaxLength(50).HasColumnName("user_id");
+            entity.Property(e => e.ItemId).HasMaxLength(50).HasColumnName("item_id");
+            entity.Property(e => e.ItemType).HasMaxLength(20).HasColumnName("item_type");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
         });
 
         modelBuilder.Entity<Cafeorder>(entity =>
