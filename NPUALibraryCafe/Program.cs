@@ -1,4 +1,6 @@
-﻿using LibCafe.Infrastructure.Data;
+﻿using LibCafe.Domain.Interfaces;
+using LibCafe.Infrastructure.Data;
+using LibCafe.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -13,6 +15,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
+
+builder.Services.AddScoped<IBookRepository, BookRepository>();
 // Configure Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
