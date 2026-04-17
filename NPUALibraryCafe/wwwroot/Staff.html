@@ -41,6 +41,7 @@
             font-family: var(--font-body);
         }
 
+        /* LOGIN SCREEN */
         .login-screen {
             min-height: 100vh;
             display: flex;
@@ -142,7 +143,7 @@
                 text-decoration: underline;
             }
 
-
+        /* DASHBOARD LAYOUT */
         .dashboard {
             display: none;
             min-height: 100vh;
@@ -247,6 +248,7 @@
             margin-bottom: 2rem;
         }
 
+        /* STATS ROW */
         .stats-row {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -286,6 +288,7 @@
             color: var(--moss);
         }
 
+        /* ORDERS */
         .orders-tabs {
             display: flex;
             gap: 0.5rem;
@@ -471,6 +474,7 @@
                 margin-bottom: 1rem;
             }
 
+        /* LIBRARY WORKER */
         .lib-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -621,6 +625,7 @@
             color: var(--amber);
         }
 
+        /* PDF MODAL */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -683,6 +688,7 @@
             color: white;
         }
 
+        /* NOTIFICATION TOAST */
         .toast {
             position: fixed;
             bottom: 2rem;
@@ -740,6 +746,7 @@
 </head>
 <body>
 
+    <!-- LOGIN SCREEN -->
     <div class="login-screen" id="loginScreen">
         <div class="login-box">
             <div class="login-logo">ՀԱՊՀ <span>Գրադարան-Սրճարան</span></div>
@@ -758,6 +765,7 @@
         </div>
     </div>
 
+    <!-- DASHBOARD -->
     <div class="dashboard" id="dashboard">
         <div class="topbar">
             <div class="topbar-brand">ՀԱՊՀ <span>Աշխատակից</span></div>
@@ -769,6 +777,7 @@
         </div>
         <div class="main-content">
 
+            <!-- CAFÉ WORKER DASHBOARD -->
             <div id="cafeDashboard" style="display:none;">
                 <div class="page-title">Սրճարանի <em>Վահանակ</em></div>
                 <p class="page-desc">Կառավարեք մուտքային պատվերները — հաստատեք, նշեք ընթացքում կամ ավարտված</p>
@@ -787,10 +796,12 @@
                 <div class="orders-grid" id="ordersGrid"></div>
             </div>
 
+            <!-- LIBRARY WORKER DASHBOARD -->
             <div id="libraryDashboard" style="display:none;">
                 <div class="page-title">Գրադարանի <em>Վահանակ</em></div>
                 <p class="page-desc">Կառավարեք գրապահոց, հայտեր և ժամկետ անցած գրքեր</p>
 
+                <!-- Borrow request tabs -->
                 <div style="display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap;">
                     <button class="tab-btn active" onclick="filterBorrowings('all',this)">Բոլոր Հայտերը</button>
                     <button class="tab-btn" onclick="filterBorrowings('borrowed',this)">📖 Ձեռքում</button>
@@ -799,13 +810,16 @@
                 </div>
                 <div id="borrowingsGrid" style="display:flex;flex-direction:column;gap:0.8rem;margin-bottom:2.5rem;"></div>
 
+                <!-- Book management -->
                 <div class="page-title" style="font-size:1.2rem;margin-bottom:1rem;">Գրքերի <em>Կառավարում</em></div>
                 <div class="lib-grid">
+                    <!-- Book list -->
                     <div class="lib-panel">
                         <h3>Բոլոր <em>Գրքերը</em></h3>
                         <input type="text" placeholder="Որոնել..." id="libSearch" oninput="filterLibBooks()" style="width:100%;padding:0.6rem 1rem;border:1px solid var(--rule);border-radius:8px;margin-bottom:1rem;outline:none;font-size:0.85rem;">
                         <div class="book-list" id="libBookList"></div>
                     </div>
+                    <!-- Edit panel -->
                     <div class="lib-panel">
                         <h3>Խմբագրել <em>Գիրք</em></h3>
                         <div id="libEditEmpty" style="text-align:center;padding:3rem;color:var(--warm-gray);">
@@ -841,9 +855,96 @@
                 </div>
             </div>
 
+            <!-- RESERVATIONS DASHBOARD (admin only) -->
+            <div id="reservationsDashboard" style="display:none;">
+                <div class="page-title" style="margin-top:2.5rem;">Ամրագրումների <em>Կառավարում</em></div>
+                <p class="page-desc">Բոլոր սեղանի ամրագրումները — հաստատեք կամ չեղարկեք</p>
+                <div style="display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+                    <button class="tab-btn active" onclick="filterReservations('all',this)">Բոլորը</button>
+                    <button class="tab-btn" onclick="filterReservations('Active',this)">🟡 Ակտիվ</button>
+                    <button class="tab-btn" onclick="filterReservations('Confirmed',this)">✅ Հաստատված</button>
+                    <button class="tab-btn" onclick="filterReservations('Cancelled',this)">❌ Չեղարկված</button>
+                    <button class="tab-btn" onclick="filterReservations('Expired',this)">⏰ Ժամկետանց</button>
+                </div>
+                <div id="reservationsGrid" style="display:flex;flex-direction:column;gap:0.8rem;"></div>
+            </div>
+
+            <!-- MENU MANAGEMENT (admin only) -->
+            <div id="menuDashboard" style="display:none;">
+                <div class="page-title" style="margin-top:2.5rem;">Մենյուի <em>Կառավարում</em></div>
+                <p class="page-desc">Ավելացրեք, խմբագրեք կամ հեռացրեք մենյուի կետեր</p>
+                <div style="display:flex;justify-content:flex-end;margin-bottom:1rem;">
+                    <button class="btn-save" onclick="openAddMenuModal()">+ Ավելացնել կետ</button>
+                </div>
+                <div id="menuAdminGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;"></div>
+            </div>
+
+            <!-- USER MANAGEMENT (admin only) -->
+            <div id="usersDashboard" style="display:none;">
+                <div class="page-title" style="margin-top:2.5rem;">Օգտատերերի <em>Կառավարում</em></div>
+                <p class="page-desc">Փոխեք դերերը կամ ջնջեք հաշիվները</p>
+                <input type="text" placeholder="Որոնել անունով կամ էլ. փոստով..." id="userSearch" oninput="filterUsers()" style="width:100%;max-width:400px;padding:0.6rem 1rem;border:1px solid var(--rule);border-radius:8px;margin-bottom:1.5rem;outline:none;font-size:0.85rem;">
+                <div id="usersGrid" style="display:flex;flex-direction:column;gap:0.6rem;"></div>
+            </div>
+
         </div>
     </div>
 
+    <!-- ADD/EDIT MENU ITEM MODAL -->
+    <div class="modal-overlay" id="menuModal">
+        <div class="modal-box">
+            <div class="modal-title" id="menuModalTitle">Ավելացնել Կետ</div>
+            <p class="modal-sub" id="menuModalSub">Լրացրեք մանրամասները</p>
+            <input type="hidden" id="menuModalId">
+            <div class="form-group"><label>Անուն</label><input type="text" id="menuModalName"></div>
+            <div class="form-group"><label>Նկարագրություն</label><input type="text" id="menuModalDesc"></div>
+            <div class="form-group">
+                <label>Կատեգորիա</label>
+                <select id="menuModalCat" style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;">
+                    <option value="hot">Տաք Ըմպելիք</option>
+                    <option value="cold">Սառը Ըմպելիք</option>
+                    <option value="food">Ուտելիք</option>
+                    <option value="snack">Նախուտեստ</option>
+                </select>
+            </div>
+            <div class="form-group"><label>Գին (AMD)</label><input type="number" id="menuModalPrice" min="0"></div>
+            <div class="form-group" id="menuModalAvailGroup">
+                <label>Հասանելի</label>
+                <select id="menuModalAvail" style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;">
+                    <option value="true">Այո</option>
+                    <option value="false">Ոչ</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel-modal" onclick="closeModal('menuModal')">Չեղարկել</button>
+                <button class="btn-primary-modal" onclick="saveMenuItem()">Պահպանել</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- USER ROLE MODAL -->
+    <div class="modal-overlay" id="userModal">
+        <div class="modal-box">
+            <div class="modal-title">Օգտատիրոջ Դեր</div>
+            <p class="modal-sub" id="userModalName"></p>
+            <input type="hidden" id="userModalId">
+            <div class="form-group">
+                <label>Դեր</label>
+                <select id="userModalRole" style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;">
+                    <option value="user">Օգտատեր</option>
+                    <option value="cafe staff">Սրճարանի Աշխատող</option>
+                    <option value="librarian">Գրադարանավար</option>
+                    <option value="admin">Ադմին</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel-modal" onclick="closeModal('userModal')">Չեղարկել</button>
+                <button class="btn-primary-modal" onclick="saveUserRole()">Պահպանել</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF VIEWER MODAL (for reading) -->
     <div class="modal-overlay" id="pdfModal">
         <div class="modal-box" style="width:90vw;max-width:900px;height:85vh;display:flex;flex-direction:column;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
@@ -854,6 +955,7 @@
         </div>
     </div>
 
+    <!-- SHELF EDIT MODAL -->
     <div class="modal-overlay" id="shelfModal">
         <div class="modal-box">
             <div class="modal-title">Խմբագրել Դարակ</div>
@@ -881,6 +983,7 @@
         let shelfModalBookId = null;
         let orderRefreshInterval = null;
 
+        // ===== AUTH =====
         async function doLogin() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
@@ -897,8 +1000,7 @@
                 if (!res.ok) { errEl.textContent = data.error || 'Մուտքը ձախողվեց'; errEl.style.display = 'block'; return; }
 
                 const role = data.user.role;
-                if (role === 'admin') { window.location.href = 'admin.html'; return; }
-                if (role !== 'cafe staff' && role !== 'coffee_worker' && role !== 'librarian' && role !== 'library_worker') {
+                if (role !== 'cafe staff' && role !== 'coffee_worker' && role !== 'librarian' && role !== 'library_worker' && role !== 'admin') {
                     errEl.textContent = 'Այս էջը միայն աշխատակիցների համար է'; errEl.style.display = 'block'; return;
                 }
 
@@ -940,7 +1042,7 @@
                 roleEl.className = 'topbar-role role-cafe';
                 document.getElementById('cafeDashboard').style.display = 'block';
                 loadOrders();
-                orderRefreshInterval = setInterval(loadOrders, 15000); 
+                orderRefreshInterval = setInterval(loadOrders, 15000); // auto-refresh every 15s
             } else if (role === 'librarian' || role === 'library_worker') {
                 roleEl.textContent = 'Գրադարանավար';
                 roleEl.className = 'topbar-role role-library';
@@ -953,13 +1055,20 @@
                 roleEl.className = 'topbar-role role-admin';
                 document.getElementById('cafeDashboard').style.display = 'block';
                 document.getElementById('libraryDashboard').style.display = 'block';
+                document.getElementById('reservationsDashboard').style.display = 'block';
+                document.getElementById('menuDashboard').style.display = 'block';
+                document.getElementById('usersDashboard').style.display = 'block';
                 loadOrders();
                 loadLibraryBooks();
                 loadBorrowings();
+                loadReservations();
+                loadMenuAdmin();
+                loadUsers();
                 orderRefreshInterval = setInterval(loadOrders, 15000);
             }
         }
 
+        // ===== CAFÉ WORKER =====
         async function loadOrders() {
             try {
                 const data = await apiCall('/Orders/pending');
@@ -972,6 +1081,7 @@
         function updateOrderStats(orders) {
             document.getElementById('cntPending').textContent = orders.filter(o => o.status === 'Pending').length;
             document.getElementById('cntProgress').textContent = orders.filter(o => o.status === 'InProgress').length;
+            // Done today from separate count - approximate
             document.getElementById('cntDone').textContent = orders.filter(o => o.status === 'Done').length;
         }
 
@@ -1033,6 +1143,7 @@
             }
         }
 
+        // ===== LIBRARY BORROWINGS =====
         let allBorrowings = [];
         let currentBorrowFilter = 'all';
 
@@ -1122,6 +1233,7 @@
             } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
         }
 
+        // ===== LIBRARY WORKER =====
         async function loadLibraryBooks() {
             try {
                 const data = await apiCall('/Books');
@@ -1199,6 +1311,7 @@
             } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
         }
 
+        // ===== UTILS =====
         function openModal(id) { document.getElementById(id).classList.add('show'); }
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
@@ -1209,11 +1322,239 @@
             setTimeout(() => t.className = 'toast', 3000);
         }
 
+        // ===== RESERVATIONS (ADMIN) =====
+        let allReservations = [];
+        let currentResFilter = 'all';
+
+        async function loadReservations() {
+            try {
+                const data = await apiCall('/Reservations/all');
+                allReservations = data;
+                renderReservations(data);
+            } catch (e) { console.error(e); }
+        }
+
+        function filterReservations(status, btn) {
+            document.querySelectorAll('#reservationsDashboard .tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentResFilter = status;
+            const filtered = status === 'all' ? allReservations : allReservations.filter(r => r.status === status);
+            renderReservations(filtered);
+        }
+
+        function renderReservations(items) {
+            const grid = document.getElementById('reservationsGrid');
+            if (!items || items.length === 0) {
+                grid.innerHTML = '<div class="empty-state" style="padding:2rem;text-align:center;color:#888;"><div style="font-size:2rem;margin-bottom:0.5rem;">💺</div><p>Ամրագրումներ չկան</p></div>';
+                return;
+            }
+            const statusLabel = { Active: '🟡 Ակտիվ', Confirmed: '✅ Հաստատված', Cancelled: '❌ Չեղարկված', Expired: '⏰ Ժամկետանց' };
+            const statusColor = { Active: '#c4873a', Confirmed: '#2d7a2d', Cancelled: '#b85540', Expired: '#888' };
+            grid.innerHTML = items.map(r => {
+                const start = new Date(r.startTime);
+                const end = new Date(r.endTime);
+                const startStr = start.toLocaleDateString('hy-AM') + ' ' + start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const endStr = end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const color = statusColor[r.status] || '#666';
+                const label = statusLabel[r.status] || r.status;
+                const seats = (r.seats || []).join(', ') || '—';
+                const canCancel = r.status === 'Active' || r.status === 'Confirmed';
+                return '<div style="background:white;border-radius:10px;padding:1rem 1.2rem;border:1px solid #e5e0d8;">'
+                    + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;">'
+                    + '<div style="flex:1;min-width:200px;">'
+                    + '<div style="font-weight:700;font-size:0.95rem;">💺 ' + (r.tableName || ('Նստատեղ ' + seats)) + '</div>'
+                    + '<div style="font-size:0.82rem;margin-top:0.2rem;"><strong>' + (r.user || '') + '</strong></div>'
+                    + '<div style="font-size:0.78rem;color:#888;">' + (r.userEmail || '') + '</div>'
+                    + '<div style="font-size:0.78rem;color:var(--warm-gray);margin-top:0.4rem;">🕐 ' + startStr + ' – ' + endStr + '</div>'
+                    + (r.notes ? '<div style="font-size:0.75rem;color:#888;margin-top:0.2rem;">📝 ' + r.notes + '</div>' : '')
+                    + '</div>'
+                    + '<div style="text-align:right;">'
+                    + '<span style="font-size:0.75rem;font-weight:700;color:' + color + ';">' + label + '</span>'
+                    + '<div style="font-size:0.72rem;color:#888;margin-top:0.3rem;">#' + r.id + '</div>'
+                    + '</div>'
+                    + '</div>'
+                    + (canCancel ? '<div style="margin-top:0.8rem;"><button class="btn-done" style="background:#e74c3c;" onclick="adminCancelReservation(' + r.id + ')">❌ Չեղարկել</button></div>' : '')
+                    + '</div>';
+            }).join('');
+        }
+
+        async function adminCancelReservation(id) {
+            if (!confirm('Չեղարկե՞լ այս ամրագրումը։')) return;
+            try {
+                await apiCall('/Reservations/' + id, { method: 'DELETE' });
+                showToast('Ամրագրումը չեղարկված է', 'success');
+                loadReservations();
+            } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
+        }
+
+        // ===== MENU MANAGEMENT (ADMIN) =====
+        let allMenuItems = [];
+        let editingMenuId = null;
+
+        async function loadMenuAdmin() {
+            try {
+                const data = await apiCall('/Menu/all');
+                allMenuItems = data;
+                renderMenuAdmin(data);
+            } catch (e) { console.error(e); }
+        }
+
+        function renderMenuAdmin(items) {
+            const grid = document.getElementById('menuAdminGrid');
+            if (!items || items.length === 0) { grid.innerHTML = '<p style="color:#888;">Մենյու դատարկ է</p>'; return; }
+            const catLabel = { hot: 'Տաք', cold: 'Սառը', food: 'Ուտելիք', snack: 'Նախուտեստ' };
+            grid.innerHTML = items.map(item => {
+                const cat = catLabel[item.category_id] || item.category_id || '';
+                const avail = item.available;
+                return '<div style="background:white;border-radius:12px;padding:1.2rem;border:1px solid ' + (avail ? 'var(--rule)' : '#f5c2b8') + ';' + (!avail ? 'opacity:0.7;' : '') + '">'
+                    + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem;">'
+                    + '<div style="font-weight:700;font-size:0.95rem;">' + item.name + '</div>'
+                    + '<span style="font-size:0.65rem;padding:0.15rem 0.5rem;border-radius:100px;font-weight:600;background:' + (avail ? '#e8f5e8' : '#fdf3e6') + ';color:' + (avail ? '#2d7a2d' : '#c4873a') + ';">' + (avail ? 'Հասանելի' : 'Անհասանելի') + '</span>'
+                    + '</div>'
+                    + (item.description ? '<div style="font-size:0.75rem;color:#888;margin-bottom:0.4rem;">' + item.description + '</div>' : '')
+                    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.8rem;">'
+                    + '<div><span style="font-size:0.7rem;color:var(--warm-gray);">' + cat + '</span><span style="font-weight:700;margin-left:0.8rem;">' + item.price + ' AMD</span></div>'
+                    + '<div style="display:flex;gap:0.4rem;">'
+                    + '<button class="btn-edit-shelf" onclick="openEditMenuModal(\'' + item.id + '\')">✏️ Խմբագրել</button>'
+                    + '<button class="btn-edit-shelf" style="color:var(--terracotta);border-color:var(--terracotta);" onclick="deleteMenuItem(\'' + item.id + '\',\'' + item.name.replace(/'/g, "\\'") + '\')">🗑️</button>'
+                    + '</div></div></div>';
+            }).join('');
+        }
+
+        function openAddMenuModal() {
+            editingMenuId = null;
+            document.getElementById('menuModalTitle').textContent = 'Ավելացնել Կետ';
+            document.getElementById('menuModalSub').textContent = 'Նոր մենյուի կետ';
+            document.getElementById('menuModalId').value = '';
+            document.getElementById('menuModalName').value = '';
+            document.getElementById('menuModalDesc').value = '';
+            document.getElementById('menuModalPrice').value = '';
+            document.getElementById('menuModalCat').value = 'hot';
+            document.getElementById('menuModalAvail').value = 'true';
+            document.getElementById('menuModalAvailGroup').style.display = 'none';
+            openModal('menuModal');
+        }
+
+        function openEditMenuModal(id) {
+            const item = allMenuItems.find(i => i.id === id);
+            if (!item) return;
+            editingMenuId = id;
+            document.getElementById('menuModalTitle').textContent = 'Խմբագրել Կետ';
+            document.getElementById('menuModalSub').textContent = item.name;
+            document.getElementById('menuModalId').value = id;
+            document.getElementById('menuModalName').value = item.name;
+            document.getElementById('menuModalDesc').value = item.description || '';
+            document.getElementById('menuModalPrice').value = item.price;
+            document.getElementById('menuModalCat').value = item.category_id || 'hot';
+            document.getElementById('menuModalAvail').value = item.available ? 'true' : 'false';
+            document.getElementById('menuModalAvailGroup').style.display = 'block';
+            openModal('menuModal');
+        }
+
+        async function saveMenuItem() {
+            const name = document.getElementById('menuModalName').value.trim();
+            const desc = document.getElementById('menuModalDesc').value.trim();
+            const price = parseFloat(document.getElementById('menuModalPrice').value);
+            const cat = document.getElementById('menuModalCat').value;
+            const avail = document.getElementById('menuModalAvail').value === 'true';
+            if (!name || !price) { showToast('Լրացրեք անուն և գին', 'error'); return; }
+            try {
+                if (editingMenuId) {
+                    await apiCall('/Menu/' + editingMenuId, { method: 'PUT', body: JSON.stringify({ name, description: desc, price, available: avail, categoryId: cat }) });
+                    showToast('Թարմացված ✓', 'success');
+                } else {
+                    await apiCall('/Menu', { method: 'POST', body: JSON.stringify({ name, description: desc, price, categoryId: cat }) });
+                    showToast('Ավելացված ✓', 'success');
+                }
+                closeModal('menuModal');
+                loadMenuAdmin();
+            } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
+        }
+
+        async function deleteMenuItem(id, name) {
+            if (!confirm('"' + name + '" հեռացնե՞լ մենյուից։')) return;
+            try {
+                await apiCall('/Menu/' + id, { method: 'DELETE' });
+                showToast('Հեռացված ✓', 'success');
+                loadMenuAdmin();
+            } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
+        }
+
+        // ===== USER MANAGEMENT (ADMIN) =====
+        let allUsers = [];
+
+        async function loadUsers() {
+            try {
+                const data = await apiCall('/Auth/users');
+                allUsers = data;
+                renderUsers(data);
+            } catch (e) { console.error(e); }
+        }
+
+        function filterUsers() {
+            const q = document.getElementById('userSearch').value.toLowerCase();
+            const filtered = allUsers.filter(u => (u.name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q));
+            renderUsers(filtered);
+        }
+
+        function renderUsers(users) {
+            const grid = document.getElementById('usersGrid');
+            if (!users || users.length === 0) { grid.innerHTML = '<p style="color:#888;">Օգտատերեր չկան</p>'; return; }
+            const roleColor = { user: '#888', 'cafe staff': '#c4873a', coffee_worker: '#c4873a', librarian: '#3d5c3a', library_worker: '#3d5c3a', admin: '#3a5a80' };
+            const roleLabel = { user: 'Օգտատեր', 'cafe staff': 'Սրճ. Աշխ.', coffee_worker: 'Սրճ. Աշխ.', librarian: 'Գրադ.', library_worker: 'Գրադ.', admin: 'Ադմին' };
+            grid.innerHTML = users.map(u => {
+                const color = roleColor[u.role] || '#888';
+                const label = roleLabel[u.role] || u.role;
+                const safeName = (u.name || '').replace(/'/g, "\\'");
+                return '<div style="background:white;border-radius:10px;padding:0.9rem 1.2rem;border:1px solid var(--rule);display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">'
+                    + '<div style="width:36px;height:36px;border-radius:50%;background:' + color + ';color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;flex-shrink:0;">' + (u.name || u.email || '?').substring(0, 2).toUpperCase() + '</div>'
+                    + '<div style="flex:1;min-width:150px;">'
+                    + '<div style="font-weight:600;font-size:0.9rem;">' + (u.name || '—') + '</div>'
+                    + '<div style="font-size:0.75rem;color:#888;">' + u.email + '</div>'
+                    + (u.phone ? '<div style="font-size:0.72rem;color:var(--moss);">📞 ' + u.phone + '</div>' : '')
+                    + '</div>'
+                    + '<span style="font-size:0.7rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:100px;background:' + color + '22;color:' + color + ';">' + label + '</span>'
+                    + '<div style="display:flex;gap:0.4rem;">'
+                    + '<button class="btn-edit-shelf" onclick="openUserModal(' + u.id + ',\'' + safeName + '\',\'' + u.role + '\')">✏️ Դեր</button>'
+                    + '<button class="btn-edit-shelf" style="color:var(--terracotta);border-color:var(--terracotta);" onclick="deleteUser(' + u.id + ',\'' + safeName + '\')">🗑️</button>'
+                    + '</div></div>';
+            }).join('');
+        }
+
+        function openUserModal(id, name, role) {
+            document.getElementById('userModalId').value = id;
+            document.getElementById('userModalName').textContent = name;
+            document.getElementById('userModalRole').value = role;
+            openModal('userModal');
+        }
+
+        async function saveUserRole() {
+            const id = document.getElementById('userModalId').value;
+            const role = document.getElementById('userModalRole').value;
+            try {
+                await apiCall('/Auth/users/' + id + '/role', { method: 'PUT', body: JSON.stringify({ role }) });
+                showToast('Դերը փոխված է ✓', 'success');
+                closeModal('userModal');
+                loadUsers();
+            } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
+        }
+
+        async function deleteUser(id, name) {
+            if (!confirm('"' + name + '" հաշիվը ջնջե՞լ։ Հնարավոր չէ վերականգնել։')) return;
+            try {
+                await apiCall('/Auth/users/' + id, { method: 'DELETE' });
+                showToast('Ջնջված է ✓', 'success');
+                loadUsers();
+            } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
+        }
+
+        // Init on load
         window.addEventListener('load', async () => {
             const token = localStorage.getItem('staffToken');
             const user = localStorage.getItem('staffUser');
             if (token && user) {
                 authToken = token;
+                // Always fetch fresh profile to get correct role
                 try {
                     const res = await fetch(API + '/Auth/profile', {
                         headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }
@@ -1223,6 +1564,7 @@
                         currentUser = { ...JSON.parse(user), role: fresh.role, name: fresh.name };
                         localStorage.setItem('staffUser', JSON.stringify(currentUser));
                     } else {
+                        // Token expired
                         localStorage.removeItem('staffToken');
                         localStorage.removeItem('staffUser');
                         return;
