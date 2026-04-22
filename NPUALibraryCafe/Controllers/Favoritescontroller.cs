@@ -1,7 +1,9 @@
 ﻿using LibCafe.Domain.Entities;
 using LibCafe.Domain.Interfaces;
+using LibCafe.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NPUALibraryCafe.DTOs.Favorites;
 using System.Security.Claims;
 
@@ -15,15 +17,18 @@ public class FavoritesController : ControllerBase
     private readonly IFavoriteRepository _favoriteRepository;
     private readonly IBookRepository _bookRepository;
     private readonly IMenuitemRepository _menuRepository;
+    private readonly LibraryCafeDbContext _context;
 
     public FavoritesController(
         IFavoriteRepository favoriteRepository,
         IBookRepository bookRepository,
-        IMenuitemRepository menuRepository)
+        IMenuitemRepository menuRepository,
+        LibraryCafeDbContext context)
     {
         _favoriteRepository = favoriteRepository;
         _bookRepository = bookRepository;
         _menuRepository = menuRepository;
+        _context = context;
     }
 
     private string GetUserId() =>
@@ -44,17 +49,22 @@ public class FavoritesController : ControllerBase
         {
             if (fav.ItemType == "menu")
             {
-                var item = await _menuRepository.GetByIdAsync(fav.ItemId);
+                var items = await _context.Database
+                    .SqlQueryRaw<FavMenuItemDto>(
+                        "SELECT id, name, description, category_id, price, image_url, available, rating FROM menu_items WHERE id = {0}",
+                        fav.ItemId)
+                    .ToListAsync();
+                var item = items.FirstOrDefault();
                 if (item != null)
                     menuFavs.Add(new FavoriteMenuResponseDto
                     {
                         Id = fav.Id,
                         ItemId = fav.ItemId,
                         CreatedAt = fav.CreatedAt,
-                        Name = item.Itemname,
+                        Name = item.Name,
                         Price = item.Price,
-                        CategoryId = item.CategoryId,
-                        ImagePath = item.Imagepath
+                        CategoryId = item.Category_id,
+                        ImagePath = item.Image_url
                     });
             }
             else if (fav.ItemType == "book" && int.TryParse(fav.ItemId, out int bookId))
@@ -151,5 +161,17 @@ public class FavoritesController : ControllerBase
 
         await _favoriteRepository.DeleteAsync(userId, bookId.ToString(), "book");
         return Ok(new { message = "Removed from favorites" });
+    }
+
+    internal class FavMenuItemDto
+    {
+        public string Id { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string? Category_id { get; set; }
+        public decimal Price { get; set; }
+        public string? Image_url { get; set; }
+        public bool Available { get; set; }
+        public decimal? Rating { get; set; }
+        public string? Description { get; set; }
     }
 }

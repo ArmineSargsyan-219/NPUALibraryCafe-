@@ -34,7 +34,7 @@ public class OrdersController : ControllerBase
         User.FindFirst(ClaimTypes.Role)?.Value ?? "";
 
     private bool IsCafeStaff() =>
-        GetUserRole() is "cafe staff" or "admin";
+    GetUserRole() is "cafe staff" or "coffee_worker" or "admin";
 
     [HttpPost]
     public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDto dto)
