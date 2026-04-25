@@ -109,8 +109,9 @@ public class BorrowingsController : ControllerBase
             DueDate = b.Duedate,
             ReturnedAt = b.Returndate,
             UserId = b.Userid,
-            UserName = b.User.Fullname,
-            UserEmail = b.User.Email
+            UserName = b.User?.Fullname ?? "",
+            UserEmail = b.User?.Email ?? "",
+            UserPhone = b.User?.Phone
         }));
     }
 
@@ -131,8 +132,9 @@ public class BorrowingsController : ControllerBase
             DueDate = b.Duedate,
             ReturnedAt = b.Returndate,
             UserId = b.Userid,
-            UserName = b.User.Fullname,
-            UserEmail = b.User.Email
+            UserName = b.User?.Fullname ?? "",
+            UserEmail = b.User?.Email ?? "",
+            UserPhone = b.User?.Phone
         }));
     }
 

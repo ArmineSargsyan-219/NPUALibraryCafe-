@@ -1079,16 +1079,15 @@
         }
 
         function updateOrderStats(orders) {
-            document.getElementById('cntPending').textContent = orders.filter(o => o.status === 'Pending').length;
-            document.getElementById('cntProgress').textContent = orders.filter(o => o.status === 'InProgress').length;
-            // Done today from separate count - approximate
-            document.getElementById('cntDone').textContent = orders.filter(o => o.status === 'Done').length;
+            document.getElementById('cntPending').textContent = orders.filter(o => o.status?.toLowerCase() === 'pending').length;
+            document.getElementById('cntProgress').textContent = orders.filter(o => o.status?.toLowerCase() === 'inprogress').length;
+            document.getElementById('cntDone').textContent = orders.filter(o => ['done', 'ready'].includes(o.status?.toLowerCase())).length;
         }
 
         function filterOrders(status, btn) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            const filtered = status === 'all' ? allOrders : allOrders.filter(o => o.status === status);
+            const filtered = status === 'all' ? allOrders : allOrders.filter(o => o.status?.toLowerCase() === status.toLowerCase());
             renderOrders(filtered);
         }
 
@@ -1101,16 +1100,17 @@
             grid.innerHTML = orders.map(o => {
                 const time = new Date(o.orderDate);
                 const timeStr = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                const statusClass = { Pending: 's-pending', Confirmed: 's-confirmed', InProgress: 's-inprogress', Done: 's-done' }[o.status] || '';
-                const statusText = { Pending: 'Սպասում', Confirmed: 'Հաստատված', InProgress: 'Ընթացքում', Done: 'Ավարտված' }[o.status] || o.status;
+                const statusNorm = o.status?.toLowerCase();
+                const statusClass = { pending: 's-pending', confirmed: 's-confirmed', inprogress: 's-inprogress', done: 's-done', ready: 's-done', history: 's-done' }[statusNorm] || '';
+                const statusText = { pending: 'Սպասում', confirmed: 'Հաստատված', inprogress: 'Ընթացքում', done: 'Ավարտված', ready: 'Պատրաստ', history: 'Պատմություն' }[statusNorm] || o.status;
                 const isNew = o.status === 'Pending';
 
                 let actions = '';
-                if (o.status === 'Pending') {
+                if (o.status === 'Pending' || o.status === 'pending') {
                     actions = '<button class="btn-confirm" onclick="updateOrder(' + o.orderId + ',\'confirm\')">✓ Հաստատել</button>';
-                } else if (o.status === 'Confirmed') {
+                } else if (o.status === 'Confirmed' || o.status === 'confirmed') {
                     actions = '<button class="btn-inprogress" onclick="updateOrder(' + o.orderId + ',\'inprogress\')">⏳ Ընթացքում</button>';
-                } else if (o.status === 'InProgress') {
+                } else if (o.status === 'InProgress' || o.status === 'inprogress') {
                     actions = '<button class="btn-done" onclick="updateOrder(' + o.orderId + ',\'done\')">✅ Ավարտված</button>';
                 }
 

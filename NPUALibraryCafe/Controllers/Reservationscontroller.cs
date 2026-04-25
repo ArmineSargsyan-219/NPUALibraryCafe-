@@ -25,11 +25,14 @@ public class ReservationsController : ControllerBase
     [HttpGet("tables")]
     [AllowAnonymous]
     public async Task<IActionResult> GetTableAvailability(
-        [FromQuery] DateTime startTime,
-        [FromQuery] DateTime endTime)
+        [FromQuery] DateTimeOffset startTime,
+        [FromQuery] DateTimeOffset endTime)
     {
+        var startLocal = DateTime.SpecifyKind(startTime.LocalDateTime, DateTimeKind.Local);
+        var endLocal = DateTime.SpecifyKind(endTime.LocalDateTime, DateTimeKind.Local);
+
         var allTables = await _reservationRepository.GetAllTablesAsync();
-        var reservedIds = await _reservationRepository.GetReservedTableIdsAsync(startTime, endTime);
+        var reservedIds = await _reservationRepository.GetReservedTableIdsAsync(startLocal, endLocal);
 
         return Ok(allTables.Select(t => new TableAvailabilityDto
         {
@@ -85,21 +88,26 @@ public class ReservationsController : ControllerBase
     [Authorize]
     public async Task<IActionResult> CreateReservation([FromBody] CreateReservationDto dto)
     {
+        System.Diagnostics.Debug.WriteLine($">>> Received StartTime: {dto.StartTime} | LocalDateTime: {dto.StartTime.LocalDateTime} | Offset: {dto.StartTime.Offset}");
+
         var email = GetUserEmail();
         var name = GetUserName();
         if (string.IsNullOrEmpty(email)) return Unauthorized();
 
-        if (dto.StartTime <= DateTime.Now)
+        var startLocal = DateTime.SpecifyKind(dto.StartTime.LocalDateTime, DateTimeKind.Local);
+        var endLocal = DateTime.SpecifyKind(dto.EndTime.LocalDateTime, DateTimeKind.Local);
+
+        if (startLocal <= DateTime.Now)
             return BadRequest(new { error = "Start time must be in the future" });
 
-        if (dto.EndTime <= dto.StartTime)
+        if (endLocal <= startLocal)
             return BadRequest(new { error = "End time must be after start time" });
 
         var tables = await _reservationRepository.GetAllTablesAsync();
         var table = tables.FirstOrDefault(t => t.Id == dto.TableId);
         if (table == null) return BadRequest(new { error = "Table not found" });
 
-        var conflict = await _reservationRepository.HasConflictAsync(dto.TableId, dto.StartTime, dto.EndTime);
+        var conflict = await _reservationRepository.HasConflictAsync(dto.TableId, startLocal, endLocal);
         if (conflict)
             return BadRequest(new { error = "This table is already reserved for that time. Please choose another table or time." });
 
@@ -108,8 +116,8 @@ public class ReservationsController : ControllerBase
             TableId = dto.TableId,
             UserEmail = email,
             UserName = name,
-            StartTime = dto.StartTime,
-            EndTime = dto.EndTime,
+            StartTime = startLocal,
+            EndTime = endLocal,
             Status = "Active",
             CreatedAt = DateTime.Now
         };
