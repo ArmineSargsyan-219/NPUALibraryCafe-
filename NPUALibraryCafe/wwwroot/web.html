@@ -2607,10 +2607,11 @@
             const startTime = document.getElementById('resStartTime').value;
             const endTime = document.getElementById('resEndTime').value;
             if (!dateVal || !startTime || !endTime) { alert(t('alert_selectTime')); return; }
-            const tzOffset = -new Date().getTimezoneOffset();
+            const tzOffset = -new Date().getTimezoneOffset(); // e.g. 240 for UTC+4
             const tzSign = tzOffset >= 0 ? '+' : '-';
-            const tzPad = n => String(Math.floor(Math.abs(n))).padStart(2, '0');
-            const tz = tzSign + tzPad(tzOffset / 60) + ':' + tzPad(tzOffset % 60);
+            const tzHours = String(Math.floor(Math.abs(tzOffset) / 60)).padStart(2, '0');
+            const tzMins = String(Math.abs(tzOffset) % 60).padStart(2, '0');
+            const tz = tzSign + tzHours + ':' + tzMins;
             const start = dateVal + 'T' + startTime + ':00' + tz;
             const end = dateVal + 'T' + endTime + ':00' + tz;
             if (new Date(end) <= new Date(start)) { alert(t('alert_endAfterStart')); return; }

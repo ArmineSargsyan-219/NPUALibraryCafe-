@@ -28,8 +28,8 @@ public class ReservationsController : ControllerBase
         [FromQuery] DateTimeOffset startTime,
         [FromQuery] DateTimeOffset endTime)
     {
-        var startLocal = DateTime.SpecifyKind(startTime.LocalDateTime, DateTimeKind.Local);
-        var endLocal = DateTime.SpecifyKind(endTime.LocalDateTime, DateTimeKind.Local);
+        var startLocal = startTime.ToLocalTime().DateTime;
+        var endLocal = endTime.ToLocalTime().DateTime;
 
         var allTables = await _reservationRepository.GetAllTablesAsync();
         var reservedIds = await _reservationRepository.GetReservedTableIdsAsync(startLocal, endLocal);
@@ -94,10 +94,10 @@ public class ReservationsController : ControllerBase
         var name = GetUserName();
         if (string.IsNullOrEmpty(email)) return Unauthorized();
 
-        var startLocal = DateTime.SpecifyKind(dto.StartTime.LocalDateTime, DateTimeKind.Local);
-        var endLocal = DateTime.SpecifyKind(dto.EndTime.LocalDateTime, DateTimeKind.Local);
+        var startLocal = dto.StartTime.ToLocalTime().DateTime;
+        var endLocal = dto.EndTime.ToLocalTime().DateTime;
 
-        if (startLocal <= DateTime.Now)
+        if (startLocal <= DateTime.Now.ToLocalTime())
             return BadRequest(new { error = "Start time must be in the future" });
 
         if (endLocal <= startLocal)
