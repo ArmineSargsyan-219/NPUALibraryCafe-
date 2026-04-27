@@ -15,7 +15,7 @@ public partial class Cafeorder
     [Column("user_id")]
     public int Userid { get; set; }
 
-    [Column("items")]
+    [Column("items", TypeName = "jsonb")]
     public string? Items { get; set; }
 
     [Column("total_price")]

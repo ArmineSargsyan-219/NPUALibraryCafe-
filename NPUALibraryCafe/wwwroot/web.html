@@ -1798,8 +1798,8 @@
                 resStatus_Cancelled: 'Չեղարկված', resStatus_Expired: 'Ժամկետանց',
                 resConfirmBtn: 'Հաստատել', resCancelBtn: 'Չեղարկել',
                 noReservations: 'Ամրագրումներ դեռ չկան։',
-                orderStatus_Pending: 'Սպասում', orderStatus_Confirmed: 'Հաստատված',
-                orderStatus_InProgress: 'Պատրաստվում', orderStatus_Done: 'Պատրաստ', orderStatus_Cancelled: ' Չեղարկված',
+                orderStatus_Pending: 'Սպասում',
+                orderStatus_Done: 'Պատրաստ',
                 borrowStatus_borrowed: '📖 Ձեռքիս', borrowStatus_returned: '↩️ Վերադարձված', borrowStatus_overdue: ' Ժամկետ անցած',
                 borrowDate: 'Հայտ՝', borrowDue: 'Վերադարձ՝', borrowOverdueMsg: 'Խնդրում ենք անհապաղ վերադարձնել գիրքը գրադարան',
                 resCodeSent: ' հասցեին։', regCodeSentPre: '6-նիշ կոդ ուղարկվեց ',
@@ -1899,8 +1899,8 @@
                 resStatus_Cancelled: 'Cancelled', resStatus_Expired: 'Expired',
                 resConfirmBtn: 'Confirm', resCancelBtn: 'Cancel',
                 noReservations: 'No reservations yet.',
-                orderStatus_Pending: '⏳ Pending', orderStatus_Confirmed: '👍 Confirmed',
-                orderStatus_InProgress: '☕ In Progress', orderStatus_Done: '✅ Ready', orderStatus_Cancelled: '❌ Cancelled',
+                orderStatus_Pending: '⏳ Pending',
+                orderStatus_Done: '✅ Ready',
                 borrowStatus_borrowed: '📖 Borrowed', borrowStatus_returned: '↩️ Returned', borrowStatus_overdue: '⚠️ Overdue',
                 borrowDate: 'Requested:', borrowDue: 'Due:', borrowOverdueMsg: '⚠️ Please return this book to the library immediately',
                 resCodeSent: '.', regCodeSentPre: 'A 6-digit code was sent to ',
@@ -2462,12 +2462,23 @@
             if (!data) return;
             if (data.length === 0) { document.getElementById('myOrdersEmpty').style.display = 'block'; document.getElementById('myOrdersList').innerHTML = ''; return; }
             document.getElementById('myOrdersEmpty').style.display = 'none';
-            const statusLabel = { Pending: t('orderStatus_Pending'), Confirmed: t('orderStatus_Confirmed'), InProgress: t('orderStatus_InProgress'), Done: t('orderStatus_Done'), Cancelled: t('orderStatus_Cancelled') };
-            const statusColor = { Pending: '#c4873a', Confirmed: '#3a5a80', InProgress: '#856404', Done: '#2d7a2d', Cancelled: '#b85540' };
+            const statusLabel = {
+                pending: t('orderStatus_Pending'),
+                ready: t('orderStatus_Done'),
+                history: lang === 'hy' ? 'Ստացված' : 'Collected',
+            };
+
+            const statusColor = {
+                pending: '#c4873a',
+                ready: '#2d7a2d',
+                history: '#888',
+            };
+
             document.getElementById('myOrdersList').innerHTML = data.map(o => {
                 const date = new Date(o.orderDate).toLocaleString(lang === 'hy' ? 'hy-AM' : 'en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-                const status = statusLabel[o.status] || o.status;
-                const color = statusColor[o.status] || '#6b6560';
+                const rawStatus = (o.status || '').toLowerCase();
+                const status = statusLabel[rawStatus] || rawStatus;
+                const color = statusColor[rawStatus] || '#6b6560';
                 let itemsHtml = '';
                 try { const items = typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []); itemsHtml = items.map(i => '<span style="font-size:0.8rem;color:var(--warm-gray);">' + (i.qty || i.quantity || 1) + '× ' + (i.name || i.itemName || '') + '</span>').join(', '); } catch { itemsHtml = o.items || ''; }
                 return '<div style="background:white;border-radius:12px;padding:1.2rem 1.5rem;border:1px solid var(--rule);">'

@@ -30,6 +30,9 @@ public partial class User
     [Column("platform")]
     public string? Platform { get; set; }
 
+    [Column("phone")]
+    public string? Phone { get; set; }
+
     public virtual ICollection<Bookreview> Bookreviews { get; set; } = new List<Bookreview>();
     public virtual ICollection<Borrowing> Borrowings { get; set; } = new List<Borrowing>();
     public virtual ICollection<Cafeorder> Cafeorders { get; set; } = new List<Cafeorder>();

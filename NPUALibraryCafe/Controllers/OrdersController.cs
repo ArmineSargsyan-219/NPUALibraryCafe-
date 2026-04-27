@@ -62,7 +62,7 @@ public class OrdersController : ControllerBase
             Userid = userId,
             Items = JsonSerializer.Serialize(itemDetails),
             Totalamount = total,
-            Status = "Pending",
+            Status = "pending",
             Orderdate = DateTime.Now,
             Createdat = DateTime.Now,
             Updatedat = DateTime.Now
@@ -80,7 +80,7 @@ public class OrdersController : ControllerBase
             Createdat = DateTime.Now
         });
 
-        return Ok(new { message = "Պատվերը ընդունվեց!", orderId, totalAmount = total, status = "Pending" });
+        return Ok(new { message = "Պատվերը ընդունվեց!", orderId, totalAmount = total, status = "pending" });
     }
 
     [HttpGet("my-orders")]
@@ -155,63 +155,16 @@ public class OrdersController : ControllerBase
         });
     }
 
-    [HttpPut("{id}/confirm")]
-    public async Task<IActionResult> ConfirmOrder(int id)
+
+
+    [HttpPut("{id}/ready")]
+    public async Task<IActionResult> MarkReady(int id)
     {
         if (!IsCafeStaff()) return Forbid();
         var order = await _orderRepository.GetByIdAsync(id);
         if (order == null) return NotFound(new { error = "Order not found" });
 
-        order.Status = "Confirmed";
-        order.Updatedat = DateTime.Now;
-        await _orderRepository.UpdateAsync(order);
-
-        await _notificationRepository.CreateAsync(new Notification
-        {
-            Userid = order.Userid,
-            Title = "Պատվերը հաստատվեց 👍",
-            Message = "Ձեր պատվերը հաստատվեց սրճարանի անձնակազմի կողմից!",
-            Type = "order_confirmed",
-            Relatedid = id,
-            Createdat = DateTime.Now
-        });
-
-        return Ok(new { message = "Order confirmed", orderId = id });
-    }
-
-    [HttpPut("{id}/inprogress")]
-    public async Task<IActionResult> MarkInProgress(int id)
-    {
-        if (!IsCafeStaff()) return Forbid();
-        var order = await _orderRepository.GetByIdAsync(id);
-        if (order == null) return NotFound(new { error = "Order not found" });
-
-        order.Status = "InProgress";
-        order.Updatedat = DateTime.Now;
-        await _orderRepository.UpdateAsync(order);
-
-        await _notificationRepository.CreateAsync(new Notification
-        {
-            Userid = order.Userid,
-            Title = "Պատվերը պատրաստվում է ☕",
-            Message = "Ձեր պատվերն այժմ պատրաստվում է! Շուտով կլինի պատրաստ!",
-            Type = "order_inprogress",
-            Relatedid = id,
-            Createdat = DateTime.Now
-        });
-
-        return Ok(new { message = "Order in progress", orderId = id });
-    }
-
-    [HttpPut("{id}/done")]
-    public async Task<IActionResult> MarkDone(int id)
-    {
-        if (!IsCafeStaff()) return Forbid();
-        var order = await _orderRepository.GetByIdAsync(id);
-        if (order == null) return NotFound(new { error = "Order not found" });
-
-        order.Status = "Done";
-        order.Completedat = DateTime.Now;
+        order.Status = "ready";
         order.Updatedat = DateTime.Now;
         await _orderRepository.UpdateAsync(order);
 
@@ -225,6 +178,22 @@ public class OrdersController : ControllerBase
             Createdat = DateTime.Now
         });
 
-        return Ok(new { message = "Order done", orderId = id });
+        return Ok(new { message = "Order ready", orderId = id });
     }
+
+    [HttpPut("{id}/history")]
+    public async Task<IActionResult> MarkHistory(int id)
+    {
+        if (!IsCafeStaff()) return Forbid();
+        var order = await _orderRepository.GetByIdAsync(id);
+        if (order == null) return NotFound(new { error = "Order not found" });
+
+        order.Status = "history";
+        order.Completedat = DateTime.Now;
+        order.Updatedat = DateTime.Now;
+        await _orderRepository.UpdateAsync(order);
+
+        return Ok(new { message = "Order collected", orderId = id });
+    }
+
 }

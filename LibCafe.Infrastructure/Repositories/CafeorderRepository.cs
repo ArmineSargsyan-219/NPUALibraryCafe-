@@ -27,7 +27,7 @@ public class CafeorderRepository : ICafeorderRepository
 
     public async Task<IEnumerable<Cafeorder>> GetPendingAsync() =>
         await _context.Cafeorders
-            .Where(o => o.Status == "Pending" || o.Status == "Confirmed" || o.Status == "InProgress")
+            .Where(o => o.Status == "pending" || o.Status == "ready" || o.Status == "history")
             .Include(o => o.User)
             .OrderBy(o => o.Orderdate)
             .ToListAsync();

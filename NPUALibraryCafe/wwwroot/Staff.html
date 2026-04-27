@@ -777,21 +777,31 @@
         </div>
         <div class="main-content">
 
+            <!-- ADMIN NAV TABS -->
+            <div id="adminTabs" style="display:none;margin-bottom:2rem;display:none;">
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;background:white;padding:0.8rem;border-radius:12px;border:1px solid var(--rule);">
+                    <button class="tab-btn active" onclick="showAdminSection('cafe')" id="adminTab-cafe">☕ Սրճարան</button>
+                    <button class="tab-btn" onclick="showAdminSection('library')" id="adminTab-library">📚 Գրադարան</button>
+                    <button class="tab-btn" onclick="showAdminSection('reservations')" id="adminTab-reservations">💺 Ամրագրումներ</button>
+                    <button class="tab-btn" onclick="showAdminSection('menu')" id="adminTab-menu">🍽️ Մենյու</button>
+                    <button class="tab-btn" onclick="showAdminSection('users')" id="adminTab-users">👥 Օգտատերեր</button>
+                </div>
+            </div>
+
             <!-- CAFÉ WORKER DASHBOARD -->
             <div id="cafeDashboard" style="display:none;">
                 <div class="page-title">Սրճարանի <em>Վահանակ</em></div>
                 <p class="page-desc">Կառավարեք մուտքային պատվերները — հաստատեք, նշեք ընթացքում կամ ավարտված</p>
                 <div class="stats-row">
                     <div class="stat-card stat-pending"><div class="num" id="cntPending">0</div><div class="lbl">Սպասող</div></div>
-                    <div class="stat-card stat-progress"><div class="num" id="cntProgress">0</div><div class="lbl">Ընթացքում</div></div>
-                    <div class="stat-card stat-done"><div class="num" id="cntDone">0</div><div class="lbl">Ավարտված այսօր</div></div>
+                    <div class="stat-card stat-progress"><div class="num" id="cntProgress">0</div><div class="lbl">Պատրաստ</div></div>
+                    <div class="stat-card stat-done"><div class="num" id="cntDone">0</div><div class="lbl">Հանձնված</div></div>
                 </div>
                 <div class="orders-tabs">
                     <button class="tab-btn active" onclick="filterOrders('all', this)">Բոլորը</button>
-                    <button class="tab-btn" onclick="filterOrders('Pending', this)">Սպասող</button>
-                    <button class="tab-btn" onclick="filterOrders('Confirmed', this)">Հաստատված</button>
-                    <button class="tab-btn" onclick="filterOrders('InProgress', this)">Ընթացքում</button>
-                    <button class="tab-btn" onclick="filterOrders('Done', this)">Ավարտված</button>
+                    <button class="tab-btn" onclick="filterOrders('pending', this)">⏳ Սպասող</button>
+                    <button class="tab-btn" onclick="filterOrders('ready', this)">✅ Պատրաստ</button>
+                    <button class="tab-btn" onclick="filterOrders('history', this)">📦 Հանձնված</button>
                 </div>
                 <div class="orders-grid" id="ordersGrid"></div>
             </div>
@@ -1050,14 +1060,11 @@
                 loadLibraryBooks();
                 loadBorrowings();
                 setInterval(loadBorrowings, 30000);
-            } else if (role === 'admin') {
-                roleEl.textContent = 'Ադմին';
-                roleEl.className = 'topbar-role role-admin';
-                document.getElementById('cafeDashboard').style.display = 'block';
-                document.getElementById('libraryDashboard').style.display = 'block';
-                document.getElementById('reservationsDashboard').style.display = 'block';
-                document.getElementById('menuDashboard').style.display = 'block';
-                document.getElementById('usersDashboard').style.display = 'block';
+        } else if (role === 'admin') {
+            roleEl.textContent = 'Ադմին';
+            roleEl.className = 'topbar-role role-admin';
+            document.getElementById('adminTabs').style.display = 'block';
+            showAdminSection('cafe'); // show cafe by default
                 loadOrders();
                 loadLibraryBooks();
                 loadBorrowings();
@@ -1079,10 +1086,11 @@
         }
 
         function updateOrderStats(orders) {
-            document.getElementById('cntPending').textContent = orders.filter(o => o.status?.toLowerCase() === 'pending').length;
-            document.getElementById('cntProgress').textContent = orders.filter(o => o.status?.toLowerCase() === 'inprogress').length;
-            document.getElementById('cntDone').textContent = orders.filter(o => ['done', 'ready'].includes(o.status?.toLowerCase())).length;
-        }
+                document.getElementById('cntPending').textContent = orders.filter(o => o.status?.toLowerCase() === 'pending').length;
+                document.getElementById('cntProgress').textContent = orders.filter(o => o.status?.toLowerCase() === 'ready').length;
+                document.getElementById('cntDone').textContent = orders.filter(o => o.status?.toLowerCase() === 'history').length;
+            }
+        
 
         function filterOrders(status, btn) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -1107,11 +1115,9 @@
 
                 let actions = '';
                 if (o.status === 'Pending' || o.status === 'pending') {
-                    actions = '<button class="btn-confirm" onclick="updateOrder(' + o.orderId + ',\'confirm\')">✓ Հաստատել</button>';
-                } else if (o.status === 'Confirmed' || o.status === 'confirmed') {
-                    actions = '<button class="btn-inprogress" onclick="updateOrder(' + o.orderId + ',\'inprogress\')">⏳ Ընթացքում</button>';
-                } else if (o.status === 'InProgress' || o.status === 'inprogress') {
-                    actions = '<button class="btn-done" onclick="updateOrder(' + o.orderId + ',\'done\')">✅ Ավարտված</button>';
+                    actions = '<button class="btn-confirm" onclick="updateOrder(' + o.orderId + ',\'ready\')">✅ Պատրաստ է</button>';
+                } else if (o.status === 'ready' || o.status === 'Ready') {
+                    actions = '<button class="btn-done" onclick="updateOrder(' + o.orderId + ',\'history\')">📦 Հանձնված</button>';
                 }
 
                 return '<div class="order-card' + (isNew ? ' new-order' : '') + '">'
@@ -1135,7 +1141,7 @@
         async function updateOrder(id, action) {
             try {
                 await apiCall('/Orders/' + id + '/' + action, { method: 'PUT' });
-                const msgs = { confirm: 'Պատվերը հաստատվեց ✓', inprogress: 'Ընթացքում նշված ⏳', done: 'Ավարտված! Ծանուցում ուղարկվեց ✅' };
+                const msgs = { ready: 'Պատրաստ է — հաճախորդն ծանուցված է ✅', history: 'Հանձնված, արխիվացված ✓' };
                 showToast(msgs[action] || 'Թարմացվեց', 'success');
                 await loadOrders();
             } catch (e) {
@@ -1550,6 +1556,24 @@
                 showToast('Ջնջված է ✓', 'success');
                 loadUsers();
             } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
+        }
+
+        // ===== ADMIN SECTION TABS =====
+        function showAdminSection(section) {
+            const sections = ['cafe', 'library', 'reservations', 'menu', 'users'];
+            const map = {
+                cafe: 'cafeDashboard',
+                library: 'libraryDashboard',
+                reservations: 'reservationsDashboard',
+                menu: 'menuDashboard',
+                users: 'usersDashboard'
+            };
+            sections.forEach(s => {
+                const el = document.getElementById(map[s]);
+                const tab = document.getElementById('adminTab-' + s);
+                if (el) el.style.display = s === section ? 'block' : 'none';
+                if (tab) tab.classList.toggle('active', s === section);
+            });
         }
 
         // Init on load
