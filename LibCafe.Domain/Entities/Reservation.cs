@@ -28,12 +28,12 @@ namespace  LibCafe.Domain.Entities
         [Column("end_time")]
         public DateTime EndTime { get; set; }
 
+        [Column("created_at")]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
         [Column("status")]
         [MaxLength(20)]
         public string Status { get; set; } = "Active";
-
-        [Column("created_at")]
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         [ForeignKey("TableId")]
         public virtual CafeTable? Table { get; set; }
@@ -67,6 +67,6 @@ namespace  LibCafe.Domain.Entities
         public bool IsReserved { get; set; }
 
         [Column("created_at")]
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

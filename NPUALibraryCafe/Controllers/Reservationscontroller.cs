@@ -28,11 +28,11 @@ public class ReservationsController : ControllerBase
         [FromQuery] DateTimeOffset startTime,
         [FromQuery] DateTimeOffset endTime)
     {
-        var startLocal = startTime.ToLocalTime().DateTime;
-        var endLocal = endTime.ToLocalTime().DateTime;
+        var startUtc = startTime.UtcDateTime;
+        var endUtc = endTime.UtcDateTime;
 
         var allTables = await _reservationRepository.GetAllTablesAsync();
-        var reservedIds = await _reservationRepository.GetReservedTableIdsAsync(startLocal, endLocal);
+        var reservedIds = await _reservationRepository.GetReservedTableIdsAsync(startUtc, endUtc);
 
         return Ok(allTables.Select(t => new TableAvailabilityDto
         {
@@ -94,20 +94,20 @@ public class ReservationsController : ControllerBase
         var name = GetUserName();
         if (string.IsNullOrEmpty(email)) return Unauthorized();
 
-        var startLocal = dto.StartTime.ToLocalTime().DateTime;
-        var endLocal = dto.EndTime.ToLocalTime().DateTime;
+        var startUtc = dto.StartTime.UtcDateTime;
+        var endUtc = dto.EndTime.UtcDateTime;
 
-        if (startLocal <= DateTime.Now.ToLocalTime())
+        if (startUtc <= DateTime.UtcNow)
             return BadRequest(new { error = "Start time must be in the future" });
-
-        if (endLocal <= startLocal)
+        if (endUtc <= startUtc)
             return BadRequest(new { error = "End time must be after start time" });
+        
 
         var tables = await _reservationRepository.GetAllTablesAsync();
         var table = tables.FirstOrDefault(t => t.Id == dto.TableId);
         if (table == null) return BadRequest(new { error = "Table not found" });
 
-        var conflict = await _reservationRepository.HasConflictAsync(dto.TableId, startLocal, endLocal);
+        var conflict = await _reservationRepository.HasConflictAsync(dto.TableId, startUtc, endUtc);
         if (conflict)
             return BadRequest(new { error = "This table is already reserved for that time. Please choose another table or time." });
 
@@ -116,10 +116,10 @@ public class ReservationsController : ControllerBase
             TableId = dto.TableId,
             UserEmail = email,
             UserName = name,
-            StartTime = startLocal,
-            EndTime = endLocal,
+            StartTime = startUtc,
+            EndTime = endUtc,
             Status = "Active",
-            CreatedAt = DateTime.Now
+            CreatedAt = DateTime.UtcNow
         };
 
         table.IsReserved = true;
@@ -188,7 +188,7 @@ public class ReservationsController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> CheckAndSendReminders()
     {
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var upcoming = await _reservationRepository.GetUpcomingAsync(now, now.AddMinutes(15));
         var toExpire = await _reservationRepository.GetExpiredAsync(now);
 

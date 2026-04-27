@@ -41,7 +41,6 @@
             font-family: var(--font-body);
         }
 
-        /* LOGIN SCREEN */
         .login-screen {
             min-height: 100vh;
             display: flex;
@@ -143,7 +142,6 @@
                 text-decoration: underline;
             }
 
-        /* DASHBOARD LAYOUT */
         .dashboard {
             display: none;
             min-height: 100vh;
@@ -224,6 +222,37 @@
                 color: var(--terracotta);
             }
 
+        /* Lang switcher — same as web.html */
+        .lang-switcher {
+            display: flex;
+            gap: 0.25rem;
+            align-items: center;
+        }
+
+        .lang-btn {
+            padding: 0.28rem 0.6rem;
+            border-radius: 100px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid var(--rule);
+            background: none;
+            color: var(--warm-gray);
+            transition: all 0.2s;
+            letter-spacing: 0.05em;
+        }
+
+            .lang-btn:hover {
+                border-color: var(--ink);
+                color: var(--ink);
+            }
+
+            .lang-btn.active {
+                background: var(--ink);
+                border-color: var(--ink);
+                color: white;
+            }
+
         .main-content {
             padding: 2rem;
             max-width: 1400px;
@@ -248,7 +277,6 @@
             margin-bottom: 2rem;
         }
 
-        /* STATS ROW */
         .stats-row {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -288,7 +316,6 @@
             color: var(--moss);
         }
 
-        /* ORDERS */
         .orders-tabs {
             display: flex;
             gap: 0.5rem;
@@ -405,22 +432,6 @@
                 background: #2d4a2d;
             }
 
-        .btn-inprogress {
-            flex: 1;
-            padding: 0.6rem;
-            background: var(--blue);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-            .btn-inprogress:hover {
-                background: #2a4060;
-            }
-
         .btn-done {
             flex: 1;
             padding: 0.6rem;
@@ -447,16 +458,6 @@
             color: var(--amber);
         }
 
-        .s-confirmed {
-            background: #e8eef5;
-            color: var(--blue);
-        }
-
-        .s-inprogress {
-            background: #fff3cd;
-            color: #856404;
-        }
-
         .s-done {
             background: #e8f5e8;
             color: #2d7a2d;
@@ -474,7 +475,6 @@
                 margin-bottom: 1rem;
             }
 
-        /* LIBRARY WORKER */
         .lib-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -560,7 +560,6 @@
             width: 36px;
             height: 52px;
             border-radius: 3px;
-            object-fit: cover;
             background: linear-gradient(135deg, var(--moss), #2d5228);
             flex-shrink: 0;
             background-size: cover;
@@ -586,11 +585,6 @@
             font-size: 0.72rem;
             color: var(--moss);
             font-weight: 500;
-        }
-
-        .book-row-actions {
-            display: flex;
-            gap: 0.4rem;
         }
 
         .btn-edit-shelf {
@@ -625,7 +619,6 @@
             color: var(--amber);
         }
 
-        /* PDF MODAL */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -688,7 +681,6 @@
             color: white;
         }
 
-        /* NOTIFICATION TOAST */
         .toast {
             position: fixed;
             bottom: 2rem;
@@ -750,184 +742,182 @@
     <div class="login-screen" id="loginScreen">
         <div class="login-box">
             <div class="login-logo">ՀԱՊՀ <span>Գրադարան-Սրճարան</span></div>
-            <p class="login-sub">Աշխատակցի մուտք</p>
+            <p class="login-sub" id="loginSubText">Աշխատակցի մուտք</p>
             <div class="form-group">
-                <label>Էլ. փոստ</label>
+                <label id="loginEmailLabel">Էլ. փոստ</label>
                 <input type="email" id="loginEmail" placeholder="your@email.com">
             </div>
             <div class="form-group">
-                <label>Գաղտնաբառ</label>
+                <label id="loginPasswordLabel">Գաղտնաբառ</label>
                 <input type="password" id="loginPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
             </div>
-            <button class="btn-login" onclick="doLogin()">Մուտք գործել</button>
+            <button class="btn-login" id="loginBtn" onclick="doLogin()">Մուտք գործել</button>
             <div class="login-err" id="loginErr"></div>
-            <div class="back-link"><a onclick="window.location.href='web.html'">← Վերադառնալ կայք</a></div>
+            <div class="back-link"><a onclick="window.location.href='web.html'" id="backLink">← Վերադառնալ կայք</a></div>
         </div>
     </div>
 
     <!-- DASHBOARD -->
     <div class="dashboard" id="dashboard">
         <div class="topbar">
-            <div class="topbar-brand">ՀԱՊՀ <span>Աշխատակից</span></div>
+            <div class="topbar-brand">ՀԱՊՀ <span id="topbarBrandSpan">Աշխատակից</span></div>
             <div class="topbar-right">
+                <div class="lang-switcher">
+                    <button class="lang-btn active" data-lang="hy" onclick="setLang('hy')">ՀԱՅ</button>
+                    <button class="lang-btn" data-lang="en" onclick="setLang('en')">ENG</button>
+                </div>
                 <span class="topbar-user" id="topbarUser"></span>
                 <span class="topbar-role" id="topbarRole"></span>
-                <button class="btn-logout" onclick="logout()">Ելք</button>
+                <button class="btn-logout" id="logoutBtn" onclick="logout()">Ելք</button>
             </div>
         </div>
         <div class="main-content">
 
-            <!-- ADMIN NAV TABS -->
-            <div id="adminTabs" style="display:none;margin-bottom:2rem;display:none;">
+            <!-- ADMIN TABS -->
+            <div id="adminTabs" style="display:none;margin-bottom:2rem;">
                 <div style="display:flex;gap:0.5rem;flex-wrap:wrap;background:white;padding:0.8rem;border-radius:12px;border:1px solid var(--rule);">
-                    <button class="tab-btn active" onclick="showAdminSection('cafe')" id="adminTab-cafe">☕ Սրճարան</button>
-                    <button class="tab-btn" onclick="showAdminSection('library')" id="adminTab-library">📚 Գրադարան</button>
-                    <button class="tab-btn" onclick="showAdminSection('reservations')" id="adminTab-reservations">💺 Ամրագրումներ</button>
-                    <button class="tab-btn" onclick="showAdminSection('menu')" id="adminTab-menu">🍽️ Մենյու</button>
-                    <button class="tab-btn" onclick="showAdminSection('users')" id="adminTab-users">👥 Օգտատերեր</button>
+                    <button class="tab-btn active" onclick="showAdminSection('cafe')" id="adminTab-cafe">☕ <span id="adminTabCafeLabel">Սրճարան</span></button>
+                    <button class="tab-btn" onclick="showAdminSection('library')" id="adminTab-library">📚 <span id="adminTabLibraryLabel">Գրադարան</span></button>
+                    <button class="tab-btn" onclick="showAdminSection('reservations')" id="adminTab-reservations">💺 <span id="adminTabReservationsLabel">Ամրագրումներ</span></button>
+                    <button class="tab-btn" onclick="showAdminSection('menu')" id="adminTab-menu">🍽️ <span id="adminTabMenuLabel">Մենյու</span></button>
+                    <button class="tab-btn" onclick="showAdminSection('users')" id="adminTab-users">👥 <span id="adminTabUsersLabel">Օգտատերեր</span></button>
                 </div>
             </div>
 
-            <!-- CAFÉ WORKER DASHBOARD -->
+            <!-- CAFÉ DASHBOARD -->
             <div id="cafeDashboard" style="display:none;">
-                <div class="page-title">Սրճարանի <em>Վահանակ</em></div>
-                <p class="page-desc">Կառավարեք մուտքային պատվերները — հաստատեք, նշեք ընթացքում կամ ավարտված</p>
+                <div class="page-title" id="cafeDashTitle">Սրճարանի <em>Վահանակ</em></div>
+                <p class="page-desc" id="cafeDashDesc">Կառավարեք մուտքային պատվերները — հաստատեք, նշեք ընթացքում կամ ավարտված</p>
                 <div class="stats-row">
-                    <div class="stat-card stat-pending"><div class="num" id="cntPending">0</div><div class="lbl">Սպասող</div></div>
-                    <div class="stat-card stat-progress"><div class="num" id="cntProgress">0</div><div class="lbl">Պատրաստ</div></div>
-                    <div class="stat-card stat-done"><div class="num" id="cntDone">0</div><div class="lbl">Հանձնված</div></div>
+                    <div class="stat-card stat-pending"><div class="num" id="cntPending">0</div><div class="lbl" id="statLblPending">Սպասող</div></div>
+                    <div class="stat-card stat-progress"><div class="num" id="cntProgress">0</div><div class="lbl" id="statLblProgress">Պատրաստ</div></div>
+                    <div class="stat-card stat-done"><div class="num" id="cntDone">0</div><div class="lbl" id="statLblDone">Հանձնված</div></div>
                 </div>
                 <div class="orders-tabs">
-                    <button class="tab-btn active" onclick="filterOrders('all', this)">Բոլորը</button>
-                    <button class="tab-btn" onclick="filterOrders('pending', this)">⏳ Սպասող</button>
-                    <button class="tab-btn" onclick="filterOrders('ready', this)">✅ Պատրաստ</button>
-                    <button class="tab-btn" onclick="filterOrders('history', this)">📦 Հանձնված</button>
+                    <button class="tab-btn active" onclick="filterOrders('all', this)" id="orderTabAll">Բոլորը</button>
+                    <button class="tab-btn" onclick="filterOrders('pending', this)" id="orderTabPending">⏳ Սպասող</button>
+                    <button class="tab-btn" onclick="filterOrders('ready', this)" id="orderTabReady">✅ Պատրաստ</button>
+                    <button class="tab-btn" onclick="filterOrders('history', this)" id="orderTabHistory">📦 Հանձնված</button>
                 </div>
                 <div class="orders-grid" id="ordersGrid"></div>
             </div>
 
-            <!-- LIBRARY WORKER DASHBOARD -->
+            <!-- LIBRARY DASHBOARD -->
             <div id="libraryDashboard" style="display:none;">
-                <div class="page-title">Գրադարանի <em>Վահանակ</em></div>
-                <p class="page-desc">Կառավարեք գրապահոց, հայտեր և ժամկետ անցած գրքեր</p>
-
-                <!-- Borrow request tabs -->
-                <div style="display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap;">
-                    <button class="tab-btn active" onclick="filterBorrowings('all',this)">Բոլոր Հայտերը</button>
-                    <button class="tab-btn" onclick="filterBorrowings('borrowed',this)">📖 Ձեռքում</button>
-                    <button class="tab-btn overdue-tab" onclick="filterBorrowings('overdue',this)">⚠️ Ժամկետ Անցած</button>
-                    <button class="tab-btn" onclick="filterBorrowings('returned',this)">↩️ Վերադարձված</button>
+                <div class="page-title" id="libDashTitle">Գրադարանի <em>Վահանակ</em></div>
+                <p class="page-desc" id="libDashDesc">Կառավարեք գրապահոց, հայտեր և ժամկետ անցած գրքեր</p>
+                <div style="display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap;" id="borrowTabsRow">
+                    <button class="tab-btn active" onclick="filterBorrowings('all',this)" id="borrowTabAll">Բոլոր Հայտերը</button>
+                    <button class="tab-btn" onclick="filterBorrowings('borrowed',this)" id="borrowTabBorrowed">📖 Ձեռքում</button>
+                    <button class="tab-btn overdue-tab" onclick="filterBorrowings('overdue',this)" id="borrowTabOverdue">⚠️ Ժամկետ Անցած</button>
+                    <button class="tab-btn" onclick="filterBorrowings('returned',this)" id="borrowTabReturned">↩️ Վերադարձված</button>
                 </div>
                 <div id="borrowingsGrid" style="display:flex;flex-direction:column;gap:0.8rem;margin-bottom:2.5rem;"></div>
-
-                <!-- Book management -->
-                <div class="page-title" style="font-size:1.2rem;margin-bottom:1rem;">Գրքերի <em>Կառավարում</em></div>
+                <div class="page-title" style="font-size:1.2rem;margin-bottom:1rem;" id="bookMgmtTitle">Գրքերի <em>Կառավարում</em></div>
                 <div class="lib-grid">
-                    <!-- Book list -->
                     <div class="lib-panel">
-                        <h3>Բոլոր <em>Գրքերը</em></h3>
-                        <input type="text" placeholder="Որոնել..." id="libSearch" oninput="filterLibBooks()" style="width:100%;padding:0.6rem 1rem;border:1px solid var(--rule);border-radius:8px;margin-bottom:1rem;outline:none;font-size:0.85rem;">
+                        <h3 id="allBooksTitle">Բոլոր <em>Գրքերը</em></h3>
+                        <input type="text" id="libSearch" oninput="filterLibBooks()" style="width:100%;padding:0.6rem 1rem;border:1px solid var(--rule);border-radius:8px;margin-bottom:1rem;outline:none;font-size:0.85rem;">
                         <div class="book-list" id="libBookList"></div>
                     </div>
-                    <!-- Edit panel -->
                     <div class="lib-panel">
-                        <h3>Խմբագրել <em>Գիրք</em></h3>
+                        <h3 id="editBookTitle2">Խմբագրել <em>Գիրք</em></h3>
                         <div id="libEditEmpty" style="text-align:center;padding:3rem;color:var(--warm-gray);">
                             <div style="font-size:2.5rem;margin-bottom:1rem;">📚</div>
-                            <p>Ձախ կողմից ընտրեք գիրք</p>
+                            <p id="libEditEmptyMsg">Ձախ կողմից ընտրեք գիրք</p>
                         </div>
                         <div id="libEditForm" style="display:none;">
                             <div style="font-weight:600;font-size:1rem;margin-bottom:0.3rem;" id="editBookTitle"></div>
                             <div style="font-size:0.82rem;color:var(--warm-gray);margin-bottom:1.5rem;" id="editBookAuthor"></div>
                             <div class="shelf-form">
                                 <div>
-                                    <label style="display:block;font-size:0.72rem;font-weight:600;color:var(--charcoal);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;">Դարակ</label>
+                                    <label style="display:block;font-size:0.72rem;font-weight:600;color:var(--charcoal);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;" id="shelfLabel">Դարակ</label>
                                     <input type="text" id="editShelfNumber" placeholder="օրինակ՝ A-01">
                                 </div>
                                 <div>
-                                    <label style="display:block;font-size:0.72rem;font-weight:600;color:var(--charcoal);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;">Հասանելի օրինակներ</label>
+                                    <label style="display:block;font-size:0.72rem;font-weight:600;color:var(--charcoal);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;" id="availCopiesLabel">Հասանելի օրինակներ</label>
                                     <input type="number" id="editAvailable" min="0">
                                 </div>
                                 <div>
-                                    <label style="display:block;font-size:0.72rem;font-weight:600;color:var(--charcoal);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;">Ֆիզիկական օրինակներ</label>
+                                    <label style="display:block;font-size:0.72rem;font-weight:600;color:var(--charcoal);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;" id="physCopiesLabel">Ֆիզիկական օրինակներ</label>
                                     <input type="number" id="editPhysical" min="0">
                                 </div>
-                                <button class="btn-save" onclick="saveShelf()">💾 Պահպանել դարակ</button>
+                                <button class="btn-save" onclick="saveShelf()" id="saveShelfBtn">💾 Պահպանել դարակ</button>
                                 <hr style="border:none;border-top:1px solid var(--rule);">
                                 <div>
-                                    <label style="display:block;font-size:0.72rem;font-weight:600;color:var(--charcoal);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;">PDF Հղում</label>
+                                    <label style="display:block;font-size:0.72rem;font-weight:600;color:var(--charcoal);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;" id="pdfUrlLabel">PDF Հղում</label>
                                     <input type="url" id="editPdfUrl" placeholder="https://...">
                                 </div>
-                                <button class="btn-save" style="background:var(--blue);" onclick="savePdf()">📄 Պահպանել PDF</button>
+                                <button class="btn-save" style="background:var(--blue);" onclick="savePdf()" id="savePdfBtn">📄 Պահպանել PDF</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- RESERVATIONS DASHBOARD (admin only) -->
+            <!-- RESERVATIONS DASHBOARD -->
             <div id="reservationsDashboard" style="display:none;">
-                <div class="page-title" style="margin-top:2.5rem;">Ամրագրումների <em>Կառավարում</em></div>
-                <p class="page-desc">Բոլոր սեղանի ամրագրումները — հաստատեք կամ չեղարկեք</p>
+                <div class="page-title" style="margin-top:2.5rem;" id="resDashTitle">Ամրագրումների <em>Կառավարում</em></div>
+                <p class="page-desc" id="resDashDesc">Բոլոր սեղանի ամրագրումները — հաստատեք կամ չեղարկեք</p>
                 <div style="display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap;">
-                    <button class="tab-btn active" onclick="filterReservations('all',this)">Բոլորը</button>
-                    <button class="tab-btn" onclick="filterReservations('Active',this)">🟡 Ակտիվ</button>
-                    <button class="tab-btn" onclick="filterReservations('Confirmed',this)">✅ Հաստատված</button>
-                    <button class="tab-btn" onclick="filterReservations('Cancelled',this)">❌ Չեղարկված</button>
-                    <button class="tab-btn" onclick="filterReservations('Expired',this)">⏰ Ժամկետանց</button>
+                    <button class="tab-btn active" onclick="filterReservations('all',this)" id="resTabAll">Բոլորը</button>
+                    <button class="tab-btn" onclick="filterReservations('Active',this)" id="resTabActive">🟡 Ակտիվ</button>
+                    <button class="tab-btn" onclick="filterReservations('Confirmed',this)" id="resTabConfirmed">✅ Հաստատված</button>
+                    <button class="tab-btn" onclick="filterReservations('Cancelled',this)" id="resTabCancelled">❌ Չեղարկված</button>
+                    <button class="tab-btn" onclick="filterReservations('Expired',this)" id="resTabExpired">⏰ Ժամկետանց</button>
                 </div>
                 <div id="reservationsGrid" style="display:flex;flex-direction:column;gap:0.8rem;"></div>
             </div>
 
-            <!-- MENU MANAGEMENT (admin only) -->
+            <!-- MENU DASHBOARD -->
             <div id="menuDashboard" style="display:none;">
-                <div class="page-title" style="margin-top:2.5rem;">Մենյուի <em>Կառավարում</em></div>
-                <p class="page-desc">Ավելացրեք, խմբագրեք կամ հեռացրեք մենյուի կետեր</p>
+                <div class="page-title" style="margin-top:2.5rem;" id="menuDashTitle">Մենյուի <em>Կառավարում</em></div>
+                <p class="page-desc" id="menuDashDesc">Ավելացրեք, խմբագրեք կամ հեռացրեք մենյուի կետեր</p>
                 <div style="display:flex;justify-content:flex-end;margin-bottom:1rem;">
-                    <button class="btn-save" onclick="openAddMenuModal()">+ Ավելացնել կետ</button>
+                    <button class="btn-save" onclick="openAddMenuModal()" id="addMenuBtn">+ <span id="addMenuBtnLabel">Ավելացնել կետ</span></button>
                 </div>
                 <div id="menuAdminGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;"></div>
             </div>
 
-            <!-- USER MANAGEMENT (admin only) -->
+            <!-- USERS DASHBOARD -->
             <div id="usersDashboard" style="display:none;">
-                <div class="page-title" style="margin-top:2.5rem;">Օգտատերերի <em>Կառավարում</em></div>
-                <p class="page-desc">Փոխեք դերերը կամ ջնջեք հաշիվները</p>
-                <input type="text" placeholder="Որոնել անունով կամ էլ. փոստով..." id="userSearch" oninput="filterUsers()" style="width:100%;max-width:400px;padding:0.6rem 1rem;border:1px solid var(--rule);border-radius:8px;margin-bottom:1.5rem;outline:none;font-size:0.85rem;">
+                <div class="page-title" style="margin-top:2.5rem;" id="usersDashTitle">Օգտատերերի <em>Կառավարում</em></div>
+                <p class="page-desc" id="usersDashDesc">Փոխեք դերերը կամ ջնջեք հաշիվները</p>
+                <input type="text" id="userSearch" oninput="filterUsers()" style="width:100%;max-width:400px;padding:0.6rem 1rem;border:1px solid var(--rule);border-radius:8px;margin-bottom:1.5rem;outline:none;font-size:0.85rem;">
                 <div id="usersGrid" style="display:flex;flex-direction:column;gap:0.6rem;"></div>
             </div>
 
         </div>
     </div>
 
-    <!-- ADD/EDIT MENU ITEM MODAL -->
+    <!-- ADD/EDIT MENU MODAL -->
     <div class="modal-overlay" id="menuModal">
         <div class="modal-box">
             <div class="modal-title" id="menuModalTitle">Ավելացնել Կետ</div>
             <p class="modal-sub" id="menuModalSub">Լրացրեք մանրամասները</p>
             <input type="hidden" id="menuModalId">
-            <div class="form-group"><label>Անուն</label><input type="text" id="menuModalName"></div>
-            <div class="form-group"><label>Նկարագրություն</label><input type="text" id="menuModalDesc"></div>
+            <div class="form-group"><label id="menuModalNameLabel">Անուն</label><input type="text" id="menuModalName"></div>
+            <div class="form-group"><label id="menuModalDescLabel">Նկարագրություն</label><input type="text" id="menuModalDesc"></div>
             <div class="form-group">
-                <label>Կատեգորիա</label>
+                <label id="menuModalCatLabel">Կատեգորիա</label>
                 <select id="menuModalCat" style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;">
-                    <option value="hot">Տաք Ըմպելիք</option>
-                    <option value="cold">Սառը Ըմպելիք</option>
-                    <option value="food">Ուտելիք</option>
-                    <option value="snack">Նախուտեստ</option>
+                    <option value="hot" id="catOptHot">Տաք Ըմպելիք</option>
+                    <option value="cold" id="catOptCold">Սառը Ըմպելիք</option>
+                    <option value="food" id="catOptFood">Ուտելիք</option>
+                    <option value="snack" id="catOptSnack">Նախուտեստ</option>
                 </select>
             </div>
-            <div class="form-group"><label>Գին (AMD)</label><input type="number" id="menuModalPrice" min="0"></div>
+            <div class="form-group"><label id="menuModalPriceLabel">Գին (AMD)</label><input type="number" id="menuModalPrice" min="0"></div>
             <div class="form-group" id="menuModalAvailGroup">
-                <label>Հասանելի</label>
+                <label id="menuModalAvailLabel">Հասանելի</label>
                 <select id="menuModalAvail" style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;">
-                    <option value="true">Այո</option>
-                    <option value="false">Ոչ</option>
+                    <option value="true" id="availOptYes">Այո</option>
+                    <option value="false" id="availOptNo">Ոչ</option>
                 </select>
             </div>
             <div class="modal-actions">
-                <button class="btn-cancel-modal" onclick="closeModal('menuModal')">Չեղարկել</button>
-                <button class="btn-primary-modal" onclick="saveMenuItem()">Պահպանել</button>
+                <button class="btn-cancel-modal" onclick="closeModal('menuModal')" id="menuModalCancel">Չեղարկել</button>
+                <button class="btn-primary-modal" onclick="saveMenuItem()" id="menuModalSave">Պահպանել</button>
             </div>
         </div>
     </div>
@@ -935,26 +925,26 @@
     <!-- USER ROLE MODAL -->
     <div class="modal-overlay" id="userModal">
         <div class="modal-box">
-            <div class="modal-title">Օգտատիրոջ Դեր</div>
+            <div class="modal-title" id="userModalTitle">Օգտատիրոջ Դեր</div>
             <p class="modal-sub" id="userModalName"></p>
             <input type="hidden" id="userModalId">
             <div class="form-group">
-                <label>Դեր</label>
+                <label id="userModalRoleLabel">Դեր</label>
                 <select id="userModalRole" style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;">
-                    <option value="user">Օգտատեր</option>
-                    <option value="cafe staff">Սրճարանի Աշխատող</option>
-                    <option value="librarian">Գրադարանավար</option>
-                    <option value="admin">Ադմին</option>
+                    <option value="user" id="roleOptUser">Օգտատեր</option>
+                    <option value="cafe staff" id="roleOptCafe">Սրճարանի Աշխատող</option>
+                    <option value="librarian" id="roleOptLibrarian">Գրադարանավար</option>
+                    <option value="admin" id="roleOptAdmin">Ադմին</option>
                 </select>
             </div>
             <div class="modal-actions">
-                <button class="btn-cancel-modal" onclick="closeModal('userModal')">Չեղարկել</button>
-                <button class="btn-primary-modal" onclick="saveUserRole()">Պահպանել</button>
+                <button class="btn-cancel-modal" onclick="closeModal('userModal')" id="userModalCancel">Չեղարկել</button>
+                <button class="btn-primary-modal" onclick="saveUserRole()" id="userModalSaveBtn">Պահպանել</button>
             </div>
         </div>
     </div>
 
-    <!-- PDF VIEWER MODAL (for reading) -->
+    <!-- PDF MODAL -->
     <div class="modal-overlay" id="pdfModal">
         <div class="modal-box" style="width:90vw;max-width:900px;height:85vh;display:flex;flex-direction:column;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
@@ -965,18 +955,18 @@
         </div>
     </div>
 
-    <!-- SHELF EDIT MODAL -->
+    <!-- SHELF MODAL -->
     <div class="modal-overlay" id="shelfModal">
         <div class="modal-box">
-            <div class="modal-title">Խմբագրել Դարակ</div>
+            <div class="modal-title" id="shelfModalTitle">Խմբագրել Դարակ</div>
             <p class="modal-sub" id="shelfModalBook"></p>
             <div class="form-group">
-                <label>Դարակի համար</label>
+                <label id="shelfModalLabel">Դարակի համար</label>
                 <input type="text" id="modalShelfNum" placeholder="օրինակ՝ A-01">
             </div>
             <div class="modal-actions">
-                <button class="btn-cancel-modal" onclick="closeModal('shelfModal')">Չեղարկել</button>
-                <button class="btn-primary-modal" onclick="saveModalShelf()">Պահպանել</button>
+                <button class="btn-cancel-modal" onclick="closeModal('shelfModal')" id="shelfModalCancel">Չեղարկել</button>
+                <button class="btn-primary-modal" onclick="saveModalShelf()" id="shelfModalSave">Պահպանել</button>
             </div>
         </div>
     </div>
@@ -985,43 +975,415 @@
 
     <script>
         const API = 'https://localhost:7296/api';
-        let authToken = null;
-        let currentUser = null;
-        let allOrders = [];
-        let allBooks = [];
-        let editingBookId = null;
-        let shelfModalBookId = null;
+        let authToken = null, currentUser = null;
+        let allOrders = [], allBooks = [], allBorrowings = [], allReservations = [], allMenuItems = [], allUsers = [];
+        let editingBookId = null, shelfModalBookId = null, editingMenuId = null;
         let orderRefreshInterval = null;
+        let currentBorrowFilter = 'all';
 
-        // ===== AUTH =====
+        // ── TRANSLATIONS ──────────────────────────────────────────────────────────────
+        const TR = {
+            hy: {
+                // Login
+                loginSubText: 'Աշխատակցի մուտք',
+                loginEmailLabel: 'Էլ. փոստ',
+                loginPasswordLabel: 'Գաղտնաբառ',
+                loginBtn: 'Մուտք գործել',
+                backLink: '← Վերադառնալ կայք',
+                loginErrRole: 'Այս էջը միայն աշխատակիցների համար է',
+                loginErrConn: 'Կապի սխալ',
+                loginErrFail: 'Մուտքը ձախողվեց',
+                // Topbar
+                topbarBrandSpan: 'Աշխատակից',
+                logoutBtn: 'Ելք',
+                // Admin tabs
+                adminTabCafeLabel: 'Սրճարան',
+                adminTabLibraryLabel: 'Գրադարան',
+                adminTabReservationsLabel: 'Ամրագրումներ',
+                adminTabMenuLabel: 'Մենյու',
+                adminTabUsersLabel: 'Օգտատերեր',
+                // Roles
+                roleCafe: 'Սրճարանի Աշխատող',
+                roleLibrary: 'Գրադարանավար',
+                roleAdmin: 'Ադմին',
+                // Café
+                cafeDashTitle: 'Սրճարանի',
+                cafeDashTitleEm: 'Վահանակ',
+                cafeDashDesc: 'Կառավարեք մուտքային պատվերները — հաստատեք, նշեք ընթացքում կամ ավարտված',
+                statLblPending: 'Սպասող',
+                statLblProgress: 'Պատրաստ',
+                statLblDone: 'Հանձնված',
+                orderTabAll: 'Բոլորը',
+                orderTabPending: '⏳ Սպասող',
+                orderTabReady: '✅ Պատրաստ',
+                orderTabHistory: '📦 Հանձնված',
+                orderStatusPending: 'Սպասում',
+                orderStatusReady: 'Պատրաստ',
+                orderStatusHistory: 'Պատմություն',
+                orderStatusConfirmed: 'Հաստատված',
+                orderTotal: 'Ընդամենը՝',
+                orderMarkReady: '✅ Պատրաստ է',
+                orderMarkDelivered: '📦 Հանձնված',
+                toastReady: 'Պատրաստ է — հաճախորդն ծանուցված է ✅',
+                toastDelivered: 'Հանձնված, արխիվացված ✓',
+                toastUpdated: 'Թարմացվեց',
+                noActiveOrders: 'Ակտիվ պատվերներ չկան',
+                // Library
+                libDashTitle: 'Գրադարանի',
+                libDashTitleEm: 'Վահանակ',
+                libDashDesc: 'Կառավարեք գրապահոց, հայտեր և ժամկետ անցած գրքեր',
+                borrowTabAll: 'Բոլոր Հայտերը',
+                borrowTabBorrowed: '📖 Ձեռքում',
+                borrowTabOverdue: '⚠️ Ժամկետ Անցած',
+                borrowTabReturned: '↩️ Վերադարձված',
+                borrowStatusRequested: '⏳ Սպասում',
+                borrowStatusApproved: '✅ Հաստատված',
+                borrowStatusBorrowed: '📖 Ձեռքում',
+                borrowStatusReturned: '↩️ Վերադարձված',
+                borrowStatusOverdue: '⚠️ Ժամկետ Անցած',
+                borrowStatusRejected: '❌ Մերժված',
+                borrowDate: 'Ամսաթիվ՝',
+                borrowDue: 'Վերադարձ՝',
+                borrowApprove: '✓ Հաստատել',
+                borrowReject: '✗ Մերժել',
+                borrowReturn: '↩️ Վերադարձված է',
+                noRequests: 'Հայտեր չկան',
+                toastApproved: 'Հաստատվեց — 14 օր ժամկետ ✓',
+                toastRejected: 'Մերժված է',
+                toastReturned: 'Գիրքը ընդունված է ✓',
+                rejectPrompt: 'Մերժման պատճառ (կամ թողեք դատարկ):',
+                phoneNA: 'Հեռ. չկա',
+                bookMgmtTitle: 'Գրքերի',
+                bookMgmtTitleEm: 'Կառավարում',
+                allBooksTitle: 'Բոլոր',
+                allBooksTitleEm: 'Գրքերը',
+                libSearchPlaceholder: 'Որոնել...',
+                editBookTitle2H: 'Խմբագրել',
+                editBookTitle2Em: 'Գիրք',
+                libEditEmptyMsg: 'Ձախ կողմից ընտրեք գիրք',
+                shelfLabel: 'Դարակ',
+                availCopiesLabel: 'Հասանելի օրինակներ',
+                physCopiesLabel: 'Ֆիզիկական օրինակներ',
+                saveShelfBtn: '💾 Պահպանել դարակ',
+                pdfUrlLabel: 'PDF Հղում',
+                savePdfBtn: '📄 Պահպանել PDF',
+                editBtnLabel: 'Խմբագրել',
+                toastShelfSaved: 'Դարակը պահպանվեց ✓',
+                toastPdfSaved: 'PDF հղումը պահպանվեց ✓',
+                noShelf: 'Դարակ նշված չէ',
+                // Reservations
+                resDashTitle: 'Ամրագրումների',
+                resDashTitleEm: 'Կառավարում',
+                resDashDesc: 'Բոլոր սեղանի ամրագրումները — հաստատեք կամ չեղարկեք',
+                resTabAll: 'Բոլորը',
+                resTabActive: '🟡 Ակտիվ',
+                resTabConfirmed: '✅ Հաստատված',
+                resTabCancelled: '❌ Չեղարկված',
+                resTabExpired: '⏰ Ժամկետանց',
+                resStatusActive: '🟡 Ակտիվ',
+                resStatusConfirmed: '✅ Հաստատված',
+                resStatusCancelled: '❌ Չեղարկված',
+                resStatusExpired: '⏰ Ժամկետանց',
+                resCancelBtn: '❌ Չեղարկել',
+                confirmCancelRes: 'Չեղարկե՞լ այս ամրագրումը։',
+                toastResCancelled: 'Ամրագրումը չեղարկված է',
+                noReservations: 'Ամրագրումներ չկան',
+                seatPrefix: 'Նստատեղ ',
+                // Menu
+                menuDashTitle: 'Մենյուի',
+                menuDashTitleEm: 'Կառավարում',
+                menuDashDesc: 'Ավելացրեք, խմբագրեք կամ հեռացրեք մենյուի կետեր',
+                addMenuBtnLabel: 'Ավելացնել կետ',
+                menuModalAddTitle: 'Ավելացնել Կետ',
+                menuModalAddSub: 'Նոր մենյուի կետ',
+                menuModalEditTitle: 'Խմբագրել Կետ',
+                menuModalNameLabel: 'Անուն',
+                menuModalDescLabel: 'Նկարագրություն',
+                menuModalCatLabel: 'Կատեգորիա',
+                catOptHot: 'Տաք Ըմպելիք',
+                catOptCold: 'Սառը Ըմպելիք',
+                catOptFood: 'Ուտելիք',
+                catOptSnack: 'Նախուտեստ',
+                menuModalPriceLabel: 'Գին (AMD)',
+                menuModalAvailLabel: 'Հասանելի',
+                availOptYes: 'Այո',
+                availOptNo: 'Ոչ',
+                menuModalCancel: 'Չեղարկել',
+                menuModalSave: 'Պահպանել',
+                menuAvailable: 'Հասանելի',
+                menuUnavailable: 'Անհասանելի',
+                catLabelHot: 'Տաք', catLabelCold: 'Սառը', catLabelFood: 'Ուտելիք', catLabelSnack: 'Նախուտեստ',
+                confirmDeleteMenu: 'հեռացնե՞լ մենյուից։',
+                toastMenuAdded: 'Ավելացված ✓',
+                toastMenuUpdated: 'Թարմացված ✓',
+                toastMenuDeleted: 'Հեռացված ✓',
+                toastMenuFill: 'Լրացրեք անուն և գին',
+                noMenu: 'Մենյու դատարկ է',
+                // Users
+                usersDashTitle: 'Օգտատերերի',
+                usersDashTitleEm: 'Կառավարում',
+                usersDashDesc: 'Փոխեք դերերը կամ ջնջեք հաշիվները',
+                userSearchPlaceholder: 'Որոնել անունով կամ էլ. փոստով...',
+                userModalTitle: 'Օգտատիրոջ Դեր',
+                userModalRoleLabel: 'Դեր',
+                roleOptUser: 'Օգտատեր',
+                roleOptCafe: 'Սրճարանի Աշխատող',
+                roleOptLibrarian: 'Գրադարանավար',
+                roleOptAdmin: 'Ադմին',
+                userModalCancel: 'Չեղարկել',
+                userModalSaveBtn: 'Պահպանել',
+                roleEditBtn: '✏️ Դեր',
+                confirmDeleteUser: 'հաշիվը ջնջե՞լ։ Հնարավոր չէ վերականգնել։',
+                toastRoleChanged: 'Դերը փոխված է ✓',
+                toastUserDeleted: 'Ջնջված է ✓',
+                noUsers: 'Օգտատերեր չկան',
+                // Shelf modal
+                shelfModalTitle: 'Խմբագրել Դարակ',
+                shelfModalLabel: 'Դարակի համար',
+                shelfModalCancel: 'Չեղարկել',
+                shelfModalSave: 'Պահպանել',
+                // Errors
+                toastError: 'Սխալ: ',
+            },
+            en: {
+                loginSubText: 'Staff login',
+                loginEmailLabel: 'Email',
+                loginPasswordLabel: 'Password',
+                loginBtn: 'Login',
+                backLink: '← Back to site',
+                loginErrRole: 'This page is for staff only',
+                loginErrConn: 'Connection error',
+                loginErrFail: 'Login failed',
+                topbarBrandSpan: 'Staff',
+                logoutBtn: 'Logout',
+                adminTabCafeLabel: 'Café',
+                adminTabLibraryLabel: 'Library',
+                adminTabReservationsLabel: 'Reservations',
+                adminTabMenuLabel: 'Menu',
+                adminTabUsersLabel: 'Users',
+                roleCafe: 'Café Staff',
+                roleLibrary: 'Librarian',
+                roleAdmin: 'Admin',
+                cafeDashTitle: 'Café',
+                cafeDashTitleEm: 'Dashboard',
+                cafeDashDesc: 'Manage incoming orders — confirm, mark in progress, or complete',
+                statLblPending: 'Pending',
+                statLblProgress: 'Ready',
+                statLblDone: 'Delivered',
+                orderTabAll: 'All',
+                orderTabPending: '⏳ Pending',
+                orderTabReady: '✅ Ready',
+                orderTabHistory: '📦 Delivered',
+                orderStatusPending: 'Pending',
+                orderStatusReady: 'Ready',
+                orderStatusHistory: 'History',
+                orderStatusConfirmed: 'Confirmed',
+                orderTotal: 'Total:',
+                orderMarkReady: '✅ Mark Ready',
+                orderMarkDelivered: '📦 Delivered',
+                toastReady: 'Ready — customer notified ✅',
+                toastDelivered: 'Delivered, archived ✓',
+                toastUpdated: 'Updated',
+                noActiveOrders: 'No active orders',
+                libDashTitle: 'Library',
+                libDashTitleEm: 'Dashboard',
+                libDashDesc: 'Manage shelves, borrow requests, and overdue books',
+                borrowTabAll: 'All Requests',
+                borrowTabBorrowed: '📖 Borrowed',
+                borrowTabOverdue: '⚠️ Overdue',
+                borrowTabReturned: '↩️ Returned',
+                borrowStatusRequested: '⏳ Requested',
+                borrowStatusApproved: '✅ Approved',
+                borrowStatusBorrowed: '📖 Borrowed',
+                borrowStatusReturned: '↩️ Returned',
+                borrowStatusOverdue: '⚠️ Overdue',
+                borrowStatusRejected: '❌ Rejected',
+                borrowDate: 'Date:',
+                borrowDue: 'Due:',
+                borrowApprove: '✓ Approve',
+                borrowReject: '✗ Reject',
+                borrowReturn: '↩️ Mark Returned',
+                noRequests: 'No requests',
+                toastApproved: 'Approved — 14 day loan ✓',
+                toastRejected: 'Rejected',
+                toastReturned: 'Book received ✓',
+                rejectPrompt: 'Reason for rejection (or leave blank):',
+                phoneNA: 'No phone',
+                bookMgmtTitle: 'Book',
+                bookMgmtTitleEm: 'Management',
+                allBooksTitle: 'All',
+                allBooksTitleEm: 'Books',
+                libSearchPlaceholder: 'Search...',
+                editBookTitle2H: 'Edit',
+                editBookTitle2Em: 'Book',
+                libEditEmptyMsg: 'Select a book from the left',
+                shelfLabel: 'Shelf',
+                availCopiesLabel: 'Available copies',
+                physCopiesLabel: 'Physical copies',
+                saveShelfBtn: '💾 Save shelf',
+                pdfUrlLabel: 'PDF URL',
+                savePdfBtn: '📄 Save PDF',
+                editBtnLabel: 'Edit',
+                toastShelfSaved: 'Shelf saved ✓',
+                toastPdfSaved: 'PDF URL saved ✓',
+                noShelf: 'No shelf assigned',
+                resDashTitle: 'Reservation',
+                resDashTitleEm: 'Management',
+                resDashDesc: 'All table reservations — confirm or cancel',
+                resTabAll: 'All',
+                resTabActive: '🟡 Active',
+                resTabConfirmed: '✅ Confirmed',
+                resTabCancelled: '❌ Cancelled',
+                resTabExpired: '⏰ Expired',
+                resStatusActive: '🟡 Active',
+                resStatusConfirmed: '✅ Confirmed',
+                resStatusCancelled: '❌ Cancelled',
+                resStatusExpired: '⏰ Expired',
+                resCancelBtn: '❌ Cancel',
+                confirmCancelRes: 'Cancel this reservation?',
+                toastResCancelled: 'Reservation cancelled',
+                noReservations: 'No reservations',
+                seatPrefix: 'Seat ',
+                menuDashTitle: 'Menu',
+                menuDashTitleEm: 'Management',
+                menuDashDesc: 'Add, edit, or remove menu items',
+                addMenuBtnLabel: 'Add item',
+                menuModalAddTitle: 'Add Item',
+                menuModalAddSub: 'New menu item',
+                menuModalEditTitle: 'Edit Item',
+                menuModalNameLabel: 'Name',
+                menuModalDescLabel: 'Description',
+                menuModalCatLabel: 'Category',
+                catOptHot: 'Hot Drink',
+                catOptCold: 'Cold Drink',
+                catOptFood: 'Food',
+                catOptSnack: 'Snack',
+                menuModalPriceLabel: 'Price (AMD)',
+                menuModalAvailLabel: 'Available',
+                availOptYes: 'Yes',
+                availOptNo: 'No',
+                menuModalCancel: 'Cancel',
+                menuModalSave: 'Save',
+                menuAvailable: 'Available',
+                menuUnavailable: 'Unavailable',
+                catLabelHot: 'Hot', catLabelCold: 'Cold', catLabelFood: 'Food', catLabelSnack: 'Snack',
+                confirmDeleteMenu: 'remove from menu?',
+                toastMenuAdded: 'Added ✓',
+                toastMenuUpdated: 'Updated ✓',
+                toastMenuDeleted: 'Removed ✓',
+                toastMenuFill: 'Please fill in name and price',
+                noMenu: 'Menu is empty',
+                usersDashTitle: 'User',
+                usersDashTitleEm: 'Management',
+                usersDashDesc: 'Change roles or delete accounts',
+                userSearchPlaceholder: 'Search by name or email...',
+                userModalTitle: 'User Role',
+                userModalRoleLabel: 'Role',
+                roleOptUser: 'User',
+                roleOptCafe: 'Café Staff',
+                roleOptLibrarian: 'Librarian',
+                roleOptAdmin: 'Admin',
+                userModalCancel: 'Cancel',
+                userModalSaveBtn: 'Save',
+                roleEditBtn: '✏️ Role',
+                confirmDeleteUser: 'delete this account? This cannot be undone.',
+                toastRoleChanged: 'Role changed ✓',
+                toastUserDeleted: 'Deleted ✓',
+                noUsers: 'No users',
+                shelfModalTitle: 'Edit Shelf',
+                shelfModalLabel: 'Shelf number',
+                shelfModalCancel: 'Cancel',
+                shelfModalSave: 'Save',
+                toastError: 'Error: ',
+            }
+        };
+
+        let lang = localStorage.getItem('lang') || 'hy';
+        function t(key) { return TR[lang][key] || TR['en'][key] || key; }
+
+        function applyTranslations() {
+            const ids = [
+                'loginSubText', 'loginEmailLabel', 'loginPasswordLabel', 'loginBtn', 'backLink',
+                'topbarBrandSpan', 'logoutBtn',
+                'adminTabCafeLabel', 'adminTabLibraryLabel', 'adminTabReservationsLabel', 'adminTabMenuLabel', 'adminTabUsersLabel',
+                'statLblPending', 'statLblProgress', 'statLblDone',
+                'orderTabAll', 'orderTabPending', 'orderTabReady', 'orderTabHistory',
+                'cafeDashDesc', 'libDashDesc', 'resDashDesc', 'menuDashDesc', 'usersDashDesc',
+                'borrowTabAll', 'borrowTabBorrowed', 'borrowTabOverdue', 'borrowTabReturned',
+                'libEditEmptyMsg', 'shelfLabel', 'availCopiesLabel', 'physCopiesLabel',
+                'saveShelfBtn', 'pdfUrlLabel', 'savePdfBtn',
+                'resTabAll', 'resTabActive', 'resTabConfirmed', 'resTabCancelled', 'resTabExpired',
+                'addMenuBtnLabel', 'menuModalNameLabel', 'menuModalDescLabel', 'menuModalCatLabel',
+                'catOptHot', 'catOptCold', 'catOptFood', 'catOptSnack',
+                'menuModalPriceLabel', 'menuModalAvailLabel', 'availOptYes', 'availOptNo',
+                'menuModalCancel', 'menuModalSave',
+                'usersDashDesc', 'userModalTitle', 'userModalRoleLabel',
+                'roleOptUser', 'roleOptCafe', 'roleOptLibrarian', 'roleOptAdmin',
+                'userModalCancel', 'userModalSaveBtn',
+                'shelfModalTitle', 'shelfModalLabel', 'shelfModalCancel', 'shelfModalSave',
+            ];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = t(id);
+            });
+
+            // innerHTML titles with <em>
+            setTitleWithEm('cafeDashTitle', 'cafeDashTitle', 'cafeDashTitleEm');
+            setTitleWithEm('libDashTitle', 'libDashTitle', 'libDashTitleEm');
+            setTitleWithEm('resDashTitle', 'resDashTitle', 'resDashTitleEm');
+            setTitleWithEm('menuDashTitle', 'menuDashTitle', 'menuDashTitleEm');
+            setTitleWithEm('usersDashTitle', 'usersDashTitle', 'usersDashTitleEm');
+            setTitleWithEm('bookMgmtTitle', 'bookMgmtTitle', 'bookMgmtTitleEm');
+            setTitleWithEm('allBooksTitle', 'allBooksTitle', 'allBooksTitleEm');
+            setTitleWithEm('editBookTitle2', 'editBookTitle2H', 'editBookTitle2Em');
+
+            // Placeholders
+            const libSearch = document.getElementById('libSearch');
+            if (libSearch) libSearch.placeholder = t('libSearchPlaceholder');
+            const userSearch = document.getElementById('userSearch');
+            if (userSearch) userSearch.placeholder = t('userSearchPlaceholder');
+
+            // Lang buttons
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+
+            // Re-render dynamic content if loaded
+            if (allOrders.length) renderOrders(allOrders);
+            if (allBorrowings.length) renderBorrowings(allBorrowings);
+            if (allReservations.length) renderReservations(allReservations);
+            if (allMenuItems.length) renderMenuAdmin(allMenuItems);
+            if (allUsers.length) renderUsers(allUsers);
+            if (allBooks.length) renderLibBooks(allBooks);
+        }
+
+        function setTitleWithEm(elId, plainKey, emKey) {
+            const el = document.getElementById(elId);
+            if (el) el.innerHTML = t(plainKey) + ' <em>' + t(emKey) + '</em>';
+        }
+
+        function setLang(l) {
+            lang = l;
+            localStorage.setItem('lang', l);
+            applyTranslations();
+        }
+
+        // ── AUTH ──────────────────────────────────────────────────────────────────────
         async function doLogin() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             const errEl = document.getElementById('loginErr');
             errEl.style.display = 'none';
-
             try {
-                const res = await fetch(API + '/Auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
+                const res = await fetch(API + '/Auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
                 const data = await res.json();
-                if (!res.ok) { errEl.textContent = data.error || 'Մուտքը ձախողվեց'; errEl.style.display = 'block'; return; }
-
+                if (!res.ok) { errEl.textContent = data.error || t('loginErrFail'); errEl.style.display = 'block'; return; }
                 const role = data.user.role;
                 if (role !== 'cafe staff' && role !== 'coffee_worker' && role !== 'librarian' && role !== 'library_worker' && role !== 'admin') {
-                    errEl.textContent = 'Այս էջը միայն աշխատակիցների համար է'; errEl.style.display = 'block'; return;
+                    errEl.textContent = t('loginErrRole'); errEl.style.display = 'block'; return;
                 }
-
-                authToken = data.token;
-                currentUser = data.user;
-                localStorage.setItem('staffToken', authToken);
-                localStorage.setItem('staffUser', JSON.stringify(currentUser));
+                authToken = data.token; currentUser = data.user;
+                localStorage.setItem('staffToken', authToken); localStorage.setItem('staffUser', JSON.stringify(currentUser));
                 initDashboard();
-            } catch (e) {
-                errEl.textContent = 'Կապի սխալ'; errEl.style.display = 'block';
-            }
+            } catch { errEl.textContent = t('loginErrConn'); errEl.style.display = 'block'; }
         }
 
         function logout() {
@@ -1043,242 +1405,169 @@
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
             document.getElementById('topbarUser').textContent = currentUser.name || currentUser.email;
+            applyTranslations();
 
             const role = currentUser.role;
             const roleEl = document.getElementById('topbarRole');
-
             if (role === 'cafe staff' || role === 'coffee_worker') {
-                roleEl.textContent = 'Սրճարանի Աշխատող';
-                roleEl.className = 'topbar-role role-cafe';
+                roleEl.textContent = t('roleCafe'); roleEl.className = 'topbar-role role-cafe';
                 document.getElementById('cafeDashboard').style.display = 'block';
                 loadOrders();
-                orderRefreshInterval = setInterval(loadOrders, 15000); // auto-refresh every 15s
+                orderRefreshInterval = setInterval(loadOrders, 15000);
             } else if (role === 'librarian' || role === 'library_worker') {
-                roleEl.textContent = 'Գրադարանավար';
-                roleEl.className = 'topbar-role role-library';
+                roleEl.textContent = t('roleLibrary'); roleEl.className = 'topbar-role role-library';
                 document.getElementById('libraryDashboard').style.display = 'block';
-                loadLibraryBooks();
-                loadBorrowings();
+                loadLibraryBooks(); loadBorrowings();
                 setInterval(loadBorrowings, 30000);
-        } else if (role === 'admin') {
-            roleEl.textContent = 'Ադմին';
-            roleEl.className = 'topbar-role role-admin';
-            document.getElementById('adminTabs').style.display = 'block';
-            showAdminSection('cafe'); // show cafe by default
-                loadOrders();
-                loadLibraryBooks();
-                loadBorrowings();
-                loadReservations();
-                loadMenuAdmin();
-                loadUsers();
+            } else if (role === 'admin') {
+                roleEl.textContent = t('roleAdmin'); roleEl.className = 'topbar-role role-admin';
+                document.getElementById('adminTabs').style.display = 'block';
+                showAdminSection('cafe');
+                loadOrders(); loadLibraryBooks(); loadBorrowings(); loadReservations(); loadMenuAdmin(); loadUsers();
                 orderRefreshInterval = setInterval(loadOrders, 15000);
             }
         }
 
-        // ===== CAFÉ WORKER =====
+        // ── CAFÉ ──────────────────────────────────────────────────────────────────────
         async function loadOrders() {
-            try {
-                const data = await apiCall('/Orders/pending');
-                allOrders = data;
-                updateOrderStats(data);
-                renderOrders(data);
-            } catch (e) { console.error(e); }
+            try { const data = await apiCall('/Orders/pending'); allOrders = data; updateOrderStats(data); renderOrders(data); } catch (e) { console.error(e); }
         }
 
         function updateOrderStats(orders) {
-                document.getElementById('cntPending').textContent = orders.filter(o => o.status?.toLowerCase() === 'pending').length;
-                document.getElementById('cntProgress').textContent = orders.filter(o => o.status?.toLowerCase() === 'ready').length;
-                document.getElementById('cntDone').textContent = orders.filter(o => o.status?.toLowerCase() === 'history').length;
-            }
-        
+            document.getElementById('cntPending').textContent = orders.filter(o => o.status?.toLowerCase() === 'pending').length;
+            document.getElementById('cntProgress').textContent = orders.filter(o => o.status?.toLowerCase() === 'ready').length;
+            document.getElementById('cntDone').textContent = orders.filter(o => o.status?.toLowerCase() === 'history').length;
+        }
 
         function filterOrders(status, btn) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('#cafeDashboard .tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            const filtered = status === 'all' ? allOrders : allOrders.filter(o => o.status?.toLowerCase() === status.toLowerCase());
-            renderOrders(filtered);
+            renderOrders(status === 'all' ? allOrders : allOrders.filter(o => o.status?.toLowerCase() === status.toLowerCase()));
+        }
+
+        function getOrderStatusText(status) {
+            const map = { pending: t('orderStatusPending'), ready: t('orderStatusReady'), history: t('orderStatusHistory'), confirmed: t('orderStatusConfirmed') };
+            return map[status] || status;
         }
 
         function renderOrders(orders) {
             const grid = document.getElementById('ordersGrid');
-            if (orders.length === 0) {
-                grid.innerHTML = '<div class="empty-state"><div class="icon">✅</div><p>Ակտիվ պատվերներ չկան</p></div>';
-                return;
-            }
+            if (orders.length === 0) { grid.innerHTML = '<div class="empty-state"><div class="icon">✅</div><p>' + t('noActiveOrders') + '</p></div>'; return; }
             grid.innerHTML = orders.map(o => {
-                const time = new Date(o.orderDate);
-                const timeStr = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const timeStr = new Date(o.orderDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 const statusNorm = o.status?.toLowerCase();
-                const statusClass = { pending: 's-pending', confirmed: 's-confirmed', inprogress: 's-inprogress', done: 's-done', ready: 's-done', history: 's-done' }[statusNorm] || '';
-                const statusText = { pending: 'Սպասում', confirmed: 'Հաստատված', inprogress: 'Ընթացքում', done: 'Ավարտված', ready: 'Պատրաստ', history: 'Պատմություն' }[statusNorm] || o.status;
-                const isNew = o.status === 'Pending';
-
+                const statusClass = { pending: 's-pending', ready: 's-done', history: 's-done' }[statusNorm] || '';
+                const statusText = getOrderStatusText(statusNorm);
+                const isNew = statusNorm === 'pending';
                 let actions = '';
-                if (o.status === 'Pending' || o.status === 'pending') {
-                    actions = '<button class="btn-confirm" onclick="updateOrder(' + o.orderId + ',\'ready\')">✅ Պատրաստ է</button>';
-                } else if (o.status === 'ready' || o.status === 'Ready') {
-                    actions = '<button class="btn-done" onclick="updateOrder(' + o.orderId + ',\'history\')">📦 Հանձնված</button>';
-                }
-
+                if (statusNorm === 'pending') actions = '<button class="btn-confirm" onclick="updateOrder(' + o.orderId + ',\'ready\')">' + t('orderMarkReady') + '</button>';
+                else if (statusNorm === 'ready') actions = '<button class="btn-done" onclick="updateOrder(' + o.orderId + ',\'history\')">' + t('orderMarkDelivered') + '</button>';
+                let itemsHtml = '';
+                try { const items = typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []); itemsHtml = items.map(i => '<div class="order-item-row"><span>' + (i.qty || i.quantity || 1) + '× ' + (i.name || i.itemName || '') + '</span><span>' + ((i.price || 0) * (i.qty || i.quantity || 1)) + ' AMD</span></div>').join(''); } catch { itemsHtml = '<div class="order-item-row"><span>' + (o.items || '') + '</span></div>'; }
                 return '<div class="order-card' + (isNew ? ' new-order' : '') + '">'
                     + '<div class="order-hdr"><span class="order-id">#' + o.orderId + '</span><span class="status-pill ' + statusClass + '">' + statusText + '</span></div>'
                     + '<div class="order-time">🕐 ' + timeStr + ' — ' + o.orderType + '</div>'
                     + '<div class="order-user">👤 ' + o.userName + '</div>'
-                    + '<div class="order-items">'
-                    + (() => {
-                        try {
-                            const items = typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []);
-                            return items.map(i => '<div class="order-item-row"><span>' + (i.qty || i.quantity || 1) + '× ' + (i.name || i.itemName || 'Item') + '</span><span>' + ((i.price || 0) * (i.qty || i.quantity || 1)) + ' AMD</span></div>').join('');
-                        } catch (e) { return '<div class="order-item-row"><span>' + (o.items || '') + '</span></div>'; }
-                    })()
-                    + '</div>'
-                    + '<div class="order-total">Ընդամենը՝ ' + o.totalAmount + ' AMD</div>'
-                    + (actions ? '<div class="order-actions">' + actions + '</div>' : '')
-                    + '</div>';
+                    + '<div class="order-items">' + itemsHtml + '</div>'
+                    + '<div class="order-total">' + t('orderTotal') + ' ' + o.totalAmount + ' AMD</div>'
+                    + (actions ? '<div class="order-actions">' + actions + '</div>' : '') + '</div>';
             }).join('');
         }
 
         async function updateOrder(id, action) {
             try {
                 await apiCall('/Orders/' + id + '/' + action, { method: 'PUT' });
-                const msgs = { ready: 'Պատրաստ է — հաճախորդն ծանուցված է ✅', history: 'Հանձնված, արխիվացված ✓' };
-                showToast(msgs[action] || 'Թարմացվեց', 'success');
+                showToast(action === 'ready' ? t('toastReady') : t('toastDelivered'), 'success');
                 await loadOrders();
-            } catch (e) {
-                showToast('Սխալ: ' + e.message, 'error');
-            }
+            } catch (e) { showToast(t('toastError') + e.message, 'error'); }
         }
 
-        // ===== LIBRARY BORROWINGS =====
-        let allBorrowings = [];
-        let currentBorrowFilter = 'all';
-
+        // ── BORROWINGS ────────────────────────────────────────────────────────────────
         async function loadBorrowings() {
             try {
-                const status = currentBorrowFilter === 'all' ? '' : currentBorrowFilter;
-                const url = currentBorrowFilter === 'overdue' ? '/Borrowings/overdue' : '/Borrowings/all' + (status ? '?status=' + status : '');
+                const url = currentBorrowFilter === 'overdue' ? '/Borrowings/overdue' : '/Borrowings/all' + (currentBorrowFilter !== 'all' ? '?status=' + currentBorrowFilter : '');
                 const data = await apiCall(url);
-                allBorrowings = data;
-                renderBorrowings(data);
+                allBorrowings = data; renderBorrowings(data);
             } catch (e) { console.error(e); }
         }
 
         function filterBorrowings(status, btn) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('#borrowTabsRow .tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            currentBorrowFilter = status;
-            loadBorrowings();
+            currentBorrowFilter = status; loadBorrowings();
         }
+
+        function getBorrowStatusText(s) {
+            const map = { requested: t('borrowStatusRequested'), approved: t('borrowStatusApproved'), borrowed: t('borrowStatusBorrowed'), returned: t('borrowStatusReturned'), overdue: t('borrowStatusOverdue'), rejected: t('borrowStatusRejected') };
+            return map[s] || s;
+        }
+        const borrowStatusColor = { requested: '#c4873a', approved: '#2d7a2d', borrowed: '#3a6ea5', returned: '#888', overdue: '#b85540', rejected: '#999' };
 
         function renderBorrowings(items) {
             const grid = document.getElementById('borrowingsGrid');
-            if (!items || items.length === 0) {
-                grid.innerHTML = '<div class="empty-state" style="padding:2rem;text-align:center;color:#888;"><div style="font-size:2rem;margin-bottom:0.5rem;">📋</div><p>Հայտեր չկան</p></div>';
-                return;
-            }
-            const statusLabel = { requested: '⏳ Սպասում', approved: '✅ Հաստատված', borrowed: '📖 Ձեռքում', returned: '↩️ Վերադարձված', overdue: '⚠️ Ժամկետ Անցած', rejected: '❌ Մերժված' };
-            const statusColor = { requested: '#c4873a', approved: '#2d7a2d', borrowed: '#3a6ea5', returned: '#888', overdue: '#b85540', rejected: '#999' };
+            if (!items || items.length === 0) { grid.innerHTML = '<div class="empty-state" style="padding:2rem;text-align:center;color:#888;"><div style="font-size:2rem;margin-bottom:0.5rem;">📋</div><p>' + t('noRequests') + '</p></div>'; return; }
             grid.innerHTML = items.map(b => {
-                const title = b.bookTitle || b.book_title || 'Անհայտ գիրք';
+                const title = b.bookTitle || b.book_title || '—';
                 const author = b.bookAuthor || b.book_author || '';
                 const userName = b.userName || b.user_name || '';
                 const userEmail = b.userEmail || b.user_email || '';
                 const userPhone = b.userPhone || b.user_phone || null;
-                const status = statusLabel[b.status] || b.status;
-                const color = statusColor[b.status] || '#666';
+                const status = getBorrowStatusText(b.status);
+                const color = borrowStatusColor[b.status] || '#666';
                 const isOverdue = b.status === 'overdue' || (b.status === 'borrowed' && b.dueDate && new Date(b.dueDate) < new Date());
                 const rawDate = b.borrowedAt || b.borrowed_at || b.requestedAt || b.requested_at || b.createdAt || b.created_at;
-                const reqDate = rawDate ? new Date(rawDate).toLocaleDateString('hy-AM') : '—';
+                const reqDate = rawDate ? new Date(rawDate).toLocaleDateString() : '—';
                 const dueDateRaw = b.dueDate || b.due_date;
-                const dueDate = dueDateRaw ? new Date(dueDateRaw).toLocaleDateString('hy-AM') : null;
+                const dueDate = dueDateRaw ? new Date(dueDateRaw).toLocaleDateString() : null;
                 let actions = '';
-                if (b.status === 'requested') {
-                    actions = '<button class="btn-confirm" onclick="approveBorrowing(' + b.id + ')">✓ Հաստատել</button>'
-                        + '<button class="btn-done" style="background:#e74c3c;" onclick="rejectBorrowing(' + b.id + ')">✗ Մերժել</button>';
-                } else if (b.status === 'borrowed' || b.status === 'overdue') {
-                    actions = '<button class="btn-confirm" onclick="returnBorrowing(' + b.id + ')">↩️ Վերադարձված է</button>';
-                }
+                if (b.status === 'requested') actions = '<button class="btn-confirm" onclick="approveBorrowing(' + b.id + ')">' + t('borrowApprove') + '</button><button class="btn-done" style="background:#e74c3c;" onclick="rejectBorrowing(' + b.id + ')">' + t('borrowReject') + '</button>';
+                else if (b.status === 'borrowed' || b.status === 'overdue') actions = '<button class="btn-confirm" onclick="returnBorrowing(' + b.id + ')">' + t('borrowReturn') + '</button>';
                 return '<div style="background:white;border-radius:10px;padding:1rem 1.2rem;border:1px solid ' + (isOverdue ? '#f5c2b8' : '#e5e0d8') + ';' + (isOverdue ? 'background:#fff8f7;' : '') + '">'
                     + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;">'
-                    + '<div style="flex:1;min-width:200px;">'
-                    + '<div style="font-weight:700;font-size:0.95rem;">' + title + '</div>'
-                    + '<div style="font-size:0.78rem;color:#888;margin-bottom:0.4rem;">' + author + '</div>'
+                    + '<div style="flex:1;min-width:200px;"><div style="font-weight:700;font-size:0.95rem;">' + title + '</div><div style="font-size:0.78rem;color:#888;margin-bottom:0.4rem;">' + author + '</div>'
                     + '<div style="font-size:0.82rem;"><strong>' + userName + '</strong></div>'
-                    + '<div style="font-size:0.78rem;color:#888;">' + userEmail
-                    + (userPhone ? ' · <strong style="color:#2d6a2d;">📞 ' + userPhone + '</strong>' : ' · <span style="color:#b85540;">Հեռ. չկա</span>') + '</div>'
-                    + '</div>'
-                    + '<div style="text-align:right;">'
-                    + '<span style="font-size:0.75rem;font-weight:700;color:' + color + ';">' + status + '</span>'
-                    + '<div style="font-size:0.75rem;color:#888;margin-top:0.3rem;">Ամսաթիվ՝ ' + reqDate + '</div>'
-                    + (dueDate ? '<div style="font-size:0.75rem;color:' + (isOverdue ? '#b85540' : '#888') + ';font-weight:' + (isOverdue ? '700' : '400') + ';">Վերադարձ՝ ' + dueDate + '</div>' : '')
-                    + '</div>'
-                    + '</div>'
-                    + (actions ? '<div style="display:flex;gap:0.5rem;margin-top:0.8rem;">' + actions + '</div>' : '')
-                    + '</div>';
+                    + '<div style="font-size:0.78rem;color:#888;">' + userEmail + (userPhone ? ' · <strong style="color:#2d6a2d;">📞 ' + userPhone + '</strong>' : ' · <span style="color:#b85540;">' + t('phoneNA') + '</span>') + '</div></div>'
+                    + '<div style="text-align:right;"><span style="font-size:0.75rem;font-weight:700;color:' + color + ';">' + status + '</span>'
+                    + '<div style="font-size:0.75rem;color:#888;margin-top:0.3rem;">' + t('borrowDate') + ' ' + reqDate + '</div>'
+                    + (dueDate ? '<div style="font-size:0.75rem;color:' + (isOverdue ? '#b85540' : '#888') + ';font-weight:' + (isOverdue ? '700' : '400') + ';">' + t('borrowDue') + ' ' + dueDate + '</div>' : '')
+                    + '</div></div>'
+                    + (actions ? '<div style="display:flex;gap:0.5rem;margin-top:0.8rem;">' + actions + '</div>' : '') + '</div>';
             }).join('');
         }
 
         async function approveBorrowing(id) {
-            try {
-                await apiCall('/Borrowings/' + id + '/approve', { method: 'PUT' });
-                showToast('Հաստատվեց — 14 օր ժամկետ ✓', 'success');
-                loadBorrowings();
-            } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
+            try { await apiCall('/Borrowings/' + id + '/approve', { method: 'PUT' }); showToast(t('toastApproved'), 'success'); loadBorrowings(); } catch (e) { showToast(t('toastError') + e.message, 'error'); }
         }
-
         async function rejectBorrowing(id) {
-            const reason = prompt('Մերժման պատճառ (կամ թողեք դատարկ):') || '';
-            try {
-                await apiCall('/Borrowings/' + id + '/reject', { method: 'PUT', body: JSON.stringify({ reason }) });
-                showToast('Մերժված է', 'success');
-                loadBorrowings();
-            } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
+            const reason = prompt(t('rejectPrompt')) || '';
+            try { await apiCall('/Borrowings/' + id + '/reject', { method: 'PUT', body: JSON.stringify({ reason }) }); showToast(t('toastRejected'), 'success'); loadBorrowings(); } catch (e) { showToast(t('toastError') + e.message, 'error'); }
         }
-
         async function returnBorrowing(id) {
-            try {
-                await apiCall('/Borrowings/' + id + '/return', { method: 'PUT' });
-                showToast('Գիրքը ընդունված է ✓', 'success');
-                loadBorrowings();
-            } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
+            try { await apiCall('/Borrowings/' + id + '/return', { method: 'PUT' }); showToast(t('toastReturned'), 'success'); loadBorrowings(); } catch (e) { showToast(t('toastError') + e.message, 'error'); }
         }
 
-        // ===== LIBRARY WORKER =====
+        // ── LIBRARY BOOKS ─────────────────────────────────────────────────────────────
         async function loadLibraryBooks() {
-            try {
-                const data = await apiCall('/Books');
-                allBooks = data;
-                renderLibBooks(data);
-            } catch (e) { console.error(e); }
+            try { const data = await apiCall('/Books'); allBooks = data; renderLibBooks(data); } catch (e) { console.error(e); }
         }
-
         function filterLibBooks() {
             const q = document.getElementById('libSearch').value.toLowerCase();
-            const filtered = allBooks.filter(b => b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q));
-            renderLibBooks(filtered);
+            renderLibBooks(allBooks.filter(b => b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q)));
         }
-
         function renderLibBooks(books) {
             document.getElementById('libBookList').innerHTML = books.map(b => {
                 const imgStyle = b.imagepath ? 'background-image:url(\'' + b.imagepath + '\');background-size:cover;background-position:center;' : '';
                 return '<div class="book-row">'
                     + '<div class="book-row-cover" style="' + imgStyle + '"></div>'
-                    + '<div class="book-row-info">'
-                    + '<div class="book-row-title">' + b.title + '</div>'
-                    + '<div class="book-row-author">' + b.author + '</div>'
-                    + '<div class="book-row-shelf">' + (b.shelfNumber || b.shelfnumber || 'Դարակ նշված չէ') + '</div>'
-                    + '</div>'
+                    + '<div class="book-row-info"><div class="book-row-title">' + b.title + '</div><div class="book-row-author">' + b.author + '</div>'
+                    + '<div class="book-row-shelf">' + (b.shelfNumber || b.shelfnumber || t('noShelf')) + '</div></div>'
                     + '<div style="display:flex;flex-direction:column;gap:0.3rem;align-items:flex-end;">'
                     + '<span class="pdf-badge ' + (b.pdfAvailable || b.pdfavailable ? 'pdf-yes' : 'pdf-no') + '">' + (b.pdfAvailable || b.pdfavailable ? 'PDF ✓' : 'PDF ✗') + '</span>'
-                    + '<button class="btn-edit-shelf" onclick="selectBook(' + b.bookId + ')">Խմբագրել</button>'
-                    + '</div>'
-                    + '</div>';
+                    + '<button class="btn-edit-shelf" onclick="selectBook(' + b.bookId + ')">' + t('editBtnLabel') + '</button></div></div>';
             }).join('');
         }
-
         function selectBook(bookId) {
-            const book = allBooks.find(b => b.bookId === bookId);
-            if (!book) return;
+            const book = allBooks.find(b => b.bookId === bookId); if (!book) return;
             editingBookId = bookId;
             document.getElementById('libEditEmpty').style.display = 'none';
             document.getElementById('libEditForm').style.display = 'block';
@@ -1289,167 +1578,103 @@
             document.getElementById('editPhysical').value = book.physicalCopies || book.physicalcopies || 0;
             document.getElementById('editPdfUrl').value = book.pdfUrl || book.pdfurl || '';
         }
-
         async function saveShelf() {
             if (!editingBookId) return;
             try {
-                await apiCall('/Books/' + editingBookId + '/shelf', {
-                    method: 'PUT',
-                    body: JSON.stringify({ shelfNumber: document.getElementById('editShelfNumber').value })
-                });
-                await apiCall('/Books/' + editingBookId + '/copies', {
-                    method: 'PUT',
-                    body: JSON.stringify({
-                        physicalCopies: parseInt(document.getElementById('editPhysical').value),
-                        availableCopies: parseInt(document.getElementById('editAvailable').value)
-                    })
-                });
-                showToast('Դարակը պահպանվեց ✓', 'success');
-                await loadLibraryBooks();
-            } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
+                await apiCall('/Books/' + editingBookId + '/shelf', { method: 'PUT', body: JSON.stringify({ shelfNumber: document.getElementById('editShelfNumber').value }) });
+                await apiCall('/Books/' + editingBookId + '/copies', { method: 'PUT', body: JSON.stringify({ physicalCopies: parseInt(document.getElementById('editPhysical').value), availableCopies: parseInt(document.getElementById('editAvailable').value) }) });
+                showToast(t('toastShelfSaved'), 'success'); await loadLibraryBooks();
+            } catch (e) { showToast(t('toastError') + e.message, 'error'); }
         }
-
         async function savePdf() {
             if (!editingBookId) return;
-            try {
-                await apiCall('/Books/' + editingBookId + '/pdf', {
-                    method: 'PUT',
-                    body: JSON.stringify({ pdfUrl: document.getElementById('editPdfUrl').value })
-                });
-                showToast('PDF հղումը պահպանվեց ✓', 'success');
-                await loadLibraryBooks();
-            } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
+            try { await apiCall('/Books/' + editingBookId + '/pdf', { method: 'PUT', body: JSON.stringify({ pdfUrl: document.getElementById('editPdfUrl').value }) }); showToast(t('toastPdfSaved'), 'success'); await loadLibraryBooks(); } catch (e) { showToast(t('toastError') + e.message, 'error'); }
         }
 
-        // ===== UTILS =====
-        function openModal(id) { document.getElementById(id).classList.add('show'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-
-        function showToast(msg, type) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.className = 'toast show ' + (type || '');
-            setTimeout(() => t.className = 'toast', 3000);
-        }
-
-        // ===== RESERVATIONS (ADMIN) =====
-        let allReservations = [];
-        let currentResFilter = 'all';
-
+        // ── RESERVATIONS ──────────────────────────────────────────────────────────────
         async function loadReservations() {
-            try {
-                const data = await apiCall('/Reservations/all');
-                allReservations = data;
-                renderReservations(data);
-            } catch (e) { console.error(e); }
+            try { const data = await apiCall('/Reservations/all'); allReservations = data; renderReservations(data); } catch (e) { console.error(e); }
         }
-
         function filterReservations(status, btn) {
             document.querySelectorAll('#reservationsDashboard .tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            currentResFilter = status;
-            const filtered = status === 'all' ? allReservations : allReservations.filter(r => r.status === status);
-            renderReservations(filtered);
+            renderReservations(status === 'all' ? allReservations : allReservations.filter(r => r.status === status));
         }
-
+        function getResStatusText(s) {
+            const map = { Active: t('resStatusActive'), Confirmed: t('resStatusConfirmed'), Cancelled: t('resStatusCancelled'), Expired: t('resStatusExpired') };
+            return map[s] || s;
+        }
+        const resStatusColor = { Active: '#c4873a', Confirmed: '#2d7a2d', Cancelled: '#b85540', Expired: '#888' };
         function renderReservations(items) {
             const grid = document.getElementById('reservationsGrid');
-            if (!items || items.length === 0) {
-                grid.innerHTML = '<div class="empty-state" style="padding:2rem;text-align:center;color:#888;"><div style="font-size:2rem;margin-bottom:0.5rem;">💺</div><p>Ամրագրումներ չկան</p></div>';
-                return;
-            }
-            const statusLabel = { Active: '🟡 Ակտիվ', Confirmed: '✅ Հաստատված', Cancelled: '❌ Չեղարկված', Expired: '⏰ Ժամկետանց' };
-            const statusColor = { Active: '#c4873a', Confirmed: '#2d7a2d', Cancelled: '#b85540', Expired: '#888' };
+            if (!items || items.length === 0) { grid.innerHTML = '<div class="empty-state" style="padding:2rem;text-align:center;color:#888;"><div style="font-size:2rem;margin-bottom:0.5rem;">💺</div><p>' + t('noReservations') + '</p></div>'; return; }
             grid.innerHTML = items.map(r => {
-                const start = new Date(r.startTime);
-                const end = new Date(r.endTime);
-                const startStr = start.toLocaleDateString('hy-AM') + ' ' + start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const start = new Date(r.startTime); const end = new Date(r.endTime);
+                const startStr = start.toLocaleDateString() + ' ' + start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 const endStr = end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                const color = statusColor[r.status] || '#666';
-                const label = statusLabel[r.status] || r.status;
+                const color = resStatusColor[r.status] || '#666';
+                const label = getResStatusText(r.status);
                 const seats = (r.seats || []).join(', ') || '—';
                 const canCancel = r.status === 'Active' || r.status === 'Confirmed';
                 return '<div style="background:white;border-radius:10px;padding:1rem 1.2rem;border:1px solid #e5e0d8;">'
                     + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;">'
-                    + '<div style="flex:1;min-width:200px;">'
-                    + '<div style="font-weight:700;font-size:0.95rem;">💺 ' + (r.tableName || ('Նստատեղ ' + seats)) + '</div>'
+                    + '<div style="flex:1;min-width:200px;"><div style="font-weight:700;font-size:0.95rem;">💺 ' + (r.tableName || (t('seatPrefix') + seats)) + '</div>'
                     + '<div style="font-size:0.82rem;margin-top:0.2rem;"><strong>' + (r.user || '') + '</strong></div>'
                     + '<div style="font-size:0.78rem;color:#888;">' + (r.userEmail || '') + '</div>'
                     + '<div style="font-size:0.78rem;color:var(--warm-gray);margin-top:0.4rem;">🕐 ' + startStr + ' – ' + endStr + '</div>'
-                    + (r.notes ? '<div style="font-size:0.75rem;color:#888;margin-top:0.2rem;">📝 ' + r.notes + '</div>' : '')
-                    + '</div>'
-                    + '<div style="text-align:right;">'
-                    + '<span style="font-size:0.75rem;font-weight:700;color:' + color + ';">' + label + '</span>'
-                    + '<div style="font-size:0.72rem;color:#888;margin-top:0.3rem;">#' + r.id + '</div>'
-                    + '</div>'
-                    + '</div>'
-                    + (canCancel ? '<div style="margin-top:0.8rem;"><button class="btn-done" style="background:#e74c3c;" onclick="adminCancelReservation(' + r.id + ')">❌ Չեղարկել</button></div>' : '')
-                    + '</div>';
+                    + (r.notes ? '<div style="font-size:0.75rem;color:#888;margin-top:0.2rem;">📝 ' + r.notes + '</div>' : '') + '</div>'
+                    + '<div style="text-align:right;"><span style="font-size:0.75rem;font-weight:700;color:' + color + ';">' + label + '</span>'
+                    + '<div style="font-size:0.72rem;color:#888;margin-top:0.3rem;">#' + r.id + '</div></div></div>'
+                    + (canCancel ? '<div style="margin-top:0.8rem;"><button class="btn-done" style="background:#e74c3c;" onclick="adminCancelReservation(' + r.id + ')">' + t('resCancelBtn') + '</button></div>' : '') + '</div>';
             }).join('');
         }
-
         async function adminCancelReservation(id) {
-            if (!confirm('Չեղարկե՞լ այս ամրագրումը։')) return;
-            try {
-                await apiCall('/Reservations/' + id, { method: 'DELETE' });
-                showToast('Ամրագրումը չեղարկված է', 'success');
-                loadReservations();
-            } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
+            if (!confirm(t('confirmCancelRes'))) return;
+            try { await apiCall('/Reservations/' + id, { method: 'DELETE' }); showToast(t('toastResCancelled'), 'success'); loadReservations(); } catch (e) { showToast(t('toastError') + e.message, 'error'); }
         }
 
-        // ===== MENU MANAGEMENT (ADMIN) =====
-        let allMenuItems = [];
-        let editingMenuId = null;
-
+        // ── MENU MANAGEMENT ───────────────────────────────────────────────────────────
         async function loadMenuAdmin() {
-            try {
-                const data = await apiCall('/Menu/all');
-                allMenuItems = data;
-                renderMenuAdmin(data);
-            } catch (e) { console.error(e); }
+            try { const data = await apiCall('/Menu/all'); allMenuItems = data; renderMenuAdmin(data); } catch (e) { console.error(e); }
         }
-
+        function getCatLabel(cat) {
+            const map = { hot: t('catLabelHot'), cold: t('catLabelCold'), food: t('catLabelFood'), snack: t('catLabelSnack') };
+            return map[cat] || cat;
+        }
         function renderMenuAdmin(items) {
             const grid = document.getElementById('menuAdminGrid');
-            if (!items || items.length === 0) { grid.innerHTML = '<p style="color:#888;">Մենյու դատարկ է</p>'; return; }
-            const catLabel = { hot: 'Տաք', cold: 'Սառը', food: 'Ուտելիք', snack: 'Նախուտեստ' };
+            if (!items || items.length === 0) { grid.innerHTML = '<p style="color:#888;">' + t('noMenu') + '</p>'; return; }
             grid.innerHTML = items.map(item => {
-                const cat = catLabel[item.category_id] || item.category_id || '';
+                const cat = getCatLabel(item.category_id);
                 const avail = item.available;
                 return '<div style="background:white;border-radius:12px;padding:1.2rem;border:1px solid ' + (avail ? 'var(--rule)' : '#f5c2b8') + ';' + (!avail ? 'opacity:0.7;' : '') + '">'
                     + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem;">'
                     + '<div style="font-weight:700;font-size:0.95rem;">' + item.name + '</div>'
-                    + '<span style="font-size:0.65rem;padding:0.15rem 0.5rem;border-radius:100px;font-weight:600;background:' + (avail ? '#e8f5e8' : '#fdf3e6') + ';color:' + (avail ? '#2d7a2d' : '#c4873a') + ';">' + (avail ? 'Հասանելի' : 'Անհասանելի') + '</span>'
-                    + '</div>'
+                    + '<span style="font-size:0.65rem;padding:0.15rem 0.5rem;border-radius:100px;font-weight:600;background:' + (avail ? '#e8f5e8' : '#fdf3e6') + ';color:' + (avail ? '#2d7a2d' : '#c4873a') + ';">' + (avail ? t('menuAvailable') : t('menuUnavailable')) + '</span></div>'
                     + (item.description ? '<div style="font-size:0.75rem;color:#888;margin-bottom:0.4rem;">' + item.description + '</div>' : '')
                     + '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.8rem;">'
                     + '<div><span style="font-size:0.7rem;color:var(--warm-gray);">' + cat + '</span><span style="font-weight:700;margin-left:0.8rem;">' + item.price + ' AMD</span></div>'
                     + '<div style="display:flex;gap:0.4rem;">'
-                    + '<button class="btn-edit-shelf" onclick="openEditMenuModal(\'' + item.id + '\')">✏️ Խմբագրել</button>'
+                    + '<button class="btn-edit-shelf" onclick="openEditMenuModal(\'' + item.id + '\')">✏️ ' + t('editBtnLabel') + '</button>'
                     + '<button class="btn-edit-shelf" style="color:var(--terracotta);border-color:var(--terracotta);" onclick="deleteMenuItem(\'' + item.id + '\',\'' + item.name.replace(/'/g, "\\'") + '\')">🗑️</button>'
                     + '</div></div></div>';
             }).join('');
         }
-
         function openAddMenuModal() {
             editingMenuId = null;
-            document.getElementById('menuModalTitle').textContent = 'Ավելացնել Կետ';
-            document.getElementById('menuModalSub').textContent = 'Նոր մենյուի կետ';
+            document.getElementById('menuModalTitle').textContent = t('menuModalAddTitle');
+            document.getElementById('menuModalSub').textContent = t('menuModalAddSub');
             document.getElementById('menuModalId').value = '';
-            document.getElementById('menuModalName').value = '';
-            document.getElementById('menuModalDesc').value = '';
-            document.getElementById('menuModalPrice').value = '';
+            ['menuModalName', 'menuModalDesc', 'menuModalPrice'].forEach(id => document.getElementById(id).value = '');
             document.getElementById('menuModalCat').value = 'hot';
             document.getElementById('menuModalAvail').value = 'true';
             document.getElementById('menuModalAvailGroup').style.display = 'none';
             openModal('menuModal');
         }
-
         function openEditMenuModal(id) {
-            const item = allMenuItems.find(i => i.id === id);
-            if (!item) return;
+            const item = allMenuItems.find(i => i.id === id); if (!item) return;
             editingMenuId = id;
-            document.getElementById('menuModalTitle').textContent = 'Խմբագրել Կետ';
+            document.getElementById('menuModalTitle').textContent = t('menuModalEditTitle');
             document.getElementById('menuModalSub').textContent = item.name;
             document.getElementById('menuModalId').value = id;
             document.getElementById('menuModalName').value = item.name;
@@ -1460,114 +1685,75 @@
             document.getElementById('menuModalAvailGroup').style.display = 'block';
             openModal('menuModal');
         }
-
         async function saveMenuItem() {
             const name = document.getElementById('menuModalName').value.trim();
             const desc = document.getElementById('menuModalDesc').value.trim();
             const price = parseFloat(document.getElementById('menuModalPrice').value);
             const cat = document.getElementById('menuModalCat').value;
             const avail = document.getElementById('menuModalAvail').value === 'true';
-            if (!name || !price) { showToast('Լրացրեք անուն և գին', 'error'); return; }
+            if (!name || !price) { showToast(t('toastMenuFill'), 'error'); return; }
             try {
-                if (editingMenuId) {
-                    await apiCall('/Menu/' + editingMenuId, { method: 'PUT', body: JSON.stringify({ name, description: desc, price, available: avail, categoryId: cat }) });
-                    showToast('Թարմացված ✓', 'success');
-                } else {
-                    await apiCall('/Menu', { method: 'POST', body: JSON.stringify({ name, description: desc, price, categoryId: cat }) });
-                    showToast('Ավելացված ✓', 'success');
-                }
-                closeModal('menuModal');
-                loadMenuAdmin();
-            } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
+                if (editingMenuId) { await apiCall('/Menu/' + editingMenuId, { method: 'PUT', body: JSON.stringify({ name, description: desc, price, available: avail, categoryId: cat }) }); showToast(t('toastMenuUpdated'), 'success'); }
+                else { await apiCall('/Menu', { method: 'POST', body: JSON.stringify({ name, description: desc, price, categoryId: cat }) }); showToast(t('toastMenuAdded'), 'success'); }
+                closeModal('menuModal'); loadMenuAdmin();
+            } catch (e) { showToast(t('toastError') + e.message, 'error'); }
         }
-
         async function deleteMenuItem(id, name) {
-            if (!confirm('"' + name + '" հեռացնե՞լ մենյուից։')) return;
-            try {
-                await apiCall('/Menu/' + id, { method: 'DELETE' });
-                showToast('Հեռացված ✓', 'success');
-                loadMenuAdmin();
-            } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
+            if (!confirm('"' + name + '" ' + t('confirmDeleteMenu'))) return;
+            try { await apiCall('/Menu/' + id, { method: 'DELETE' }); showToast(t('toastMenuDeleted'), 'success'); loadMenuAdmin(); } catch (e) { showToast(t('toastError') + e.message, 'error'); }
         }
 
-        // ===== USER MANAGEMENT (ADMIN) =====
-        let allUsers = [];
-
+        // ── USER MANAGEMENT ───────────────────────────────────────────────────────────
         async function loadUsers() {
-            try {
-                const data = await apiCall('/Auth/users');
-                allUsers = data;
-                renderUsers(data);
-            } catch (e) { console.error(e); }
+            try { const data = await apiCall('/Auth/users'); allUsers = data; renderUsers(data); } catch (e) { console.error(e); }
         }
-
         function filterUsers() {
             const q = document.getElementById('userSearch').value.toLowerCase();
-            const filtered = allUsers.filter(u => (u.name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q));
-            renderUsers(filtered);
+            renderUsers(allUsers.filter(u => (u.name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q)));
         }
-
+        function getRoleLabel(role) {
+            const map = { user: t('roleOptUser'), 'cafe staff': t('roleOptCafe'), coffee_worker: t('roleOptCafe'), librarian: t('roleOptLibrarian'), library_worker: t('roleOptLibrarian'), admin: t('roleOptAdmin') };
+            return map[role] || role;
+        }
+        const roleColor = { user: '#888', 'cafe staff': '#c4873a', coffee_worker: '#c4873a', librarian: '#3d5c3a', library_worker: '#3d5c3a', admin: '#3a5a80' };
         function renderUsers(users) {
             const grid = document.getElementById('usersGrid');
-            if (!users || users.length === 0) { grid.innerHTML = '<p style="color:#888;">Օգտատերեր չկան</p>'; return; }
-            const roleColor = { user: '#888', 'cafe staff': '#c4873a', coffee_worker: '#c4873a', librarian: '#3d5c3a', library_worker: '#3d5c3a', admin: '#3a5a80' };
-            const roleLabel = { user: 'Օգտատեր', 'cafe staff': 'Սրճ. Աշխ.', coffee_worker: 'Սրճ. Աշխ.', librarian: 'Գրադ.', library_worker: 'Գրադ.', admin: 'Ադմին' };
+            if (!users || users.length === 0) { grid.innerHTML = '<p style="color:#888;">' + t('noUsers') + '</p>'; return; }
             grid.innerHTML = users.map(u => {
                 const color = roleColor[u.role] || '#888';
-                const label = roleLabel[u.role] || u.role;
+                const label = getRoleLabel(u.role);
                 const safeName = (u.name || '').replace(/'/g, "\\'");
                 return '<div style="background:white;border-radius:10px;padding:0.9rem 1.2rem;border:1px solid var(--rule);display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">'
                     + '<div style="width:36px;height:36px;border-radius:50%;background:' + color + ';color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;flex-shrink:0;">' + (u.name || u.email || '?').substring(0, 2).toUpperCase() + '</div>'
-                    + '<div style="flex:1;min-width:150px;">'
-                    + '<div style="font-weight:600;font-size:0.9rem;">' + (u.name || '—') + '</div>'
-                    + '<div style="font-size:0.75rem;color:#888;">' + u.email + '</div>'
-                    + (u.phone ? '<div style="font-size:0.72rem;color:var(--moss);">📞 ' + u.phone + '</div>' : '')
-                    + '</div>'
+                    + '<div style="flex:1;min-width:150px;"><div style="font-weight:600;font-size:0.9rem;">' + (u.name || '—') + '</div><div style="font-size:0.75rem;color:#888;">' + u.email + '</div>'
+                    + (u.phone ? '<div style="font-size:0.72rem;color:var(--moss);">📞 ' + u.phone + '</div>' : '') + '</div>'
                     + '<span style="font-size:0.7rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:100px;background:' + color + '22;color:' + color + ';">' + label + '</span>'
                     + '<div style="display:flex;gap:0.4rem;">'
-                    + '<button class="btn-edit-shelf" onclick="openUserModal(' + u.id + ',\'' + safeName + '\',\'' + u.role + '\')">✏️ Դեր</button>'
+                    + '<button class="btn-edit-shelf" onclick="openUserModal(' + u.id + ',\'' + safeName + '\',\'' + u.role + '\')">' + t('roleEditBtn') + '</button>'
                     + '<button class="btn-edit-shelf" style="color:var(--terracotta);border-color:var(--terracotta);" onclick="deleteUser(' + u.id + ',\'' + safeName + '\')">🗑️</button>'
                     + '</div></div>';
             }).join('');
         }
-
         function openUserModal(id, name, role) {
             document.getElementById('userModalId').value = id;
             document.getElementById('userModalName').textContent = name;
             document.getElementById('userModalRole').value = role;
             openModal('userModal');
         }
-
         async function saveUserRole() {
             const id = document.getElementById('userModalId').value;
             const role = document.getElementById('userModalRole').value;
-            try {
-                await apiCall('/Auth/users/' + id + '/role', { method: 'PUT', body: JSON.stringify({ role }) });
-                showToast('Դերը փոխված է ✓', 'success');
-                closeModal('userModal');
-                loadUsers();
-            } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
+            try { await apiCall('/Auth/users/' + id + '/role', { method: 'PUT', body: JSON.stringify({ role }) }); showToast(t('toastRoleChanged'), 'success'); closeModal('userModal'); loadUsers(); } catch (e) { showToast(t('toastError') + e.message, 'error'); }
         }
-
         async function deleteUser(id, name) {
-            if (!confirm('"' + name + '" հաշիվը ջնջե՞լ։ Հնարավոր չէ վերականգնել։')) return;
-            try {
-                await apiCall('/Auth/users/' + id, { method: 'DELETE' });
-                showToast('Ջնջված է ✓', 'success');
-                loadUsers();
-            } catch (e) { showToast('Սխալ: ' + e.message, 'error'); }
+            if (!confirm('"' + name + '" ' + t('confirmDeleteUser'))) return;
+            try { await apiCall('/Auth/users/' + id, { method: 'DELETE' }); showToast(t('toastUserDeleted'), 'success'); loadUsers(); } catch (e) { showToast(t('toastError') + e.message, 'error'); }
         }
 
-        // ===== ADMIN SECTION TABS =====
+        // ── ADMIN SECTION SWITCH ──────────────────────────────────────────────────────
         function showAdminSection(section) {
             const sections = ['cafe', 'library', 'reservations', 'menu', 'users'];
-            const map = {
-                cafe: 'cafeDashboard',
-                library: 'libraryDashboard',
-                reservations: 'reservationsDashboard',
-                menu: 'menuDashboard',
-                users: 'usersDashboard'
-            };
+            const map = { cafe: 'cafeDashboard', library: 'libraryDashboard', reservations: 'reservationsDashboard', menu: 'menuDashboard', users: 'usersDashboard' };
             sections.forEach(s => {
                 const el = document.getElementById(map[s]);
                 const tab = document.getElementById('adminTab-' + s);
@@ -1576,30 +1762,27 @@
             });
         }
 
-        // Init on load
+        // ── UTILS ─────────────────────────────────────────────────────────────────────
+        function openModal(id) { document.getElementById(id).classList.add('show'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+        function showToast(msg, type) {
+            const el = document.getElementById('toast');
+            el.textContent = msg; el.className = 'toast show ' + (type || '');
+            setTimeout(() => el.className = 'toast', 3000);
+        }
+
+        // ── INIT ──────────────────────────────────────────────────────────────────────
         window.addEventListener('load', async () => {
+            applyTranslations();
             const token = localStorage.getItem('staffToken');
             const user = localStorage.getItem('staffUser');
             if (token && user) {
                 authToken = token;
-                // Always fetch fresh profile to get correct role
                 try {
-                    const res = await fetch(API + '/Auth/profile', {
-                        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }
-                    });
-                    if (res.ok) {
-                        const fresh = await res.json();
-                        currentUser = { ...JSON.parse(user), role: fresh.role, name: fresh.name };
-                        localStorage.setItem('staffUser', JSON.stringify(currentUser));
-                    } else {
-                        // Token expired
-                        localStorage.removeItem('staffToken');
-                        localStorage.removeItem('staffUser');
-                        return;
-                    }
-                } catch (e) {
-                    currentUser = JSON.parse(user);
-                }
+                    const res = await fetch(API + '/Auth/profile', { headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' } });
+                    if (res.ok) { const fresh = await res.json(); currentUser = { ...JSON.parse(user), role: fresh.role, name: fresh.name }; localStorage.setItem('staffUser', JSON.stringify(currentUser)); }
+                    else { localStorage.removeItem('staffToken'); localStorage.removeItem('staffUser'); return; }
+                } catch { currentUser = JSON.parse(user); }
                 initDashboard();
             }
         });

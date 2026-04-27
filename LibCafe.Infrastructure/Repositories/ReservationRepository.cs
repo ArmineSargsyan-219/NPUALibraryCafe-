@@ -70,12 +70,21 @@ public class ReservationRepository : IReservationRepository
 
     public async Task AddAsync(Reservation reservation)
     {
+        reservation.StartTime = DateTime.SpecifyKind(reservation.StartTime, DateTimeKind.Utc);
+        reservation.EndTime = DateTime.SpecifyKind(reservation.EndTime, DateTimeKind.Utc);
+        reservation.CreatedAt = DateTime.SpecifyKind(reservation.CreatedAt, DateTimeKind.Utc);
+
         await _context.Reservations.AddAsync(reservation);
         await _context.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(Reservation reservation)
     {
+        // Ensure DateTime kinds are UTC before saving
+        reservation.StartTime = DateTime.SpecifyKind(reservation.StartTime, DateTimeKind.Utc);
+        reservation.EndTime = DateTime.SpecifyKind(reservation.EndTime, DateTimeKind.Utc);
+        reservation.CreatedAt = DateTime.SpecifyKind(reservation.CreatedAt, DateTimeKind.Utc);
+
         _context.Reservations.Update(reservation);
         await _context.SaveChangesAsync();
     }
