@@ -1305,6 +1305,7 @@
                 <div class="lang-switcher">
                     <button class="lang-btn active" data-lang="hy" onclick="setLang('hy')">ՀԱՅ</button>
                     <button class="lang-btn" data-lang="en" onclick="setLang('en')">ENG</button>
+                    <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">РУС</button>
                 </div>
                 <button class="notif-btn" onclick="toggleNotif()" id="notifBtn">
                     🔔
@@ -1906,6 +1907,107 @@
                 resCodeSent: '.', regCodeSentPre: 'A 6-digit code was sent to ',
                 regResendMsg: "Didn't receive it?",
                 marquee: ['Library', 'Café', 'Table Reservations', 'Study Space', 'Fresh Coffee', 'Borrow Books']
+            },
+            ru: {
+                nav_home: 'Главная', nav_library: 'Библиотека', nav_cafe: 'Кафе',
+                nav_reservations: 'Бронирования', nav_favorites: 'Избранное',
+                nav_myorders: 'Мои Заказы', nav_myborrowing: 'Мои Книги', nav_profile: 'Профиль',
+                login: 'Войти', logout: 'Выйти',
+                heroEyebrow: 'Национальный Политехнический Университет Армении',
+                heroH1: 'Где <em>Книги</em><br>Встречают Кофе',
+                heroP: 'Пространство для учёбы, открытий и удовольствия — библиотека и кафе вашего университета в одном месте.',
+                heroBtnLibrary: 'Открыть Библиотеку', heroBtnCafe: 'Заказать в Кафе',
+                statLblBooks: 'Книги', statLblMenu: 'Позиций меню', statLblSeats: 'Места',
+                homeLibEyebrow: 'Библиотека', homeTrending: 'Популярное <em>на этой неделе</em>',
+                homeViewAll: 'Весь каталог', homeCafeEyebrow: 'Меню Кафе',
+                homePopular: 'Популярное <em>сейчас</em>', homeFullMenu: 'Полное меню',
+                libEyebrow: 'Библиотека', libTitle: 'Просмотр <em>нашей коллекции</em>',
+                searchPlaceholder: 'Поиск по названию, автору или ISBN...', searchBtn: 'Поиск',
+                cafeEyebrow: 'Кафе', cafeTitle: 'Заказать <em>из нашего меню</em>',
+                resEyebrow: 'Бронирования', resTitle: 'Забронировать <em>стол</em>',
+                resSelectTime: 'Выбрать время', resDateLabel: 'Дата',
+                resStartLabel: 'Время начала', resEndLabel: 'Время окончания',
+                resNotesLabel: 'Заметки (необязательно)', resSelectOpt: 'Выбрать...',
+                resCheckBtn: 'Проверить доступность', resSelectTable: 'Выбрать стол',
+                resSelectTableHint: 'Сначала выберите время, затем выберите доступный стол',
+                resTablePrefix: 'Стол', resSelectTimeFirst: 'Сначала выберите время',
+                resAvailable: 'Доступно', resReserved: 'Занято',
+                reserveBtn: 'Забронировать Стол', myResTitle: 'Мои <em>Бронирования</em>',
+                cartLabel: 'Корзина', cartTitle: '🛒 Ваша Корзина',
+                cartEmptyMsg: 'Корзина пуста', cartCloseBtn: 'Закрыть',
+                cartCheckoutBtn: '✓ Оформить Заказ', cartTotal: 'Итого:',
+                notifTitle: 'Уведомления', notifMarkAll: 'Отметить все прочитанными',
+                notifEmpty: 'Нет новых уведомлений',
+                loginTitle: 'Добро Пожаловать', loginSubtitle: 'Войдите в свой аккаунт',
+                loginEmailLabel: 'Эл. почта', loginPasswordLabel: 'Пароль',
+                loginCancelBtn: 'Отмена', loginSubmitBtn: 'Войти',
+                loginNoAccount: 'Нет аккаунта?', loginRegisterLink: 'Зарегистрироваться',
+                regTitle: 'Создать Аккаунт', regSubtitle: 'Присоединиться к НПУА Библиотека-Кафе',
+                regNameLabel: 'Полное имя', regEmailLabel: 'Эл. почта',
+                regPasswordLabel: 'Пароль', regCancelBtn: 'Отмена',
+                regSendCodeBtn: 'Отправить Код', regCodeLabel: 'Код подтверждения',
+                regBackBtn: 'Назад', regConfirmBtn: 'Подтвердить и Зарегистрироваться',
+                regResendBtn: 'Отправить снова', regHasAccount: 'Уже есть аккаунт?',
+                regLoginLink: 'Войти',
+                profileEyebrow: 'Личные Данные', profileTitle: 'Мой <em>Профиль</em>',
+                profileLoginMsg: 'Войдите чтобы просмотреть профиль', profileLoginBtn: 'Войти',
+                profileNameLabel: 'Имя', profileEmailLabel: 'Эл. адрес',
+                profilePhoneLabel: 'Номер телефона', profilePhoneHint: 'Требуется для запроса книг',
+                profileSaveBtn: 'Сохранить',
+                borrowEyebrow: 'Библиотека', borrowTitle: 'Мои <em>Книги</em>',
+                borrowLoginMsg: 'Войдите чтобы просмотреть книги', borrowLoginBtn: 'Войти',
+                borrowEmptyMsg: 'Запросов пока нет', borrowBrowseBtn: 'Открыть Библиотеку',
+                ordersEyebrow: 'Мои Заказы', ordersTitle: 'История <em>Заказов</em>',
+                ordersLoginMsg: 'Войдите чтобы просмотреть заказы', ordersLoginBtn: 'Войти',
+                ordersEmptyMsg: 'Заказов пока нет', ordersBrowseBtn: 'Открыть Меню',
+                ordersPrefix: 'Заказ #',
+                favEyebrow: 'Избранное', favTitle: 'Моё <em>Избранное</em>',
+                favLoginMsg: 'Войдите чтобы просмотреть избранное', favLoginBtn: 'Войти',
+                favEmptyMsg: 'Избранного пока нет', favBrowseBtn: 'Открыть Меню',
+                footerTagline: 'Университетское пространство, где знания и сообщество встречаются за отличным кофе. Открыто с понедельника по субботу.',
+                footerLibH: 'Библиотека', footerLib1: 'Каталог', footerLib2: 'Взять книгу', footerLib3: 'PDF Доступ',
+                footerCafeH: 'Кафе', footerCafe1: 'Полное Меню', footerCafe2: 'Заказать Онлайн',
+                footerAccountH: 'Аккаунт', footerAccount1: 'Мой Профиль', footerAccount2: 'Бронирования',
+                footerCopy: '© 2026 НПУА Библиотека-Кафе', footerUniv: 'Национальный Политехнический Университет Армении',
+                shelf: 'Полка', available: 'доступно', requestBook: 'Запросить',
+                unavailable: 'Недоступно', readPdf: 'Читать PDF',
+                remove: 'Удалить', bookSection: 'Книги', cafeSection: 'Кафе',
+                just_now: 'Только что', min_ago: 'мин назад', hr_ago: 'ч назад',
+                cat_hot: 'Горячие напитки', cat_cold: 'Холодные напитки', cat_food: 'Еда', cat_snack: 'Закуски', cat_all: 'Все',
+                alert_loginToOrder: 'Войдите чтобы сделать заказ',
+                alert_loginToFav: 'Войдите чтобы добавить в избранное',
+                alert_loginToRequest: 'Войдите чтобы запросить книгу',
+                alert_phoneRequired: 'Пожалуйста добавьте номер телефона в профиле перед запросом книг',
+                alert_loginSuccess: 'Вход выполнен!', alert_logoutSuccess: 'Выход выполнен',
+                alert_orderReceived: '✅ Заказ принят! Итого: ',
+                alert_phoneRequiredSave: 'Пожалуйста введите номер телефона',
+                alert_profileSaved: '✅ Профиль сохранён',
+                alert_fillAll: 'Пожалуйста заполните все поля',
+                alert_emailDomain: 'Для регистрации необходим email @polytechnic.am',
+                alert_enterCode: 'Пожалуйста введите 6-значный код',
+                alert_regSuccess: 'Регистрация прошла успешно! Войдите в систему.',
+                alert_selectTime: 'Пожалуйста выберите дату и время',
+                alert_endAfterStart: 'Время окончания должно быть позже времени начала',
+                alert_futureTime: 'Время начала должно быть в будущем',
+                alert_loginToReserve: 'Войдите чтобы сделать бронирование',
+                alert_selectTable: 'Пожалуйста выберите стол',
+                alert_selectTimeFull: 'Пожалуйста выберите дату, время начала и окончания',
+                alert_checkFirst: 'Сначала проверьте доступность',
+                alert_resConfirmed: 'Стол забронирован! Вы получите напоминание за 15 минут.',
+                confirm_reserve: 'Забронировать Стол ', confirm_ok: 'Подтвердить?',
+                confirm_cancelRes: 'Отменить это бронирование?',
+                alert_resConfirmedOk: 'Бронирование подтверждено!',
+                resStatus_Active: 'Активно', resStatus_Confirmed: 'Подтверждено',
+                resStatus_Cancelled: 'Отменено', resStatus_Expired: 'Истекло',
+                resConfirmBtn: 'Подтвердить', resCancelBtn: 'Отменить',
+                noReservations: 'Бронирований пока нет.',
+                orderStatus_Pending: '⏳ В ожидании',
+                orderStatus_Done: '✅ Готово',
+                borrowStatus_borrowed: '📖 На руках', borrowStatus_returned: '↩️ Возвращено', borrowStatus_overdue: '⚠️ Просрочено',
+                borrowDate: 'Запрошено:', borrowDue: 'Срок:', borrowOverdueMsg: '⚠️ Пожалуйста срочно верните книгу в библиотеку',
+                resCodeSent: '.', regCodeSentPre: '6-значный код отправлен на ',
+                regResendMsg: 'Не получили?',
+                marquee: ['Библиотека', 'Кафе', 'Бронирование столов', 'Учебное пространство', 'Свежий кофе', 'Взять книги']
             }
         };
 
@@ -2076,6 +2178,15 @@
             if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
             try {
                 const r = await fetch(API_BASE + endpoint, { ...options, headers: { ...headers, ...options.headers } });
+                if (r.status === 401) {
+                    authToken = null; currentUser = null;
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('currentUser');
+                    document.getElementById('userPill').style.display = 'none';
+                    document.getElementById('loginBtn').style.display = 'block';
+                    document.getElementById('logoutBtn').style.display = 'none';
+                    return null;
+                }
                 if (!r.ok) throw new Error(await r.text());
                 return await r.json();
             } catch (e) { console.error('API Error:', e); alert('Error: ' + e.message); return null; }
@@ -2086,6 +2197,15 @@
             if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
             try {
                 const r = await fetch(API_BASE + endpoint, { ...options, headers: { ...headers, ...options.headers } });
+                if (r.status === 401) {
+                    authToken = null; currentUser = null;
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('currentUser');
+                    document.getElementById('userPill').style.display = 'none';
+                    document.getElementById('loginBtn').style.display = 'block';
+                    document.getElementById('logoutBtn').style.display = 'none';
+                    return null;
+                }
                 if (!r.ok) return null;
                 return await r.json();
             } catch { return null; }
@@ -2309,7 +2429,46 @@
             document.getElementById('userName').textContent = name;
             document.getElementById('userAvatar').textContent = name.substring(0, 2).toUpperCase();
         }
-
+        function getNotifMessage(n) {
+            const messages = {
+                order_pending: {
+                    hy: 'Ձեր պատվերն ստացվեց և սպասում է հաստատման։',
+                    en: 'Your order was received and is awaiting confirmation.',
+                    ru: 'Ваш заказ получен и ожидает подтверждения.'
+                },
+                order_done: {
+                    hy: 'Ձեր պատվերը պատրաստ է! Եկեք վերցնել սրճարանի կրպակից։',
+                    en: 'Your order is ready! Come pick it up at the café.',
+                    ru: 'Ваш заказ готов! Приходите забрать его в кафе.'
+                },
+                borrow_requested: {
+                    hy: 'Ձեր հայտն ուղարկված է գրադարանավարին։',
+                    en: 'Your book request has been sent to the librarian.',
+                    ru: 'Ваш запрос отправлен библиотекарю.'
+                },
+                borrow_approved: {
+                    hy: 'Գրքի հայտը հաստատված է։ Կարող եք գալ վերցնել։ Վերադարձի ժամկետ՝ 14 օր։',
+                    en: 'Your book request is approved. Come pick it up. Due in 14 days.',
+                    ru: 'Ваш запрос одобрен. Приходите забрать книгу. Срок возврата — 14 дней.'
+                },
+                borrow_returned: {
+                    hy: 'Գիրքը հաջողությամբ վերադարձված է։ Շնորհակալություն!',
+                    en: 'Book successfully returned. Thank you!',
+                    ru: 'Книга успешно возвращена. Спасибо!'
+                },
+                borrow_rejected: {
+                    hy: 'Գրքի հայտը մերժված է։',
+                    en: 'Your book request was rejected.',
+                    ru: 'Ваш запрос на книгу отклонён.'
+                },
+                borrow_overdue: {
+                    hy: 'Գրքի վերադարձի ժամկետը լրացել է։ Խնդրում ենք անհապաղ վերադարձնել։',
+                    en: 'Your book is overdue. Please return it immediately.',
+                    ru: 'Срок возврата книги истёк. Пожалуйста, верните её немедленно.'
+                }
+            };
+            return (messages[n.type] && messages[n.type][lang]) ? messages[n.type][lang] : n.message;
+        }
         // ── NOTIFICATIONS ─────────────────────────────────────────────
         async function loadNotifications() {
             if (!authToken) return;
@@ -2320,7 +2479,7 @@
             list.innerHTML = data.notifications.map(n =>
                 '<div class="notif-item ' + (n.isRead ? '' : 'unread') + '">'
                 + '<div class="ni-icon ' + (n.type.includes('order') ? 'ni-order' : 'ni-res') + '">' + getNotifIcon(n.type) + '</div>'
-                + '<div class="ni-body"><div class="ni-text">' + n.message + '</div><div class="ni-time">' + formatTime(n.createdAt) + '</div></div></div>'
+                + '<div class="ni-body"><div class="ni-text">' + getNotifMessage(n) + '</div><div class="ni-time">' + formatTime(n.createdAt) + '</div></div></div>'
             ).join('');
             if (data.unreadCount > 0) document.getElementById('notifDot').classList.add('show');
         }
@@ -2402,12 +2561,12 @@
             document.getElementById('myBorrowEmpty').style.display = 'none';
 
             const statusLabel = {
-                requested: '📋 ' + (lang === 'hy' ? 'Հայտ ներկայացված' : 'Requested'),
-                approved: '✅ ' + (lang === 'hy' ? 'Հաստատված' : 'Approved'),
+                requested: '📋 ' + (lang === 'hy' ? 'Հայտ ներկայացված' : lang === 'ru' ? 'Запрошено' : 'Requested'),
+                approved: '✅ ' + (lang === 'hy' ? 'Հաստատված' : lang === 'ru' ? 'Одобрено' : 'Approved'),
                 borrowed: t('borrowStatus_borrowed'),
                 returned: t('borrowStatus_returned'),
                 overdue: t('borrowStatus_overdue'),
-                rejected: '❌ ' + (lang === 'hy' ? 'Մերժված' : 'Rejected')
+                rejected: '❌ ' + (lang === 'hy' ? 'Մերժված' : lang === 'ru' ? 'Отклонено' : 'Rejected')
             };
             const statusColor = {
                 requested: '#c4873a', approved: '#2d7a2d', borrowed: '#3a6ea5',
@@ -2424,8 +2583,8 @@
                     b.createdAt || b.created_at || null;
                 const rawDue = b.dueDate || b.due_date || null;
 
-                const reqDate = rawDate ? new Date(rawDate).toLocaleDateString(lang === 'hy' ? 'hy-AM' : 'en-US') : '—';
-                const dueDate = rawDue ? new Date(rawDue).toLocaleDateString(lang === 'hy' ? 'hy-AM' : 'en-US') : null;
+                const reqDate = rawDate ? new Date(rawDate).toLocaleDateString(lang === 'hy' ? 'hy-AM' : lang === 'ru' ? 'ru-RU' : 'en-US') : '—';
+                const dueDate = rawDue ? new Date(rawDue).toLocaleDateString(lang === 'hy' ? 'hy-AM' : lang === 'ru' ? 'ru-RU' : 'en-US') : null;
 
                 const status = (b.status || 'requested').toLowerCase();
                 const statusText = statusLabel[status] || b.status;
@@ -2465,7 +2624,7 @@
             const statusLabel = {
                 pending: t('orderStatus_Pending'),
                 ready: t('orderStatus_Done'),
-                history: lang === 'hy' ? 'Ստացված' : 'Collected',
+                history: lang === 'hy' ? 'Ստացված' : lang === 'ru' ? 'Получено' : 'Collected',
             };
 
             const statusColor = {
@@ -2475,7 +2634,7 @@
             };
 
             document.getElementById('myOrdersList').innerHTML = data.map(o => {
-                const date = new Date(o.orderDate).toLocaleString(lang === 'hy' ? 'hy-AM' : 'en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                const date = new Date(o.orderDate).toLocaleString(lang === 'hy' ? 'hy-AM' : lang === 'ru' ? 'ru-RU' : 'en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
                 const rawStatus = (o.status || '').toLowerCase();
                 const status = statusLabel[rawStatus] || rawStatus;
                 const color = statusColor[rawStatus] || '#6b6560';
