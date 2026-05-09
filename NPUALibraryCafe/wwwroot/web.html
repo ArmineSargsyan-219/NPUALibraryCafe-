@@ -1500,12 +1500,61 @@
             <form onsubmit="login(event)">
                 <div class="form-group"><label id="loginEmailLabel">Էլ. փոստ</label><input type="email" id="loginEmail" required></div>
                 <div class="form-group"><label id="loginPasswordLabel">Գաղտնաբառ</label><input type="password" id="loginPassword" required></div>
+                <div style="text-align:right;margin-top:-0.8rem;margin-bottom:1rem;">
+                    <button type="button" onclick="openModal('forgotModal')"
+                            style="background:none;border:none;color:var(--moss);font-size:0.78rem;cursor:pointer;text-decoration:underline;">
+                        Մոռացե՞լ եք գաղտնաբառը
+                    </button>
+                </div>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" id="loginCancelBtn" onclick="closeModal('loginModal')">Չեղարկել</button>
                     <button type="submit" class="btn-primary" id="loginSubmitBtn">Մուտք</button>
                 </div>
             </form>
             <div class="modal-switch"><span id="loginNoAccount">Հաշիվ չունե՞ք։</span> <button onclick="switchModal('loginModal','registerModal')" id="loginRegisterLink">Գրանցվել</button></div>
+        </div>
+    </div>
+
+    <!-- FORGOT PASSWORD MODAL -->
+    <div class="modal-overlay" id="forgotModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2 class="modal-title">Վերականգնել Գաղտնաբառը</h2>
+                <p class="modal-subtitle">Կոդ կուղարկվի ձեր էլ. հասցեին</p>
+            </div>
+            <div id="forgotStep1">
+                <div class="form-group">
+                    <label>Էլ. հասցե</label>
+                    <input type="email" id="forgotEmail" placeholder="your@polytechnic.am">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('forgotModal')">Չեղարկել</button>
+                    <button type="button" class="btn-primary" onclick="sendResetCode()">Ուղարկել Կոդ</button>
+                </div>
+            </div>
+            <div id="forgotStep2" style="display:none;">
+                <p style="color:var(--warm-gray);font-size:0.85rem;margin-bottom:1.5rem;">
+                    6-նիշ կոդ ուղարկվեց <strong id="forgotEmailDisplay"></strong> հասցեին։
+                </p>
+                <div class="form-group">
+                    <label>Հաստատման Կոդ</label>
+                    <input type="text" id="resetCode" maxlength="6" placeholder="000000"
+                           style="font-size:1.5rem;letter-spacing:0.5rem;text-align:center;">
+                </div>
+                <div class="form-group">
+                    <label>Նոր Գաղտնաբառ</label>
+                    <input type="password" id="resetNewPassword" placeholder="••••••••">
+                    <div id="resetPwStrength" style="margin-top:0.4rem;font-size:0.72rem;display:flex;gap:0.5rem;flex-wrap:wrap;"></div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="backToForgotStep1()">Հետ</button>
+                    <button type="button" class="btn-primary" onclick="confirmResetPassword()">Փոխել Գաղտնաբառը</button>
+                </div>
+            </div>
+            <div class="modal-switch">
+                <span>Հիշե՞լ եք գաղտնաբառը։</span>
+                <button onclick="switchModal('forgotModal','loginModal')">Մուտք</button>
+            </div>
         </div>
     </div>
 
@@ -2131,6 +2180,70 @@
             ).join('');
         }
 
+        async function sendResetCode() {
+            const email = document.getElementById('forgotEmail').value.trim();
+            if (!email) { alert('Խնդրում ենք մուտքագրել էլ. հասցեն'); return; }
+            const result = await apiCall('/Auth/forgot-password', {
+                method: 'POST',
+                body: JSON.stringify({ email })
+            });
+            if (result) {
+                document.getElementById('forgotEmailDisplay').textContent = email;
+                document.getElementById('forgotStep1').style.display = 'none';
+                document.getElementById('forgotStep2').style.display = 'block';
+            }
+        }
+
+        function backToForgotStep1() {
+            document.getElementById('forgotStep1').style.display = 'block';
+            document.getElementById('forgotStep2').style.display = 'none';
+            document.getElementById('resetCode').value = '';
+            document.getElementById('resetNewPassword').value = '';
+            document.getElementById('resetPwStrength').innerHTML = '';
+        }
+
+        async function confirmResetPassword() {
+            const email = document.getElementById('forgotEmail').value.trim();
+            const code = document.getElementById('resetCode').value.trim();
+            const newPassword = document.getElementById('resetNewPassword').value;
+            if (!code || code.length !== 6) { alert('Խնդրում ենք մուտքագրել 6-նիշ կոդը'); return; }
+            const pwErr = validatePassword(newPassword);
+            if (pwErr) { alert(pwErr); return; }
+            const result = await apiCall('/Auth/reset-password', {
+                method: 'POST',
+                body: JSON.stringify({ email, code, newPassword })
+            });
+            if (result) {
+                alert('✅ Գաղտնաբառը հաջողությամբ փոխվեց: Մուտք գործեք նոր գաղտնաբառով:');
+                closeModal('forgotModal');
+                document.getElementById('forgotStep1').style.display = 'block';
+                document.getElementById('forgotStep2').style.display = 'none';
+                document.getElementById('forgotEmail').value = '';
+                document.getElementById('resetCode').value = '';
+                document.getElementById('resetNewPassword').value = '';
+                openModal('loginModal');
+            }
+        }
+
+        // Live password strength for reset modal
+        document.addEventListener('DOMContentLoaded', () => {
+            const el = document.getElementById('resetNewPassword');
+            if (el) el.addEventListener('input', function () {
+                const pw = this.value;
+                const checks = [
+                    { test: pw.length >= 8, label: '8+ նիշ' },
+                    { test: /[a-zA-Z]/.test(pw), label: 'Տառ' },
+                    { test: /[0-9]/.test(pw), label: 'Թիվ' },
+                    { test: /[!@#$%^&*]/.test(pw), label: 'Հատուկ նիշ' },
+                ];
+                document.getElementById('resetPwStrength').innerHTML = checks.map(c =>
+                    `<span style="padding:0.15rem 0.5rem;border-radius:100px;background:${c.test ? '#e8f5e8' : '#fdf3e6'};color:${c.test ? '#2d7a2d' : '#c4873a'};">
+                ${c.test ? '✓' : '○'} ${c.label}
+            </span>`
+                ).join('');
+            });
+        });
+
         // ── INIT ─────────────────────────────────────────────────────
         window.addEventListener('load', async () => {
             setTimeout(() => document.getElementById('loader').classList.add('hidden'), 800);
@@ -2294,19 +2407,18 @@
             const name = item.name || item.Name || '';
             const price = item.price || item.Price || 0;
             const desc = item.description || item.Description || '';
-            const rating = item.rating || item.Rating || null;
             const itemId = item.id || item.Id || item.item_id || '';
             const category = getCatLabel(item.category_id || item.Category_id || '');
             menuStore[itemId] = { id: itemId, name, price, image_url: imageUrl, category_id: item.category_id || item.Category_id, description: desc };
             const isFav = favMenuIds.has(itemId);
             const favBtn = '<button class="fav-btn ' + (isFav ? 'active' : '') + '" onclick="toggleFavorite(event,\'' + itemId + '\')">' + (isFav ? '❤️' : '🤍') + '</button>';
             const removeBtn = inFavPage ? '<button class="btn-secondary" style="padding:0.3rem 0.8rem;font-size:0.72rem;" onclick="toggleFavorite(event,\'' + itemId + '\',true)">' + t('remove') + '</button>' : '';
-            const ratingHtml = rating ? ' <span style="font-size:0.7rem;color:var(--warm-gray);">⭐ ' + rating + '</span>' : '';
+            
             return '<div class="menu-card"><div class="menu-img ' + (!imageUrl ? 'no-img' : '') + '" ' + imgStyle + '>'
                 + (!imageUrl ? '' : '') + '<span class="menu-cat-tag">' + category + '</span></div>'
                 + '<div class="menu-info"><div class="menu-name">' + name + '</div>'
                 + (desc ? '<div style="font-size:0.73rem;color:var(--warm-gray);margin:0.15rem 0 0.3rem;">' + desc + '</div>' : '')
-                + '<div class="menu-footer"><span class="menu-price">' + price + ' AMD' + ratingHtml + '</span>'
+                + '<div class="menu-footer"><span class="menu-price">' + price + ' AMD</span>'
                 + '<div class="menu-actions">' + favBtn + (inFavPage ? removeBtn : '<button class="add-btn cart-add-btn" data-id="' + itemId + '">+</button>') + '</div>'
                 + '</div></div></div>';
         }
@@ -2847,7 +2959,8 @@
             if (data.length === 0) { container.innerHTML = '<p style="color:var(--warm-gray);">' + t('noReservations') + '</p>'; return; }
             container.innerHTML = data.map(r => {
                 const tableName = r.tableName || (t('resTablePrefix') + ' ' + r.tableId);
-                const start = new Date(r.startTime); const end = new Date(r.endTime);
+                const start = new Date(r.startTime.replace('Z', '').replace('z', ''));
+                const end = new Date(r.endTime.replace('Z', '').replace('z', ''));
                 const statusMap = { Active: t('resStatus_Active'), Confirmed: t('resStatus_Confirmed'), Cancelled: t('resStatus_Cancelled'), Expired: t('resStatus_Expired') };
                 const badgeClass = r.status === 'Active' ? 'badge-pending' : r.status === 'Confirmed' ? 'badge-confirmed' : '';
                 const statusText = statusMap[r.status] || r.status;

@@ -47,4 +47,11 @@ public class UserRepository : IUserRepository
             .ToListAsync();
         return result.FirstOrDefault();
     }
+
+    public async Task UpdatePasswordAsync(int userId, string passwordHash)
+    {
+        await _context.Database.ExecuteSqlRawAsync(
+            "UPDATE users SET password = {0} WHERE id = {1}",
+            passwordHash, userId);
+    }
 }

@@ -18,7 +18,7 @@ namespace NPUALibraryCafe.API.Controllers
             {
                 var items = await _context.Database
                     .SqlQueryRaw<MenuItemDto>(
-                        "SELECT id, name, description, category_id, price, image_url, available, rating FROM menu_items WHERE available = true ORDER BY category_id, name")
+                        "SELECT id, name, description, category_id, price, image_url, available FROM menu_items WHERE available = true ORDER BY category_id, name")
                     .ToListAsync();
                 return Ok(items);
             }
@@ -32,7 +32,7 @@ namespace NPUALibraryCafe.API.Controllers
             {
                 var items = await _context.Database
                     .SqlQueryRaw<MenuItemDto>(
-                        "SELECT id, name, description, category_id, price, image_url, available, rating FROM menu_items WHERE available = true AND category_id = {0} ORDER BY name",
+                        "SELECT id, name, description, category_id, price, image_url, available FROM menu_items WHERE available = true AND category_id = {0} ORDER BY name",
                         category)
                     .ToListAsync();
                 return Ok(items);
@@ -47,7 +47,7 @@ namespace NPUALibraryCafe.API.Controllers
             {
                 var items = await _context.Database
                     .SqlQueryRaw<MenuItemDto>(
-                        "SELECT id, name, description, category_id, price, image_url, available, rating FROM menu_items WHERE available = true AND (LOWER(name) LIKE {0} OR LOWER(description) LIKE {0}) ORDER BY name",
+                        "SELECT id, name, description, category_id, price, image_url, available FROM menu_items WHERE available = true AND (LOWER(name) LIKE {0} OR LOWER(description) LIKE {0}) ORDER BY name",
                         $"%{query.ToLower()}%")
                     .ToListAsync();
                 return Ok(items);
@@ -66,7 +66,7 @@ namespace NPUALibraryCafe.API.Controllers
                 if (role != "admin") return Forbid();
                 var items = await _context.Database
                     .SqlQueryRaw<MenuItemDto>(
-                        "SELECT id, name, description, category_id, price, image_url, available, rating FROM menu_items ORDER BY category_id, name")
+                        "SELECT id, name, description, category_id, price, image_url, available FROM menu_items ORDER BY category_id, name")
                     .ToListAsync();
                 return Ok(items);
             }
@@ -101,7 +101,7 @@ namespace NPUALibraryCafe.API.Controllers
                 if (role != "admin") return Forbid();
                 var newId = dto.CategoryId?.Substring(0, 1).ToLower() + DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                 await _context.Database.ExecuteSqlRawAsync(
-                    "INSERT INTO menu_items (id, name, description, category_id, price, available, rating) VALUES ({0},{1},{2},{3},{4},{5},{6})",
+                    "INSERT INTO menu_items (id, name, description, category_id, price, available) VALUES ({0},{1},{2},{3},{4})",
                     newId, dto.Name, dto.Description ?? "", dto.CategoryId ?? "other", dto.Price, true, 0);
                 return Ok(new { message = "Added", id = newId });
             }
@@ -150,6 +150,5 @@ namespace NPUALibraryCafe.API.Controllers
         public decimal Price { get; set; }
         public string? Image_url { get; set; }
         public bool Available { get; set; }
-        public decimal? Rating { get; set; }
     }
 }

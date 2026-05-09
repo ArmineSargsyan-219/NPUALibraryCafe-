@@ -30,6 +30,4 @@ public partial class Menuitem
     [Column("available")]
     public bool Available { get; set; } = true;
 
-    [Column("rating")]
-    public decimal? Rating { get; set; }
 }

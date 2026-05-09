@@ -22,6 +22,8 @@ public class AuthController : ControllerBase
 
     private static readonly ConcurrentDictionary<string, PendingRegistration> _pendingRegistrations = new();
 
+    private static readonly ConcurrentDictionary<string, PasswordResetRequest> _passwordResets = new();
+    private record PasswordResetRequest(string Code, DateTime Expiry);
     public AuthController(IUserRepository userRepository, IConfiguration configuration)
     {
         _userRepository = userRepository;
@@ -33,6 +35,10 @@ public class AuthController : ControllerBase
     {
         if (!dto.Email.EndsWith("@polytechnic.am", StringComparison.OrdinalIgnoreCase))
             return BadRequest(new { error = "Գրանցվելու համար անհրաժեշտ է @polytechnic.am էլ. հասցե" });
+
+
+        var (isValid, pwError) = ValidatePassword(dto.Password);
+        if (!isValid) return BadRequest(new { error = pwError });
 
         var existing = await _userRepository.GetByEmailAsync(dto.Email);
         if (existing != null)
@@ -116,6 +122,46 @@ public class AuthController : ControllerBase
                 Role = user.Role
             }
         });
+    }
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
+    {
+        var user = await _userRepository.GetByEmailAsync(dto.Email);
+        if (user == null)
+            return Ok(new { message = "Եթե հասցեն գոյություն ունի, կոդ կուղարկվի" }); // don't reveal if email exists
+
+        var code = new Random().Next(100000, 999999).ToString();
+        _passwordResets[dto.Email] = new PasswordResetRequest(code, DateTime.UtcNow.AddMinutes(10));
+
+        await SendPasswordResetEmailAsync(dto.Email, user.Fullname, code);
+        return Ok(new { message = "Կոդ ուղարկվեց" });
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+    {
+        if (!_passwordResets.TryGetValue(dto.Email, out var reset))
+            return BadRequest(new { error = "Նախ հարցրեք վերականգնման կոդ" });
+
+        if (DateTime.UtcNow > reset.Expiry)
+        {
+            _passwordResets.TryRemove(dto.Email, out _);
+            return BadRequest(new { error = "Կոդի ժամկետը լրացել է: Կրկին փորձեք" });
+        }
+
+        if (reset.Code != dto.Code)
+            return BadRequest(new { error = "Սխալ կոդ" });
+
+        var (isValid, pwError) = ValidatePassword(dto.NewPassword);
+        if (!isValid) return BadRequest(new { error = pwError });
+
+        var user = await _userRepository.GetByEmailAsync(dto.Email);
+        if (user == null) return NotFound();
+
+        await _userRepository.UpdatePasswordAsync(user.Userid, BCrypt.Net.BCrypt.HashPassword(dto.NewPassword));
+        _passwordResets.TryRemove(dto.Email, out _);
+
+        return Ok(new { message = "Գաղտնաբառը հաջողությամբ փոխվեց" });
     }
 
     [Authorize]
@@ -209,6 +255,56 @@ public class AuthController : ControllerBase
         {
             From = new MailAddress(fromEmail, fromName),
             Subject = $"Ձեր հաստատման կոդը՝ {code}",
+            Body = body,
+            IsBodyHtml = true
+        };
+        message.To.Add(new MailAddress(toEmail, toName));
+        await client.SendMailAsync(message);
+    }
+
+    private (bool IsValid, string Error) ValidatePassword(string password)
+    {
+        if (string.IsNullOrWhiteSpace(password))
+            return (false, "Գաղտնաբառը չի կարող դատարկ լինել");
+        if (password.Length < 8)
+            return (false, "Գաղտնաբառը պետք է լինի առնվազն 8 նիշ");
+        if (!password.Any(char.IsLetter))
+            return (false, "Գաղտնաբառը պետք է պարունակի առնվազն 1 տառ");
+        if (!password.Any(char.IsDigit))
+            return (false, "Գաղտնաբառը պետք է պարունակի առնվազն 1 թիվ");
+        if (!password.Any(c => "!@#$%^&*".Contains(c)))
+            return (false, "Գաղտնաբառը պետք է պարունակի առնվազն 1 հատուկ նիշ (!@#$%^&*)");
+        return (true, "");
+    }
+
+    private async Task SendPasswordResetEmailAsync(string toEmail, string toName, string code)
+    {
+        var smtpSettings = _configuration.GetSection("SmtpSettings");
+        var fromEmail = smtpSettings["FromEmail"]!;
+        var appPassword = smtpSettings["AppPassword"]!;
+        var fromName = smtpSettings["FromName"] ?? "ՀԱՊՀ Գրադարան-Սրճարան";
+
+        using var client = new SmtpClient("smtp.gmail.com", 587)
+        {
+            EnableSsl = true,
+            Credentials = new NetworkCredential(fromEmail, appPassword)
+        };
+
+        var body = $@"
+<div style=""font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:2rem;border:1px solid #e0dbd4;border-radius:12px;"">
+  <h2 style=""color:#141414;"">ՀԱՊՀ Գրադարան-Սրճարան</h2>
+  <p style=""color:#6b6560;"">Բարև, {toName}!</p>
+  <p>Գաղտնաբառի վերականգնման կոդն է.</p>
+  <div style=""font-size:2.5rem;font-weight:700;letter-spacing:0.5rem;text-align:center;padding:1.5rem;background:#f5f0e8;border-radius:8px;margin:1.5rem 0;color:#141414;"">
+    {code}
+  </div>
+  <p style=""color:#6b6560;font-size:0.85rem;"">Կոդը վավեր է 10 րոպե: Եթե դուք չեք հարցրել, անտեսեք այս նամակը:</p>
+</div>";
+
+        var message = new MailMessage
+        {
+            From = new MailAddress(fromEmail, fromName),
+            Subject = $"Գաղտնաբառի վերականգնում՝ {code}",
             Body = body,
             IsBodyHtml = true
         };

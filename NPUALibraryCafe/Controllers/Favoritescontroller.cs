@@ -51,7 +51,7 @@ public class FavoritesController : ControllerBase
             {
                 var items = await _context.Database
                     .SqlQueryRaw<FavMenuItemDto>(
-                        "SELECT id, name, description, category_id, price, image_url, available, rating FROM menu_items WHERE id = {0}",
+                        "SELECT id, name, description, category_id, price, image_url, available FROM menu_items WHERE id = {0}",
                         fav.ItemId)
                     .ToListAsync();
                 var item = items.FirstOrDefault();
@@ -171,7 +171,6 @@ public class FavoritesController : ControllerBase
         public decimal Price { get; set; }
         public string? Image_url { get; set; }
         public bool Available { get; set; }
-        public decimal? Rating { get; set; }
         public string? Description { get; set; }
     }
 }

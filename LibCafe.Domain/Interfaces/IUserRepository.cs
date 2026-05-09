@@ -10,4 +10,5 @@ public interface IUserRepository
     Task UpdateNameAsync(int userId, string name);
     Task UpdatePhoneAsync(int userId, string phone);
     Task<string?> GetPhoneAsync(int userId);
+    Task UpdatePasswordAsync(int userId, string passwordHash);
 }

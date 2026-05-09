@@ -5,16 +5,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.ComponentModel;
 using System.Text;
 
 
-AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", false);
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
-
-
-builder.Services.AddControllers();
-
 
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IBorrowingRepository, BorrowingRepository>();
@@ -98,7 +95,14 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
+    });
+
 var app = builder.Build();
+app.UseDeveloperExceptionPage(); 
 
 if (app.Environment.IsDevelopment())
 {

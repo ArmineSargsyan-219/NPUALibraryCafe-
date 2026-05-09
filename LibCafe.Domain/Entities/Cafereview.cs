@@ -18,8 +18,7 @@ public partial class Cafereview
     [Column("itemid")]
     public string? Itemid { get; set; }
 
-    [Column("rating")]
-    public int? Rating { get; set; }
+    
 
     [Column("comment")]
     public string? Comment { get; set; }

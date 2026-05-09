@@ -173,7 +173,6 @@ public class BooksController : ControllerBase
         {
             reviewId = r.Reviewid,
             userName = r.User.Fullname,
-            rating = r.Rating,
             comment = r.Comment,
             createdAt = r.Createdat
         }));
@@ -190,7 +189,6 @@ public class BooksController : ControllerBase
         {
             Bookid = id,
             Userid = userId,
-            Rating = dto.Rating,
             Comment = dto.Comment,
             Createdat = DateTime.Now
         });

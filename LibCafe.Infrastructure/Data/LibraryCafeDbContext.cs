@@ -57,7 +57,6 @@ public partial class LibraryCafeDbContext : DbContext
             entity.Property(e => e.Reviewid).HasColumnName("reviewid");
             entity.Property(e => e.Bookid).HasColumnName("bookid");
             entity.Property(e => e.Comment).HasColumnName("comment");
-            entity.Property(e => e.Rating).HasColumnName("rating");
             entity.Property(e => e.Userid).HasColumnName("userid");
             entity.HasOne(d => d.Book).WithMany(p => p.Bookreviews)
                 .HasForeignKey(d => d.Bookid).HasConstraintName("bookreviews_bookid_fkey");
@@ -134,7 +133,6 @@ public partial class LibraryCafeDbContext : DbContext
             entity.Property(e => e.Reviewid).HasColumnName("reviewid");
             entity.Property(e => e.Comment).HasColumnName("comment");
             entity.Property(e => e.Itemid).HasColumnName("itemid");
-            entity.Property(e => e.Rating).HasColumnName("rating");
             entity.Property(e => e.Userid).HasColumnName("userid");
             entity.HasOne(d => d.User).WithMany(p => p.Cafereviews)
                 .HasForeignKey(d => d.Userid).HasConstraintName("cafereviews_userid_fkey");
@@ -151,7 +149,6 @@ public partial class LibraryCafeDbContext : DbContext
             entity.Property(e => e.Price).HasColumnName("price");
             entity.Property(e => e.Imagepath).HasColumnName("image");
             entity.Property(e => e.Available).HasColumnName("available");
-            entity.Property(e => e.Rating).HasColumnName("rating");
         });
 
         modelBuilder.Entity<Payment>(entity =>

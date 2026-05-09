@@ -9,5 +9,4 @@ public class MenuItemResponseDto
     public decimal Price { get; set; }
     public string? ImagePath { get; set; }
     public bool Available { get; set; }
-    public decimal? Rating { get; set; }
 }

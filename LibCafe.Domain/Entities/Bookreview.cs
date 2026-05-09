@@ -17,9 +17,6 @@ public partial class Bookreview
     [Column("bookid")]
     public int Bookid { get; set; }
 
-    [Column("rating")]
-    public int? Rating { get; set; }
-
     [Column("comment")]
     public string? Comment { get; set; }
 

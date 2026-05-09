@@ -38,7 +38,7 @@ public class NotificationsController : ControllerBase
                 type = n.Type,
                 isRead = n.Isread,
                 relatedId = n.Relatedid,
-                createdAt = n.Createdat
+                createdAt = DateTime.SpecifyKind(n.Createdat, DateTimeKind.Utc)
             }),
             unreadCount
         });
