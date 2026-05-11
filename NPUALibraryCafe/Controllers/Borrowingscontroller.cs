@@ -158,7 +158,7 @@ public class BorrowingsController : ControllerBase
         {
             Userid = borrowing.Userid,
             Title = "✅ Հայտը հաստատված է",
-            Message = $"«{borrowing.BookTitle}» գիրքը հաստատված է: Կարող եք գալ վերցնել: Վերադարձի ժամկետ՝ 14 օր:",
+            Message = $"«{borrowing.BookTitle}» գիրքը հաստատված է: Կարող եք վերցնել: Վերադարձի ժամկետ՝ 14 օր:",
             Type = "borrow_approved",
             Relatedid = id,
             Createdat = DateTime.Now

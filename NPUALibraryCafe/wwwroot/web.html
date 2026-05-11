@@ -2401,6 +2401,29 @@
             });
             const menuSearchEl = document.getElementById('menuSearch');
             if (menuSearchEl) menuSearchEl.addEventListener('keydown', e => { if (e.key === 'Enter') searchMenu(); });
+            const regPwEl = document.getElementById('regPassword');
+            if (regPwEl) {
+                // add strength indicator element after the input
+                const hint = document.createElement('div');
+                hint.id = 'regPwStrength';
+                hint.style.cssText = 'margin-top:0.4rem;font-size:0.72rem;display:flex;gap:0.5rem;flex-wrap:wrap;';
+                regPwEl.parentNode.appendChild(hint);
+
+                regPwEl.addEventListener('input', function () {
+                    const pw = this.value;
+                    const checks = [
+                        { test: pw.length >= 8, label: lang === 'en' ? '8+ chars' : lang === 'ru' ? '8+ симв.' : '8+ նիշ' },
+                        { test: /[a-zA-Z]/.test(pw), label: lang === 'en' ? 'Letter' : lang === 'ru' ? 'Буква' : 'Տառ' },
+                        { test: /[0-9]/.test(pw), label: lang === 'en' ? 'Number' : lang === 'ru' ? 'Цифра' : 'Թիվ' },
+                        { test: /[!@#$%^&*]/.test(pw), label: lang === 'en' ? 'Special' : lang === 'ru' ? 'Спецсимвол' : 'Հատուկ նիշ' },
+                    ];
+                    document.getElementById('regPwStrength').innerHTML = checks.map(c =>
+                        `<span style="padding:0.15rem 0.5rem;border-radius:100px;background:${c.test ? '#e8f5e8' : '#fdf3e6'};color:${c.test ? '#2d7a2d' : '#c4873a'};">
+                ${c.test ? '✓' : '○'} ${c.label}
+            </span>`
+                    ).join('');
+                });
+            }
         });
 
         // ── INIT ─────────────────────────────────────────────────────
@@ -2681,12 +2704,34 @@
             const role = document.getElementById('regRole').value;
             if (!name || !email || !password) { alert(t('alert_fillAll')); return; }
             if (!email.endsWith('@polytechnic.am')) { alert(t('alert_emailDomain')); return; }
+            const pwErr = validatePassword(password);
+            if (pwErr) { alert(pwErr); return; }
             const result = await apiCall('/Auth/send-code', { method: 'POST', body: JSON.stringify({ name, email, password, role }) });
             if (result) {
                 document.getElementById('regCodeSentMsg').innerHTML = t('regCodeSentPre') + '<strong>' + email + '</strong>' + t('resCodeSent');
                 document.getElementById('registerStep1').style.display = 'none';
                 document.getElementById('registerStep2').style.display = 'block';
             }
+        }
+
+        function validatePassword(password) {
+            if (!password || password.length < 8)
+                return lang === 'ru' ? 'Пароль должен содержать минимум 8 символов'
+                    : lang === 'en' ? 'Password must be at least 8 characters'
+                        : 'Գաղտնաբառը պետք է լինի առնվազն 8 նիշ';
+            if (!/[a-zA-Z]/.test(password))
+                return lang === 'ru' ? 'Пароль должен содержать хотя бы одну букву'
+                    : lang === 'en' ? 'Password must contain at least one letter'
+                        : 'Գաղտնաբառը պետք է պարունակի առնվազն 1 տառ';
+            if (!/[0-9]/.test(password))
+                return lang === 'ru' ? 'Пароль должен содержать хотя бы одну цифру'
+                    : lang === 'en' ? 'Password must contain at least one number'
+                        : 'Գաղտնաբառը պետք է պարունակի առնվազն 1 թիվ';
+            if (!/[!@#$%^&*]/.test(password))
+                return lang === 'ru' ? 'Пароль должен содержать специальный символ (!@#$%^&*)'
+                    : lang === 'en' ? 'Password must contain a special character (!@#$%^&*)'
+                        : 'Գաղտնաբառը պետք է պարունակի հատուկ նիշ (!@#$%^&*)';
+            return null; // valid
         }
 
         function backToStep1() { document.getElementById('registerStep1').style.display = 'block'; document.getElementById('registerStep2').style.display = 'none'; }
@@ -2737,7 +2782,7 @@
                     ru: 'Ваш запрос отправлен библиотекарю.'
                 },
                 borrow_approved: {
-                    hy: 'Գրքի հայտը հաստատված է։ Կարող եք գալ վերցնել։ Վերադարձի ժամկետ՝ 14 օր։',
+                    hy: 'Գրքի հայտը հաստատված է։ Կարող եք վերցնել։ Վերադարձի ժամկետ՝ 14 օր։',
                     en: 'Your book request is approved. Come pick it up. Due in 14 days.',
                     ru: 'Ваш запрос одобрен. Приходите забрать книгу. Срок возврата — 14 дней.'
                 },
