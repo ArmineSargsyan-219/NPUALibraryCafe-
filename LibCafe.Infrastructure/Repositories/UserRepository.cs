@@ -54,4 +54,34 @@ public class UserRepository : IUserRepository
             "UPDATE users SET password = {0} WHERE id = {1}",
             passwordHash, userId);
     }
+
+    public async Task UpdateAvatarAsync(int userId, string avatarUrl)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user != null) { user.AvatarUrl = avatarUrl; await _context.SaveChangesAsync(); }
+    }
+
+    public async Task<IEnumerable<User>> GetAllAsync()
+    => await _context.Users.ToListAsync();
+
+    public async Task DeleteAsync(int id)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user != null)
+        {
+            user.Fullname = "Deleted User";
+            user.Email = $"deleted_{id}@deleted.com";
+            user.Passwordhash = Guid.NewGuid().ToString();
+            user.Phone = null;
+            user.AvatarUrl = null;
+            user.Role = "deleted";
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task UpdateRoleAsync(int id, string role)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user != null) { user.Role = role; await _context.SaveChangesAsync(); }
+    }
 }

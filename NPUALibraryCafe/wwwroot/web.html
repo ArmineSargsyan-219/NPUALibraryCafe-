@@ -264,6 +264,119 @@
             .notif-dot.show {
                 display: block;
             }
+        .toast-container {
+            position: fixed;
+            bottom: 5rem;
+            right: 2rem;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: white;
+            border: 1px solid var(--rule);
+            border-radius: 12px;
+            padding: 0.9rem 1.2rem;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            max-width: 320px;
+            pointer-events: all;
+            animation: toastIn 0.3s ease forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .toast.hiding {
+                animation: toastOut 0.4s ease forwards;
+            }
+
+            .toast::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                height: 3px;
+                background: var(--moss);
+                width: 100%;
+                animation: toastBar 10s linear forwards;
+            }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(40px);
+            }
+        }
+
+        @keyframes toastBar {
+            from {
+                width: 100%;
+            }
+
+            to {
+                width: 0%;
+            }
+        }
+
+        .toast-icon {
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+        }
+
+        .toast-body {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 0.2rem;
+        }
+
+        .toast-text {
+            font-size: 0.75rem;
+            color: var(--warm-gray);
+            line-height: 1.5;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--warm-gray);
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 0;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+
+            .toast-close:hover {
+                color: var(--ink);
+            }
 
         .user-pill {
             display: flex;
@@ -1282,6 +1395,8 @@
 </head>
 <body>
 
+    <div class="toast-container" id="toastContainer"></div>
+
     <div class="loader" id="loader">
         <div class="loader-logo">ՀԱՊՀ <span>Գրադարան-Սրճարան</span></div>
         <div class="loader-bar"></div>
@@ -1417,6 +1532,10 @@
                     <div class="section-eyebrow" id="cafeEyebrow">Սրճարան</div>
                     <h2 class="section-title" id="cafeTitle">Պատվիրել <em>մեր մենյուից</em></h2>
                 </div>
+            </div>
+            <div class="search-bar" style="margin-bottom:1rem;">
+                <input type="text" id="menuSearch" placeholder="Search menu...">
+                <button onclick="searchMenu()">Search</button>
             </div>
             <div class="menu-filter" id="menuFilter"></div>
             <div class="menu-grid" id="cafeMenu"></div>
@@ -1604,6 +1723,16 @@
             </div>
             <div id="profileForm" style="max-width:480px;display:none;">
                 <div style="background:white;border-radius:16px;padding:2rem;border:1px solid var(--rule);display:flex;flex-direction:column;gap:1.2rem;">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:0.8rem;">
+                        <div id="profileAvatarImg" onclick="document.getElementById('avatarInput').click()"
+                             style="width:80px;height:80px;border-radius:50%;background:var(--moss);color:white;font-size:1.8rem;font-weight:600;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;border:3px solid var(--rule);">
+                        </div>
+                        <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="uploadAvatar(event)">
+                        <button type="button" onclick="document.getElementById('avatarInput').click()"
+                                style="background:none;border:none;color:var(--moss);font-size:0.78rem;cursor:pointer;text-decoration:underline;">
+                            Փոխել նկարը
+                        </button>
+                    </div>
                     <div>
                         <label style="font-size:0.78rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--warm-gray);display:block;margin-bottom:0.4rem;" id="profileNameLabel">Անուն</label>
                         <input id="profileName" type="text" style="width:100%;padding:0.7rem 1rem;border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;outline:none;">
@@ -1752,6 +1881,31 @@
         let booksData = [], menuData = [];
         let favMenuIds = new Set(), favBookIds = new Set();
         let selectedTable = null, tableAvailability = {};
+
+
+        function showToast(message, icon) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML =
+                '<div class="toast-icon">' + (icon || '🔔') + '</div>'
+                + '<div class="toast-body">'
+                + '<div class="toast-title">' + t('notifTitle') + '</div>'
+                + '<div class="toast-text">' + message + '</div>'
+                + '</div>'
+                + '<button class="toast-close" onclick="dismissToast(this.closest(\'.toast\'))">✕</button>';
+            container.appendChild(toast);
+            const timer = setTimeout(() => dismissToast(toast), 10000);
+            toast._timer = timer;
+        }
+
+        function dismissToast(toast) {
+            if (!toast || toast._dismissed) return;
+            toast._dismissed = true;
+            clearTimeout(toast._timer);
+            toast.classList.add('hiding');
+            setTimeout(() => toast.remove(), 400);
+        }
 
         // ── TRANSLATIONS ─────────────────────────────────────────────
         const TR = {
@@ -2127,6 +2281,9 @@
             const bookSearch = document.getElementById('bookSearch');
             if (bookSearch) bookSearch.placeholder = t('searchPlaceholder');
 
+            const menuSearchEl = document.getElementById('menuSearch');
+            if (menuSearchEl) menuSearchEl.placeholder = t('searchPlaceholder');
+
             // Table names and status texts
             [1, 2, 3].forEach(i => {
                 const nameEl = document.getElementById('tname-' + i);
@@ -2238,10 +2395,12 @@
                 ];
                 document.getElementById('resetPwStrength').innerHTML = checks.map(c =>
                     `<span style="padding:0.15rem 0.5rem;border-radius:100px;background:${c.test ? '#e8f5e8' : '#fdf3e6'};color:${c.test ? '#2d7a2d' : '#c4873a'};">
-                ${c.test ? '✓' : '○'} ${c.label}
-            </span>`
+                    ${c.test ? '✓' : '○'} ${c.label}
+                </span>`
                 ).join('');
             });
+            const menuSearchEl = document.getElementById('menuSearch');
+            if (menuSearchEl) menuSearchEl.addEventListener('keydown', e => { if (e.key === 'Enter') searchMenu(); });
         });
 
         // ── INIT ─────────────────────────────────────────────────────
@@ -2256,7 +2415,12 @@
             }
             await loadBooks();
             await loadMenu();
-            if (authToken) { await loadFavoriteIds(); loadNotifications(); }
+            if (authToken) {
+                await loadFavoriteIds(); if (authToken) {
+                    await loadFavoriteIds();
+                    loadNotifications(); // seeds lastNotifIds silently (notifInitialized = false)
+                    startNotifPolling(); // then starts polling — next tick will show new ones
+                } }
         });
 
         // ── NAV ──────────────────────────────────────────────────────
@@ -2382,6 +2546,16 @@
             document.getElementById('libraryBooks').innerHTML = filtered.map(renderBook).join('');
         }
 
+        function searchMenu() {
+            const query = document.getElementById('menuSearch').value.toLowerCase();
+            const filtered = query
+                ? menuData.filter(i => (i.name || '').toLowerCase().includes(query) || (i.description || '').toLowerCase().includes(query))
+                : menuData;
+            renderMenuItems(filtered);
+            // Reset filter pills to "all"
+            document.querySelectorAll('.filter-pill').forEach((p, i) => p.classList.toggle('active', i === 0));
+        }
+
         // ── MENU ──────────────────────────────────────────────────────
         async function loadMenu() {
             const data = await apiCall('/Menu');
@@ -2413,7 +2587,7 @@
             const isFav = favMenuIds.has(itemId);
             const favBtn = '<button class="fav-btn ' + (isFav ? 'active' : '') + '" onclick="toggleFavorite(event,\'' + itemId + '\')">' + (isFav ? '❤️' : '🤍') + '</button>';
             const removeBtn = inFavPage ? '<button class="btn-secondary" style="padding:0.3rem 0.8rem;font-size:0.72rem;" onclick="toggleFavorite(event,\'' + itemId + '\',true)">' + t('remove') + '</button>' : '';
-            
+
             return '<div class="menu-card"><div class="menu-img ' + (!imageUrl ? 'no-img' : '') + '" ' + imgStyle + '>'
                 + (!imageUrl ? '' : '') + '<span class="menu-cat-tag">' + category + '</span></div>'
                 + '<div class="menu-info"><div class="menu-name">' + name + '</div>'
@@ -2496,7 +2670,7 @@
                 localStorage.setItem('authToken', authToken); localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 const role = currentUser.role;
                 if (role === 'cafe staff' || role === 'coffee_worker' || role === 'librarian' || role === 'library_worker' || role === 'admin') { window.location.href = 'staff.html'; return; }
-                updateUIForLoggedInUser(); closeModal('loginModal'); alert(t('alert_loginSuccess')); loadFavoriteIds();
+                updateUIForLoggedInUser(); closeModal('loginModal'); alert(t('alert_loginSuccess')); loadFavoriteIds(); startNotifPolling();
             }
         }
 
@@ -2526,6 +2700,9 @@
 
         function logout() {
             authToken = null; currentUser = null;
+            lastNotifIds = new Set();
+            notifInitialized = false;
+            stopNotifPolling();
             localStorage.removeItem('authToken'); localStorage.removeItem('currentUser');
             document.getElementById('userPill').style.display = 'none';
             document.getElementById('loginBtn').style.display = 'block';
@@ -2540,6 +2717,7 @@
             const name = currentUser.fullName || currentUser.name || currentUser.email;
             document.getElementById('userName').textContent = name;
             document.getElementById('userAvatar').textContent = name.substring(0, 2).toUpperCase();
+            loadAvatarInNav();
         }
         function getNotifMessage(n) {
             const messages = {
@@ -2582,12 +2760,29 @@
             return (messages[n.type] && messages[n.type][lang]) ? messages[n.type][lang] : n.message;
         }
         // ── NOTIFICATIONS ─────────────────────────────────────────────
+        let lastNotifIds = new Set();
+        let notifInitialized = false;
+
         async function loadNotifications() {
             if (!authToken) return;
             const data = await apiCall('/Notifications');
             if (!data || !data.notifications) return;
             const list = document.getElementById('notifList');
-            if (data.notifications.length === 0) { list.innerHTML = '<div class="notif-empty">' + t('notifEmpty') + '</div>'; return; }
+
+            data.notifications.forEach(n => {
+                if (!n.isRead && !lastNotifIds.has(n.id) && notifInitialized) {
+                    showToast(getNotifMessage(n), getNotifIcon(n.type));
+                }
+                lastNotifIds.add(n.id);
+            });
+
+            // After first run, mark as initialized so future polls can show toasts
+            notifInitialized = true;
+
+            if (data.notifications.length === 0) {
+                list.innerHTML = '<div class="notif-empty">' + t('notifEmpty') + '</div>';
+                return;
+            }
             list.innerHTML = data.notifications.map(n =>
                 '<div class="notif-item ' + (n.isRead ? '' : 'unread') + '">'
                 + '<div class="ni-icon ' + (n.type.includes('order') ? 'ni-order' : 'ni-res') + '">' + getNotifIcon(n.type) + '</div>'
@@ -2645,6 +2840,13 @@
             document.getElementById('profileEmail').value = data.email || '';
             document.getElementById('profilePhone').value = data.phone || '';
             userPhone = data.phone || null;
+            if (data.avatarUrl) {
+                showAvatarImage(data.avatarUrl);
+            } else {
+                const el = document.getElementById('profileAvatarImg');
+                const initials = (data.name || data.email).substring(0, 2).toUpperCase();
+                if (el) el.innerHTML = '<span>' + initials + '</span>';
+            }
         }
 
         async function saveProfile() {
@@ -2981,6 +3183,43 @@
             }).join('');
         }
 
+        function showAvatarImage(url) {
+            const el = document.getElementById('profileAvatarImg');
+            if (el) el.innerHTML = '<img src="' + url + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+        }
+
+        function showAvatarInNav(url) {
+            const el = document.getElementById('userAvatar');
+            if (el) el.innerHTML = '<img src="' + url + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+        }
+
+        async function uploadAvatar(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('file', file);
+            try {
+                const r = await fetch(API_BASE + '/Auth/upload-avatar', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + authToken },
+                    body: formData
+                });
+                if (!r.ok) { alert('Upload failed'); return; }
+                const result = await r.json();
+                showAvatarImage(result.imageUrl);
+                showAvatarInNav(result.imageUrl);
+            } catch (e) { alert('Upload failed: ' + e.message); }
+        }
+
+        async function loadAvatarInNav() {
+            const data = await apiCallSilent('/Auth/profile');
+            if (data?.avatarUrl) {
+                showAvatarInNav(data.avatarUrl);
+                showAvatarImage(data.avatarUrl);
+            }
+        }
+
+
         async function confirmReservation(id) {
             const result = await apiCall('/Reservations/' + id + '/confirm', { method: 'PUT' });
             if (result) { alert(t('alert_resConfirmedOk')); loadMyReservations(); }
@@ -2992,9 +3231,23 @@
             if (result) loadMyReservations();
         }
 
-        setInterval(async () => {
-            try { await fetch(API_BASE + '/Reservations/check-reminders', { method: 'POST' }); if (authToken) loadNotifications(); } catch { }
-        }, 60000);
+        let notifPollInterval = null;
+
+        function startNotifPolling() {
+            if (notifPollInterval) return; // already running
+            notifPollInterval = setInterval(async () => {
+                try {
+                    await fetch(API_BASE + '/Reservations/check-reminders', { method: 'POST' });
+                } catch { }
+                if (authToken) loadNotifications();
+            }, 10000);
+        }
+
+        function stopNotifPolling() {
+            clearInterval(notifPollInterval);
+            notifPollInterval = null;
+        }
+
     </script>
 </body>
 </html>

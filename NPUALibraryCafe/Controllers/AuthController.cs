@@ -98,7 +98,8 @@ public class AuthController : ControllerBase
                 Id = user.Userid,
                 Name = user.Fullname,
                 Email = user.Email,
-                Role = user.Role
+                Role = user.Role,
+                AvatarUrl = user.AvatarUrl
             }
         });
     }
@@ -164,6 +165,41 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Գաղտնաբառը հաջողությամբ փոխվեց" });
     }
 
+    [Authorize(Roles = "admin")]
+    [HttpGet("users")]
+    public async Task<IActionResult> GetAllUsers()
+    {
+        var users = await _userRepository.GetAllAsync();
+        return Ok(users.Select(u => new
+        {
+            id = u.Userid,
+            name = u.Fullname,
+            email = u.Email,
+            role = u.Role,
+            phone = u.Phone
+        }));
+    }
+
+    [Authorize(Roles = "admin")]
+    [HttpDelete("users/{id}")]
+    public async Task<IActionResult> DeleteUser(int id)
+    {
+        var user = await _userRepository.GetByIdAsync(id);
+        if (user == null) return NotFound(new { error = "Օգտատերը չի գտնվել" });
+        await _userRepository.DeleteAsync(id);
+        return Ok(new { message = "Ջնջված է" });
+    }
+
+    [Authorize(Roles = "admin")]
+    [HttpPut("users/{id}/role")]
+    public async Task<IActionResult> UpdateUserRole(int id, [FromBody] UpdateRoleDto dto)
+    {
+        var user = await _userRepository.GetByIdAsync(id);
+        if (user == null) return NotFound(new { error = "Օգտատերը չի գտնվել" });
+        await _userRepository.UpdateRoleAsync(id, dto.Role);
+        return Ok(new { message = "Դերը փոխված է" });
+    }
+
     [Authorize]
     [HttpGet("profile")]
     public async Task<IActionResult> GetProfile()
@@ -180,7 +216,8 @@ public class AuthController : ControllerBase
             Name = user.Fullname,
             Email = user.Email,
             Role = user.Role,
-            Phone = phone
+            Phone = phone,
+            AvatarUrl = user.AvatarUrl
         });
     }
 
@@ -310,5 +347,32 @@ public class AuthController : ControllerBase
         };
         message.To.Add(new MailAddress(toEmail, toName));
         await client.SendMailAsync(message);
+    }
+
+    [Authorize]
+    [HttpPost("upload-avatar")]
+    public async Task<IActionResult> UploadAvatar(IFormFile file)
+    {
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+        if (file == null || file.Length == 0)
+            return BadRequest(new { error = "No file provided" });
+
+        var allowed = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+        var ext = Path.GetExtension(file.FileName).ToLower();
+        if (!allowed.Contains(ext))
+            return BadRequest(new { error = "Only jpg, png, webp allowed" });
+
+        if (file.Length > 5 * 1024 * 1024)
+            return BadRequest(new { error = "File too large (max 5MB)" });
+
+        using var ms = new MemoryStream();
+        await file.CopyToAsync(ms);
+        var base64 = Convert.ToBase64String(ms.ToArray());
+        var mimeType = file.ContentType;
+        var dataUrl = $"data:{mimeType};base64,{base64}";
+
+        await _userRepository.UpdateAvatarAsync(userId, dataUrl);
+
+        return Ok(new { imageUrl = dataUrl });
     }
 }

@@ -11,4 +11,8 @@ public interface IUserRepository
     Task UpdatePhoneAsync(int userId, string phone);
     Task<string?> GetPhoneAsync(int userId);
     Task UpdatePasswordAsync(int userId, string passwordHash);
+    Task UpdateAvatarAsync(int userId, string avatarUrl);
+    Task<IEnumerable<User>> GetAllAsync();      
+    Task DeleteAsync(int id);                   
+    Task UpdateRoleAsync(int id, string role);  
 }
